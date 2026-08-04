@@ -119,13 +119,15 @@ PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
 | Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
 | Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
 | Coston2 deployment + full E2E, both outcomes | **Done** — see below |
-| Confidential scorer (FCE on Confidential Space) | Gate passed; next |
+| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `65940` live on Coston2 ([`fce/`](fce/)) |
+| FCE reproducible image + TEE machine registration | Needs Docker + a Confidential Space VM |
 
 ## Deployed (Coston2)
 
 | Contract | Address |
 | --- | --- |
 | `InvoiceRegistry` | [`0xC07009A556b88674BeA88BBd5794A7ef8402d00A`](https://coston2-explorer.flare.network/address/0xC07009A556b88674BeA88BBd5794A7ef8402d00A) |
+| `ScoreInstructionSender` (FCE `65940`) | [`0xfebD5Fa7e8f42d5fF05Aa2d6CEf00e98cafD8256`](https://coston2-explorer.flare.network/address/0xfebD5Fa7e8f42d5fF05Aa2d6CEf00e98cafD8256) |
 
 Both outcomes have been exercised end-to-end against the XRPL testnet:
 
@@ -139,6 +141,21 @@ Both outcomes have been exercised end-to-end against the XRPL testnet:
 
 The payer's on-chain record now reads **1 settled (5 XRP) / 1 delinquent (7 XRP)** — one
 XRPL account, both outcomes, all network-attested.
+
+## Part 2: Quittance Confidential
+
+That record is public, which is what makes it checkable — but a payment history is
+commercially sensitive, and a lender needs the judgement, not the ledger. So the second
+half of the project is a Flare Compute Extension that scores an account **inside a TEE**:
+an account hash goes in, the enclave reads the full history from `InvoiceRegistry` itself,
+and only `{score, band, basis}` comes out. Counts, amounts, dates and counterparties never
+cross the boundary, and the machine's attested identity is what makes that checkable
+rather than merely promised.
+
+Registration turned out to be **permissionless on Coston2** — the same network as the
+registry, not Songbird as expected — so extension `65940` is registered and owned by us,
+with no Foundation involvement. Details, scoring model, and the live verification against
+real Coston2 data are in [`fce/README.md`](fce/README.md).
 
 Unit tests mock `FdcVerification`, because a real Merkle proof against a relayed root cannot
 be produced in-process. Everything downstream of proof validity — every term check, the

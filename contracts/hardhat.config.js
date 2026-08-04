@@ -6,11 +6,18 @@ const accounts = PRIVATE_KEY ? [PRIVATE_KEY] : [];
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.25",
-    settings: {
-      optimizer: { enabled: true, runs: 200 },
-      viaIR: true,
-    },
+    compilers: [
+      // InvoiceRegistry and the Flare periphery interfaces.
+      {
+        version: "0.8.25",
+        settings: { optimizer: { enabled: true, runs: 200 }, viaIR: true },
+      },
+      // The FCC scaffold's contracts pin ^0.8.27.
+      {
+        version: "0.8.27",
+        settings: { optimizer: { enabled: true, runs: 200 }, viaIR: true },
+      },
+    ],
   },
   paths: {
     sources: "./src",

@@ -6,3 +6,6 @@ contracts/typechain-types/
 .env.*
 !.env.example
 *.log
+
+# Go
+fce/scorer/scorer
