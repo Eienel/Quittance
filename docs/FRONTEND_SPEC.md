@@ -409,7 +409,8 @@ XRPL payment visible (§6.2) + on-chain status = enough for a two-state pipeline
 | Attester CLI + watcher | Working; no HTTP API yet (§7) |
 | `ScoreInstructionSender` + FCE registration | Registered, extension `65940` |
 | Scoring model + in-enclave registry reader | Built and tested against live Coston2 data |
-| TEE image + machine registration | In progress — the score endpoint isn't live yet |
+| TEE image | Built, runs, verified reproducible (5.93 MB distroless) |
+| TEE machine registration | Needs a Confidential Space VM — the score endpoint isn't live yet |
 
 **Build the score screen against fixtures.** Everything else is live now.
 

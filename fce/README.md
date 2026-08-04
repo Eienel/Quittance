@@ -99,10 +99,34 @@ is what the TEE attests to, so a reader can check that the score came from *this
 ```bash
 cd fce/scorer
 SDE=$(git log -1 --format=%ct)
-DOCKER_BUILDKIT=1 docker build \
+DOCKER_BUILDKIT=1 docker build --provenance=false \
   --build-arg SOURCE_DATE_EPOCH=$SDE \
-  --output type=docker,name=quittance-scorer:0.1.0,rewrite-timestamp=true .
+  --output type=oci,dest=scorer-oci.tar,rewrite-timestamp=true .
 ```
+
+`--provenance=false` is **required**, not cosmetic. BuildKit otherwise attaches a
+provenance attestation containing the wall-clock build time, which changes the manifest
+list digest on every build even when the image itself is identical — exactly the digest a
+verifier would be comparing.
+
+### Verified reproducible
+
+Built twice from the same commit, the second time with `--no-cache`:
+
+| | Result |
+| --- | --- |
+| All 16 layer digests | identical |
+| Image config + RootFS hash | `8288dc928dab6e2d…` both times |
+| Image manifest | `sha256:07c6db11a292344ff4ba96e56ff7ee5b5faef90563cecb572d069a7cc002fb9b` |
+
+So the digest a TEE attests to is a function of the source, not of when or where it was
+built — which is what makes "this score came from this code" checkable by a third party.
+
+> One caveat on the numbers above: they were produced in a sandbox whose egress proxy
+> required an extra CA in the builder stage, added in a throwaway copy of the build context
+> rather than in the committed `Dockerfile`. The committed Dockerfile is the canonical one;
+> digests from a clean network will differ from those listed here and should be
+> re-established once, then pinned.
 
 `MODE` in the Dockerfile is `1` (simulated attestation) so a bare `docker run` works
 locally. **A real Confidential Space deploy must set `MODE=0`** — the Flare TEE data
