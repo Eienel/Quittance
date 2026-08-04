@@ -6,9 +6,13 @@ Everything the UI needs, and how to test each piece without waiting on the backe
 testnet, both of which are public. The UI reads them directly over HTTPS/RPC. The one thing
 the UI cannot do alone is *produce* an FDC proof — that's the attester's job (§7).
 
-There is a working reference implementation at `apps/web/index.html` (single file, vanilla
-JS + ethers). It is deliberately plain — it proves the wiring, not the design. Treat it as
-the source of truth for **contract calls and data shapes**, and replace everything visual.
+**There is now a scaffolded React/Vite/TypeScript app at `apps/web`** with the whole data
+layer built and tested against the live chain — read [`apps/web/README.md`](../apps/web/README.md)
+first, then come back here for product detail. Run it with `?fixtures=1` to see every state
+without a wallet or a network.
+
+The original single-file vanilla page is kept at `apps/reference/index.html` — superseded,
+but it proves the wiring in one file with no build step.
 
 ---
 

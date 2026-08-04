@@ -9,3 +9,5 @@ contracts/typechain-types/
 
 # Go
 fce/scorer/scorer
+apps/web/dist/
+apps/web/tsconfig.tsbuildinfo
