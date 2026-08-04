@@ -69,10 +69,16 @@ Verified against live data: the reader pulls the real Coston2 record for the pay
 end-to-end run (1 settled / 5 XRP, 1 delinquent / 7 XRP) and emits only
 `{score: 516, band: "poor", basis: 2}`. Run it with `LIVE=1 go test ./internal/registry/`.
 
-**Remaining:** building the reproducible Docker image and registering the TEE machine
-requires a Docker daemon and a Confidential Space VM, neither available in the build
-sandbox where this was developed. The extension is registered and its machine-owner
-allowlist is set, so machine registration is the only step left.
+The image builds and runs: the Flare tee-node boots, the scorer binds, and `GET /state`
+answers with aggregate counters only.
+
+```
+{"stateVersion":"0x302e312e30…","state":{"scoresComputed":0,"modelVersion":"quittance-score-1"}}
+```
+
+**Remaining:** registering the TEE machine, which needs a Google Cloud Confidential Space
+VM (`MODE=0`, real vTPM attestation). The extension is registered and its machine-owner
+allowlist is set, so that is the only step left before scores can be requested on-chain.
 
 ## Running
 
