@@ -82,3 +82,22 @@ go test ./...                              # scoring model + wire types
 LIVE=1 go test ./internal/registry/ -v     # reads the live Coston2 registry
 go run ./cmd                               # extension server on :8080
 ```
+
+## Building the image
+
+The image is built for reproducibility: a digest-pinned base, `SOURCE_DATE_EPOCH`-clamped
+timestamps, apt pinned to a Debian snapshot, and a static `CGO_ENABLED=0` binary on
+distroless. Two builds of the same commit must produce the same image digest — that digest
+is what the TEE attests to, so a reader can check that the score came from *this* code.
+
+```bash
+cd fce/scorer
+SDE=$(git log -1 --format=%ct)
+DOCKER_BUILDKIT=1 docker build \
+  --build-arg SOURCE_DATE_EPOCH=$SDE \
+  --output type=docker,name=quittance-scorer:0.1.0,rewrite-timestamp=true .
+```
+
+`MODE` in the Dockerfile is `1` (simulated attestation) so a bare `docker run` works
+locally. **A real Confidential Space deploy must set `MODE=0`** — the Flare TEE data
+committee rejects simulated attestation.

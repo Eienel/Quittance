@@ -1,0 +1,865 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_fdcVerificationOverride",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidProof",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "what",
+        "type": "string"
+      }
+    ],
+    "name": "InvalidTerms",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum InvoiceRegistry.Status",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "InvoiceNotOpen",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NoSuchInvoice",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "xrplTimestamp",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "deadlineTimestamp",
+        "type": "uint64"
+      }
+    ],
+    "name": "PaidAfterDeadline",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "PaymentFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "field",
+        "type": "string"
+      }
+    ],
+    "name": "ProofMismatch",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TagSpaceExhausted",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "destinationTag",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "payeeAddressHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "payerAddressHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountDrops",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "minimalBlockNumber",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "deadlineBlockNumber",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "deadlineTimestamp",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "InvoiceCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "destinationTag",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "payerAddressHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountDrops",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "firstOverflowBlockNumber",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "firstOverflowBlockTimestamp",
+        "type": "uint64"
+      }
+    ],
+    "name": "InvoiceMarkedDelinquent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "destinationTag",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "payerAddressHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "receivedDrops",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "xrplBlockNumber",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "xrplTimestamp",
+        "type": "uint64"
+      }
+    ],
+    "name": "InvoiceSettled",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "payeeAddressHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "payerAddressHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountDrops",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "minimalBlockNumber",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "deadlineBlockNumber",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "deadlineTimestamp",
+        "type": "uint64"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "createInvoice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "destinationTag",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fdcVerificationOverride",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getInvoice",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "issuer",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "destinationTag",
+            "type": "uint32"
+          },
+          {
+            "internalType": "enum InvoiceRegistry.Status",
+            "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "payeeAddressHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountDrops",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "minimalBlockNumber",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "deadlineBlockNumber",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "deadlineTimestamp",
+            "type": "uint64"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "payerAddressHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "settledByAddressHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint64",
+            "name": "outcomeTimestamp",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct InvoiceRegistry.Invoice",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "destinationTag",
+        "type": "uint32"
+      }
+    ],
+    "name": "getInvoiceByTag",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "issuer",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "destinationTag",
+            "type": "uint32"
+          },
+          {
+            "internalType": "enum InvoiceRegistry.Status",
+            "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "payeeAddressHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountDrops",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "minimalBlockNumber",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "deadlineBlockNumber",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "deadlineTimestamp",
+            "type": "uint64"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "payerAddressHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "settledByAddressHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint64",
+            "name": "outcomeTimestamp",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct InvoiceRegistry.Invoice",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "invoiceCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "invoiceIdByTag",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "xrplTimeNow",
+        "type": "uint64"
+      }
+    ],
+    "name": "isPastDeadline",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32[]",
+            "name": "merkleProof",
+            "type": "bytes32[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "attestationType",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "sourceId",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint64",
+                "name": "votingRound",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "lowestUsedTimestamp",
+                "type": "uint64"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "minimalBlockNumber",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "deadlineBlockNumber",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "deadlineTimestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "destinationAddressHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "checkFirstMemoData",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "firstMemoDataHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "checkDestinationTag",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "destinationTag",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "proofOwner",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct IXRPPaymentNonexistence.RequestBody",
+                "name": "requestBody",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "minimalBlockTimestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "firstOverflowBlockNumber",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "firstOverflowBlockTimestamp",
+                    "type": "uint64"
+                  }
+                ],
+                "internalType": "struct IXRPPaymentNonexistence.ResponseBody",
+                "name": "responseBody",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct IXRPPaymentNonexistence.Response",
+            "name": "data",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct IXRPPaymentNonexistence.Proof",
+        "name": "proof",
+        "type": "tuple"
+      }
+    ],
+    "name": "markDelinquent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "payerAddressHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "record",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "settledCount",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "delinquentCount",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint256",
+            "name": "settledDrops",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "delinquentDrops",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "lastOutcomeTimestamp",
+            "type": "uint64"
+          }
+        ],
+        "internalType": "struct InvoiceRegistry.PayerRecord",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "invoiceId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32[]",
+            "name": "merkleProof",
+            "type": "bytes32[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "attestationType",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "sourceId",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint64",
+                "name": "votingRound",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "lowestUsedTimestamp",
+                "type": "uint64"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "transactionId",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "proofOwner",
+                    "type": "address"
+                  }
+                ],
+                "internalType": "struct IXRPPayment.RequestBody",
+                "name": "requestBody",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "blockNumber",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "blockTimestamp",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "sourceAddress",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "sourceAddressHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "receivingAddressHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "intendedReceivingAddressHash",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "int256",
+                    "name": "spentAmount",
+                    "type": "int256"
+                  },
+                  {
+                    "internalType": "int256",
+                    "name": "intendedSpentAmount",
+                    "type": "int256"
+                  },
+                  {
+                    "internalType": "int256",
+                    "name": "receivedAmount",
+                    "type": "int256"
+                  },
+                  {
+                    "internalType": "int256",
+                    "name": "intendedReceivedAmount",
+                    "type": "int256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "hasMemoData",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "firstMemoData",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "hasDestinationTag",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "destinationTag",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint8",
+                    "name": "status",
+                    "type": "uint8"
+                  }
+                ],
+                "internalType": "struct IXRPPayment.ResponseBody",
+                "name": "responseBody",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct IXRPPayment.Response",
+            "name": "data",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct IXRPPayment.Proof",
+        "name": "proof",
+        "type": "tuple"
+      }
+    ],
+    "name": "settle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
