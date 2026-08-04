@@ -118,8 +118,27 @@ PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
 | FDC request/proof lifecycle (verifier → FdcHub → round wait → DA layer) | Implemented (`services/attester/src/fdc.js`); prepareRequest verified live for both attestation types on testXRP |
 | Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
 | Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
-| Coston2 deployment + full E2E | Blocked on faucet C2FLR (captcha-gated) |
-| Confidential scorer (FCE on Confidential Space) | Gated on the above being end-to-end |
+| Coston2 deployment + full E2E, both outcomes | **Done** — see below |
+| Confidential scorer (FCE on Confidential Space) | Gate passed; next |
+
+## Deployed (Coston2)
+
+| Contract | Address |
+| --- | --- |
+| `InvoiceRegistry` | [`0xC07009A556b88674BeA88BBd5794A7ef8402d00A`](https://coston2-explorer.flare.network/address/0xC07009A556b88674BeA88BBd5794A7ef8402d00A) |
+
+Both outcomes have been exercised end-to-end against the XRPL testnet:
+
+- **Quittance** — invoice 1 (5 XRP, tag 1) was paid on the XRPL
+  (tx `9E6C3DDEF5E35CE1C8E91A2705B20B9DEC6875C88B77403C1587DC56BB4DDC96`) and settled with a
+  live FDC `XRPPayment` proof in Coston2 tx
+  [`0x5b7d97b740cd8d98ffed222e4e4987040a931164b2b66c9211f80ee5fb9affff`](https://coston2-explorer.flare.network/tx/0x5b7d97b740cd8d98ffed222e4e4987040a931164b2b66c9211f80ee5fb9affff).
+- **Mark** — invoice 2 (7 XRP, tag 2) was left unpaid past its deadline and marked delinquent
+  with a live FDC `XRPPaymentNonexistence` proof in Coston2 tx
+  [`0x1798e8ee21a08b1c13c27ec4cf19d4cf5d4e44ea0d35a288676d4ff7813737b5`](https://coston2-explorer.flare.network/tx/0x1798e8ee21a08b1c13c27ec4cf19d4cf5d4e44ea0d35a288676d4ff7813737b5).
+
+The payer's on-chain record now reads **1 settled (5 XRP) / 1 delinquent (7 XRP)** — one
+XRPL account, both outcomes, all network-attested.
 
 Unit tests mock `FdcVerification`, because a real Merkle proof against a relayed root cannot
 be produced in-process. Everything downstream of proof validity — every term check, the
