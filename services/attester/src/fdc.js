@@ -183,7 +183,9 @@ async function fetchProof(roundId, abiEncodedRequest, responseAbi) {
     [responseAbi],
     body.response_hex
   );
-  return { merkleProof: body.proof, data };
+  // ethers Results are frozen; contract calls need mutable plain arrays.
+  const plain = (v) => (v instanceof ethers.Result ? v.toArray().map(plain) : v);
+  return { merkleProof: body.proof, data: plain(data) };
 }
 
 /** Full pipeline: prepare → submit → wait → proof. */
