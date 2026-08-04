@@ -59,6 +59,23 @@ contracts/
   src/test/MockFdcVerification.sol # accept/reject stand-in for FdcVerification in unit tests
   test/InvoiceRegistry.test.js     # 34 tests, incl. the cherry-picked-window attack matrix
   script/deploy.js
+services/attester/
+  src/fdc.js                       # FDC lifecycle: verifier → FdcHub (fee) → round wait → DA proof
+  src/xrpl.js                      # faucet funding, tagged payments, ledger clock
+  src/registry.js                  # settle / markDelinquent pipelines against the registry
+  bin/quittance.js                 # CLI: fund | create | pay | settle | mark | status | record | watch
+apps/web/
+  index.html                       # static UI: issue invoices, pay instructions, outcomes, records
+```
+
+### Attester quickstart
+
+```bash
+cd services/attester && npm install && cp .env.example .env  # fill PRIVATE_KEY + INVOICE_REGISTRY
+node bin/quittance.js fund                                   # fresh funded XRPL testnet account
+node bin/quittance.js create --payee rPAYEE --payer rPAYER --xrp 10 --minutes 10
+node bin/quittance.js pay --seed sSEED --to rPAYEE --tag 1 --xrp 10
+node bin/quittance.js watch --payee rPAYEE                   # drives every open invoice to its outcome
 ```
 
 ## Data model
@@ -98,9 +115,10 @@ PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
 | Component | State |
 | --- | --- |
 | `InvoiceRegistry` — issuance, both proof paths, one-outcome guard, payer records | Implemented, 34 passing tests |
-| FDC request/proof lifecycle scripts (verifier → FdcHub → DA layer) | Next |
-| Attester service — deadline watcher driving the nonexistence path | Next |
-| Web UI — invoice creation, pay instructions, status, registry | Next |
+| FDC request/proof lifecycle (verifier → FdcHub → round wait → DA layer) | Implemented (`services/attester/src/fdc.js`); prepareRequest verified live for both attestation types on testXRP |
+| Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
+| Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
+| Coston2 deployment + full E2E | Blocked on faucet C2FLR (captcha-gated) |
 | Confidential scorer (FCE on Confidential Space) | Gated on the above being end-to-end |
 
 Unit tests mock `FdcVerification`, because a real Merkle proof against a relayed root cannot
