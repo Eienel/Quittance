@@ -5,6 +5,7 @@ import { createInvoice, errorMessage } from "@/lib/registry";
 import { deadlineFromMinutes } from "@/lib/xrpl";
 import { remember } from "@/lib/addressBook";
 import { looksLikeXrplAddress, xrpToDrops, ZERO_HASH } from "@/lib/format";
+import { encodeMeta } from "@/lib/metadata";
 
 type Wallet = ReturnType<typeof useWallet>;
 
@@ -17,6 +18,7 @@ export default function Create() {
   const [bearer, setBearer] = useState(false);
   const [xrp, setXrp] = useState("10");
   const [minutes, setMinutes] = useState("10");
+  const [memo, setMemo] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +36,9 @@ export default function Create() {
         payerAddressHash: bearer ? ZERO_HASH : remember(payer),
         amountDrops: xrpToDrops(xrp),
         ...deadline,
+        // Publish the payee address so a shared invoice link is payable by
+        // someone who has never seen it. The chain stores only its hash.
+        metadataURI: encodeMeta({ payee, memo: memo || undefined }),
       });
       navigate(`/invoice/${invoiceId}`);
     } catch (err) {
@@ -81,6 +86,9 @@ export default function Create() {
           <input type="number" min="1" value={minutes} onChange={(e) => setMinutes(e.target.value)} />
         </div>
       </div>
+
+      <label>Description (optional, stored on-chain)</label>
+      <input value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="Invoice for…" />
 
       <p style={{ marginTop: ".9rem" }}>
         <button onClick={submit} disabled={!valid || busy || !wallet.address}>

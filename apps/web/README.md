@@ -102,8 +102,27 @@ by forty; hiding that would be the dishonest version of that screen.
 | --- | --- |
 | Invoice reads/writes, records | **Live** on Coston2 |
 | XRPL payment detection | **Live**, done client-side |
+| Driving an invoice to its outcome | **Live, entirely client-side** — see below |
 | Confidential score | Request path is real, but **no TEE machine is registered yet** — no score comes back. Build on `fixtures.scores` |
-| Live proof-pipeline stages | Inferred client-side. A backend progress API could make the middle stages exact — ask if you want it |
+
+## There is no backend
+
+Both Flare services the app needs — the FDC verifier and the DA layer — send
+`Access-Control-Allow-Origin: *`, so `src/lib/fdc.ts` runs the entire attestation
+lifecycle in the browser:
+
+```
+prepareRequest → FdcHub.requestAttestation (pays fee) → wait for voting round
+→ fetch Merkle proof from DA layer → InvoiceRegistry.settle() / .markDelinquent()
+```
+
+That means **nobody has to be running a server for an invoice to settle**. Whoever has the
+page open can push it through for a trivial amount of gas — `OutcomeAction` is the button.
+The whole product deploys as a static site.
+
+One constraint encoded there: the DA layer's CORS allowlist does not include `x-api-key`, so
+that header must not be sent from a browser. It isn't needed. `src/lib/fdc.live.test.ts`
+asserts this keeps working.
 
 ## Contributing
 

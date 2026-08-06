@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { useInvoice } from "@/hooks/useInvoices";
 import { usePipeline } from "@/hooks/usePipeline";
 import { resolve } from "@/lib/addressBook";
@@ -6,14 +6,24 @@ import { displayStatus, formatXrp, formatTimestamp, isBearer, truncate } from "@
 import StatusBadge from "@/components/StatusBadge";
 import PayInstructions from "@/components/PayInstructions";
 import Pipeline from "@/components/Pipeline";
+import OutcomeAction from "@/components/OutcomeAction";
+import { verifyPayee, decodeMeta } from "@/lib/metadata";
+import type { useWallet } from "@/hooks/useWallet";
+
+type Wallet = ReturnType<typeof useWallet>;
 
 export default function InvoiceDetail() {
   const { id } = useParams();
-  const { data: invoice, loading, error } = useInvoice(id ? BigInt(id) : null);
+  const wallet = useOutletContext<Wallet>();
+  const { data: invoice, loading, error, refresh } = useInvoice(id ? BigInt(id) : null);
 
-  // The chain stores only a hash, so a friendly address is available exactly
-  // when we have seen it before. Without it we cannot watch the XRPL.
-  const payeeAddress = invoice ? resolve(invoice.payeeAddressHash) : null;
+  // The issuer publishes the payee address in the invoice metadata, so a shared
+  // link is payable by someone who has never seen it. verifyPayee re-hashes the
+  // claim and only accepts it if it matches what the contract enforces; the
+  // local address book is the fallback for invoices issued before that.
+  const payeeAddress = invoice
+    ? verifyPayee(invoice, resolve(invoice.payeeAddressHash))
+    : null;
   const pipeline = usePipeline(invoice, payeeAddress);
 
   if (loading) return <section><p className="dim">Loading…</p></section>;
@@ -30,16 +40,22 @@ export default function InvoiceDetail() {
 
       <Pipeline pipeline={pipeline} />
 
-      {status === "open" && payeeAddress && (
+      {(status === "open" || status === "lapsed") && payeeAddress && (
         <PayInstructions invoice={invoice} payeeAddress={payeeAddress} />
       )}
       {status === "open" && !payeeAddress && (
         <p className="dim">
-          Payee address unknown to this browser (the chain stores only a hash), so
-          pay instructions cannot be shown. Open the invoice from the device that
-          created it, or look it up by address.
+          This invoice did not publish its payee address, and this browser has not
+          seen it, so pay instructions cannot be shown. The chain stores only a hash.
         </p>
       )}
+
+      <OutcomeAction
+        invoice={invoice}
+        pipeline={pipeline}
+        signer={wallet.signer}
+        onDone={refresh}
+      />
 
       <table>
         <tbody>
@@ -60,6 +76,9 @@ export default function InvoiceDetail() {
               {invoice.minimalBlockNumber.toString()} – {invoice.deadlineBlockNumber.toString()}
             </td>
           </tr>
+          {decodeMeta(invoice.metadataURI).memo && (
+            <tr><th>Description</th><td>{decodeMeta(invoice.metadataURI).memo}</td></tr>
+          )}
           {invoice.outcomeTimestamp > 0n && (
             <tr><th>Outcome at</th><td>{formatTimestamp(invoice.outcomeTimestamp)}</td></tr>
           )}
