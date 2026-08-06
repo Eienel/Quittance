@@ -46,7 +46,9 @@ src/lib/
   types.ts         Invoice, PayerRecord, Score, Pipeline
   format.ts        drops↔XRP, address hashing, countdowns, status mapping
   registry.ts      all contract reads/writes + custom-error decoding
+  fdc.ts           the whole attestation lifecycle, client-side (see below)
   xrpl.ts          ledger clock, deadline math, payment detection
+  metadata.ts      payee address published on-chain, re-hashed before it is trusted
   addressBook.ts   localStorage hash→address (see "one-way hashes" below)
   fixtures.ts      every state, plus the real live values
 src/hooks/
@@ -65,7 +67,7 @@ laid out as plainly as possible so the structure is obvious and the styling isn'
 way. Components worth the most attention, in order:
 
 1. **`PayInstructions`** — the screen a judge actually uses.
-2. **`Pipeline`** — the two-minute wait (see below).
+2. **`Pipeline`** and **`OutcomeAction`** — the two-minute wait (see below).
 3. **`ScorePanel`** — the privacy story.
 
 The only thing to preserve from `styles.css` is that the four status classes stay visually
@@ -87,10 +89,10 @@ reads as rigor; a spinner for two minutes reads as broken.
 
 **3. Address hashes are one-way.**
 The chain stores `keccak256(xrplAddress)`, never the address. You cannot render an `r...`
-address from a cold fetch. `addressBook.ts` remembers every address the user types; show the
-friendly name when we have it and a truncated hash when we don't. Don't fake it — and note
-`InvoiceDetail` can't show pay instructions at all for an invoice this browser has never
-seen, which is a real product gap worth designing around.
+address from a cold fetch. Two things cover this: the issuer publishes the payee address in
+the invoice's on-chain metadata (`metadata.ts`, re-hashed and checked before it is trusted),
+and `addressBook.ts` remembers every address the user types. Show the friendly name when we
+have it and a truncated hash when we don't — don't fake it.
 
 **4. `score: 0` means "no record", not a score of zero.**
 And always show `basis`. A 700 backed by two invoices is a different claim from a 700 backed
