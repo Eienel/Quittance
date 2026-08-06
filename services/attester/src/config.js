@@ -18,7 +18,12 @@ const cfg = {
 
   // XRPL side
   xrplEndpoint: process.env.XRPL_ENDPOINT || "https://testnet.xrpl-labs.com",
-  xrplWss: process.env.XRPL_WSS || "wss://testnet.xrpl-labs.com",
+  // Tried in order. Public testnet nodes fall out of sync often enough that a
+  // single endpoint is a real availability risk for a demo.
+  xrplWssList: (process.env.XRPL_WSS || "wss://testnet.xrpl-labs.com,wss://s.altnet.rippletest.net:51233")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
   xrplFaucet:
     process.env.XRPL_FAUCET || "https://faucet.altnet.rippletest.net/accounts",
   xrplSeed: process.env.XRPL_SEED,

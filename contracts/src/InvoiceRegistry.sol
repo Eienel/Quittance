@@ -44,6 +44,9 @@ contract InvoiceRegistry {
         uint64 deadlineTimestamp; // last close time that still counts as on time
         // --- the debtor this invoice is written against ---
         bytes32 payerAddressHash; // zero = bearer invoice, anyone may settle it
+        /// @dev Whether the named debtor has admitted this debt. Anyone may *name* a payer,
+        ///      so nothing accrues to that account's record until they say the debt is real.
+        bool acknowledged;
         // --- outcome ---
         bytes32 settledByAddressHash; // who actually paid (Settled only)
         uint64 outcomeTimestamp; // XRPL close time of the payment, or of the overflow block
@@ -51,6 +54,7 @@ contract InvoiceRegistry {
     }
 
     /// @notice The permanent record accumulated against one XRPL account.
+    /// @dev Only acknowledged invoices are counted here — see `markDelinquent`.
     struct PayerRecord {
         uint64 settledCount;
         uint64 delinquentCount;
@@ -109,7 +113,18 @@ contract InvoiceRegistry {
         bytes32 indexed payerAddressHash,
         uint256 amountDrops,
         uint64 firstOverflowBlockNumber,
-        uint64 firstOverflowBlockTimestamp
+        uint64 firstOverflowBlockTimestamp,
+        /// @dev False when the debt was never acknowledged, in which case the mark stands
+        ///      against the invoice but not against the payer's record.
+        bool countedAgainstPayer
+    );
+
+    event InvoiceAcknowledged(
+        uint256 indexed invoiceId,
+        uint32 indexed destinationTag,
+        bytes32 indexed payerAddressHash,
+        uint256 acknowledgedDrops,
+        uint64 xrplBlockNumber
     );
 
     // -------------------------------------------------------------------------
@@ -124,6 +139,8 @@ contract InvoiceRegistry {
     error PaymentFailed(uint8 status);
     error PaidAfterDeadline(uint64 xrplTimestamp, uint64 deadlineTimestamp);
     error TagSpaceExhausted();
+    error NotAcknowledgeable(string why);
+    error AlreadyAcknowledged(uint256 invoiceId);
 
     constructor(address _fdcVerificationOverride) {
         fdcVerificationOverride = _fdcVerificationOverride;
@@ -180,6 +197,7 @@ contract InvoiceRegistry {
             deadlineBlockNumber: deadlineBlockNumber,
             deadlineTimestamp: deadlineTimestamp,
             payerAddressHash: payerAddressHash,
+            acknowledged: false,
             settledByAddressHash: bytes32(0),
             outcomeTimestamp: 0,
             metadataURI: metadataURI
@@ -196,6 +214,62 @@ contract InvoiceRegistry {
             deadlineBlockNumber,
             deadlineTimestamp,
             metadataURI
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // Consent
+    // -------------------------------------------------------------------------
+
+    /**
+     * @notice Record that the named debtor admits this debt is real.
+     *
+     * @dev Issuance is unilateral: anyone may write an invoice naming anyone as the payer.
+     *      A nonexistence proof over such an invoice is perfectly true and completely
+     *      meaningless — it proves nobody paid a debt that was never owed. Left unguarded,
+     *      that would let anyone manufacture delinquencies against any XRPL account, and a
+     *      lender reading a record could not tell a real obligation from a fabricated one.
+     *
+     *      So the payer's own signature over the debt is what admits it into their record,
+     *      and the XRPL itself carries that signature: any payment from the payer's account
+     *      to the payee bearing this invoice's unique destination tag is an act only the
+     *      key-holder could perform, against terms only this invoice defines. One drop is
+     *      enough. Paying in full acknowledges implicitly, so an honest payer never does
+     *      this separately.
+     *
+     *      Anyone may submit the proof — the attestation, not the sender, is the authority.
+     */
+    function acknowledge(uint256 invoiceId, IXRPPayment.Proof calldata proof) external {
+        Invoice storage inv = _open(invoiceId);
+
+        if (inv.payerAddressHash == bytes32(0)) revert NotAcknowledgeable("bearer invoice");
+        if (inv.acknowledged) revert AlreadyAcknowledged(invoiceId);
+
+        if (!_xrpPaymentVerification().verifyXRPPayment(proof)) revert InvalidProof();
+
+        IXRPPayment.ResponseBody calldata rb = proof.data.responseBody;
+
+        // A failed send still proves the payer signed it, but only a success proves they
+        // meant it enough to part with the drops.
+        if (rb.status != 0) revert PaymentFailed(rb.status);
+        if (rb.sourceAddressHash != inv.payerAddressHash) revert ProofMismatch("payer");
+        if (rb.receivingAddressHash != inv.payeeAddressHash) revert ProofMismatch("payee");
+        if (!rb.hasDestinationTag || rb.destinationTag != inv.destinationTag) {
+            revert ProofMismatch("destinationTag");
+        }
+        if (rb.receivedAmount <= 0) revert ProofMismatch("amount");
+        // Confine it to this invoice's own window, so a payment predating the invoice
+        // cannot be replayed as consent to it.
+        if (rb.blockNumber < inv.minimalBlockNumber) revert ProofMismatch("minimalBlockNumber");
+
+        inv.acknowledged = true;
+
+        emit InvoiceAcknowledged(
+            invoiceId,
+            inv.destinationTag,
+            inv.payerAddressHash,
+            uint256(rb.receivedAmount),
+            rb.blockNumber
         );
     }
 
@@ -240,6 +314,8 @@ contract InvoiceRegistry {
         inv.status = Status.Settled;
         inv.settledByAddressHash = payer;
         inv.outcomeTimestamp = rb.blockTimestamp;
+        // Paying a debt admits it. Nobody needs to acknowledge separately to be credited.
+        inv.acknowledged = true;
 
         PayerRecord storage rec = _records[payer];
         rec.settledCount += 1;
@@ -300,9 +376,15 @@ contract InvoiceRegistry {
         inv.status = Status.Delinquent;
         inv.outcomeTimestamp = rb.firstOverflowBlockTimestamp;
 
-        // A bearer invoice has no debtor to attribute the mark to; the invoice itself still
-        // carries the outcome, but nobody's record moves.
-        if (payer != bytes32(0)) {
+        // Two reasons a mark may not reach anyone's record:
+        //   - a bearer invoice names no debtor at all;
+        //   - the named debtor never admitted the debt, so the proof shows only that an
+        //     unagreed demand went unpaid, which says nothing about their creditworthiness.
+        // The invoice still carries the outcome either way; the record is the thing that
+        // has to stay trustworthy, because third parties lend against it.
+        bool counted = payer != bytes32(0) && inv.acknowledged;
+
+        if (counted) {
             PayerRecord storage rec = _records[payer];
             rec.delinquentCount += 1;
             rec.delinquentDrops += inv.amountDrops;
@@ -317,7 +399,8 @@ contract InvoiceRegistry {
             payer,
             inv.amountDrops,
             rb.firstOverflowBlockNumber,
-            rb.firstOverflowBlockTimestamp
+            rb.firstOverflowBlockTimestamp,
+            counted
         );
     }
 

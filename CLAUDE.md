@@ -36,14 +36,15 @@ for two bounties: Interoperable Asset Products, and Confidential Compute Apps.
 | Thing | Where |
 | --- | --- |
 | Deployed app | https://quittance-azure.vercel.app |
-| `InvoiceRegistry` (Coston2) | `0xC07009A556b88674BeA88BBd5794A7ef8402d00A` |
-| `ScoreInstructionSender` (Coston2) | `0xfebD5Fa7e8f42d5fF05Aa2d6CEf00e98cafD8256` |
-| Flare Compute Extension ID | `65940` |
+| `InvoiceRegistry` (Coston2) | `0x14E50b59fA00c252155E5c532580d9581933D7b9` |
+| `ScoreInstructionSender` (Coston2) | `0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44` |
+| Flare Compute Extension ID | `65975` |
 | Chain | Flare Coston2 testnet, chainId **114** |
 | Explorer | https://coston2-explorer.flare.network |
 
-The registry already holds two real invoices from an end-to-end run — invoice 1 settled
-(5 XRP), invoice 2 delinquent (7 XRP) — so there is meaningful data to render immediately.
+**The registry is freshly deployed and not yet seeded**, so live mode currently shows an
+empty list. Use `?fixtures=1` (below) for everything until someone runs
+`services/attester/bin/seed-demo.js`, which needs a working XRPL testnet node.
 
 ---
 
@@ -149,7 +150,13 @@ issuer publishes the payee address in the invoice's on-chain metadata (`metadata
 re-hashes and verifies it before trusting it), and `addressBook.ts` remembers addresses the
 user types. Show the friendly address when known, a truncated hash otherwise — never fake it.
 
-**5. `score: 0` means "no record", not a score of zero.**
+**5. An unacknowledged mark is a claim, not a judgement.**
+Anyone can write an invoice naming anyone as payer. The contract lets such an invoice be
+marked delinquent — the proof is true — but it deliberately does not touch that account's
+payment record. `invoice.acknowledged` tells you which kind you are looking at, and the UI
+must not present the two identically. Fixtures: `unacknowledged`, `unacknowledgedMark`.
+
+**6. `score: 0` means "no record", not a score of zero.**
 And always display `basis` (how many attested outcomes back the score). A 700 from two
 invoices is a different claim from a 700 from forty. Hiding that would be the dishonest
 version of that screen, and a judge will poke at exactly it.

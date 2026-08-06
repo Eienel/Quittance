@@ -88,12 +88,31 @@ against:
 | `destinationTag` | Unique `uint32` issued by the registry; the XRPL-side primary key. |
 | `payeeAddressHash` | Standard address hash of the XRPL account to be paid. |
 | `payerAddressHash` | The debtor the outcome is attributed to. Zero makes it a bearer invoice: anyone may settle it, and a lapse marks nobody. |
+| `acknowledged` | Whether that debtor has admitted the debt. Nothing reaches their record until they do — see below. |
 | `amountDrops` | Amount owed in drops (1 XRP = 1,000,000 drops). Overpayment settles; underpayment does not. |
 | `minimalBlockNumber` / `deadlineBlockNumber` / `deadlineTimestamp` | The ledger range within which payment counts — and the exact range a nonexistence proof must be requested over. |
 
 Outcomes accumulate into a `PayerRecord` per XRPL account (settled/delinquent counts and
 drop totals, plus the last outcome time). That record is the input the confidential scorer
 is designed to read.
+
+### Consent: why a truthful proof is not enough
+
+Issuance is unilateral — anyone may write an invoice naming anyone as the payer. A
+nonexistence proof over such an invoice is perfectly true and completely meaningless: it
+proves nobody paid a debt that was never owed. Left unguarded, that turns the registry into
+a way to manufacture delinquencies against any XRPL account, and a lender reading a record
+could not tell a real obligation from a fabricated one.
+
+So the payer's own signature over the debt is what admits it into their record, and the
+XRPL itself carries that signature: **any payment from the payer's account to the payee
+bearing the invoice's unique destination tag** is an act only the key-holder could perform,
+against terms only that invoice defines. One drop is enough. Paying in full acknowledges
+implicitly, so an honest payer never does this separately.
+
+An unacknowledged invoice can still be marked — the mark is true — but it touches no
+payment record. The invoice carries the outcome; the record stays trustworthy, because
+third parties lend against it.
 
 ## Running it
 
@@ -119,28 +138,33 @@ PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
 | Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
 | Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
 | Coston2 deployment + full E2E, both outcomes | **Done** — see below |
-| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `65940` live on Coston2 ([`fce/`](fce/)) |
+| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `65975` live on Coston2 ([`fce/`](fce/)) |
 | FCE reproducible image + TEE machine registration | Needs Docker + a Confidential Space VM |
 
 ## Deployed (Coston2)
 
 | Contract | Address |
 | --- | --- |
-| `InvoiceRegistry` | [`0xC07009A556b88674BeA88BBd5794A7ef8402d00A`](https://coston2-explorer.flare.network/address/0xC07009A556b88674BeA88BBd5794A7ef8402d00A) |
-| `ScoreInstructionSender` (FCE `65940`) | [`0xfebD5Fa7e8f42d5fF05Aa2d6CEf00e98cafD8256`](https://coston2-explorer.flare.network/address/0xfebD5Fa7e8f42d5fF05Aa2d6CEf00e98cafD8256) |
+| `InvoiceRegistry` | [`0x14E50b59fA00c252155E5c532580d9581933D7b9`](https://coston2-explorer.flare.network/address/0x14E50b59fA00c252155E5c532580d9581933D7b9) |
+| `ScoreInstructionSender` (FCE `65975`) | [`0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44`](https://coston2-explorer.flare.network/address/0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44) |
 
-Both outcomes have been exercised end-to-end against the XRPL testnet:
+Both outcomes were exercised end-to-end against the XRPL testnet on the predecessor
+deployment (`0xC07009…2d00A`, before acknowledgement was added):
 
-- **Quittance** — invoice 1 (5 XRP, tag 1) was paid on the XRPL
+- **Quittance** — an invoice paid on the XRPL
   (tx `9E6C3DDEF5E35CE1C8E91A2705B20B9DEC6875C88B77403C1587DC56BB4DDC96`) and settled with a
   live FDC `XRPPayment` proof in Coston2 tx
   [`0x5b7d97b740cd8d98ffed222e4e4987040a931164b2b66c9211f80ee5fb9affff`](https://coston2-explorer.flare.network/tx/0x5b7d97b740cd8d98ffed222e4e4987040a931164b2b66c9211f80ee5fb9affff).
-- **Mark** — invoice 2 (7 XRP, tag 2) was left unpaid past its deadline and marked delinquent
-  with a live FDC `XRPPaymentNonexistence` proof in Coston2 tx
+- **Mark** — an invoice left unpaid past its deadline and marked delinquent with a live FDC
+  `XRPPaymentNonexistence` proof in Coston2 tx
   [`0x1798e8ee21a08b1c13c27ec4cf19d4cf5d4e44ea0d35a288676d4ff7813737b5`](https://coston2-explorer.flare.network/tx/0x1798e8ee21a08b1c13c27ec4cf19d4cf5d4e44ea0d35a288676d4ff7813737b5).
 
-The payer's on-chain record now reads **1 settled (5 XRP) / 1 delinquent (7 XRP)** — one
-XRPL account, both outcomes, all network-attested.
+> **The current deployment is not yet seeded.** Re-seeding needs a working XRPL testnet
+> node, and both public endpoints were unreachable at the time of deployment
+> (`testnet.xrpl-labs.com` out of sync; `s.altnet.rippletest.net` unreachable from the build
+> sandbox). Run `services/attester/bin/seed-demo.js` from any normal network — about ten
+> minutes — and it produces all three demo states, including the fabricated debt that proves
+> an unacknowledged mark reaches nobody's record.
 
 ## Part 2: Quittance Confidential
 
@@ -153,7 +177,7 @@ cross the boundary, and the machine's attested identity is what makes that check
 rather than merely promised.
 
 Registration turned out to be **permissionless on Coston2** — the same network as the
-registry, not Songbird as expected — so extension `65940` is registered and owned by us,
+registry, not Songbird as expected — so extension `65975` is registered and owned by us,
 with no Foundation involvement. Details, scoring model, and the live verification against
 real Coston2 data are in [`fce/README.md`](fce/README.md).
 

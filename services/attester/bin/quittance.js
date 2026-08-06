@@ -5,6 +5,7 @@
  *   fund                                     create + fund a fresh XRPL testnet account
  *   create --payee r.. [--payer r..] --xrp N --minutes M [--memo URI]
  *   pay --to r.. --tag T --xrp N [--seed s..]
+ *   acknowledge --invoice I --tx HASH        admit the debt (any payment from the payer)
  *   settle --invoice I --tx HASH             run the XRPPayment proof pipeline
  *   mark --invoice I                         run the XRPPaymentNonexistence pipeline
  *   status --invoice I
@@ -31,6 +32,7 @@ const STATUS = ["None", "Open", "Settled", "Delinquent"];
 function printInvoice(inv) {
   console.log({
     status: STATUS[Number(inv.status)],
+    acknowledged: inv.acknowledged,
     destinationTag: Number(inv.destinationTag),
     amountDrops: inv.amountDrops.toString(),
     payeeAddressHash: inv.payeeAddressHash,
@@ -91,16 +93,26 @@ async function watch(opts) {
         ledger_index_max: -1,
         limit: 200,
       });
+      // Amount matters now: a sub-amount payment is the debtor admitting the debt,
+      // not settling it. Submitting it to settle() would burn a 90 s FDC round and
+      // then revert, every cycle.
       return res.result.transactions
-        .map((t) => t.tx_json ?? t.tx)
-        .filter(
-          (t) =>
-            t &&
-            t.TransactionType === "Payment" &&
-            t.Destination === payee &&
-            Number(t.DestinationTag) === Number(tag)
-        )
-        .map((t, i) => res.result.transactions[i] && (res.result.transactions[i].hash ?? t.hash))
+        .map((entry) => {
+          const t = entry.tx_json ?? entry.tx;
+          if (
+            !t ||
+            t.TransactionType !== "Payment" ||
+            t.Destination !== payee ||
+            Number(t.DestinationTag) !== Number(tag)
+          ) {
+            return null;
+          }
+          const delivered = entry.meta?.delivered_amount ?? t.Amount;
+          return {
+            hash: entry.hash ?? t.hash,
+            drops: typeof delivered === "string" ? BigInt(delivered) : 0n,
+          };
+        })
         .filter(Boolean);
     } finally {
       await client.disconnect();
@@ -132,9 +144,16 @@ async function watch(opts) {
           }
         };
 
-        const hashes = await paymentsTo(inv.destinationTag, Number(inv.minimalBlockNumber));
-        if (hashes.length > 0) {
-          run("payment seen, settling", () => reg.settleWithPayment(id, hashes[0]));
+        const payments = await paymentsTo(inv.destinationTag, Number(inv.minimalBlockNumber));
+        const settling = payments.find((p) => p.drops >= inv.amountDrops);
+        const admitting = payments.find((p) => p.drops > 0n);
+
+        if (settling) {
+          run("payment seen, settling", () => reg.settleWithPayment(id, settling.hash));
+        } else if (admitting && !inv.acknowledged && inv.payerAddressHash !== ethers.ZeroHash) {
+          // Not enough to settle, but enough to admit the debt — which is what lets a
+          // later mark count against the payer's record.
+          run("partial payment seen, acknowledging", () => reg.acknowledge(id, admitting.hash));
         } else if (
           closeTimeUnix > Number(inv.deadlineTimestamp) &&
           ledgerIndex > Number(inv.deadlineBlockNumber) + 3 // past finality margin
@@ -170,6 +189,9 @@ async function main() {
       console.log(res);
       break;
     }
+    case "acknowledge":
+      await reg.acknowledge(Number(opts.invoice), opts.tx);
+      break;
     case "settle":
       await reg.settleWithPayment(Number(opts.invoice), opts.tx);
       break;
@@ -195,7 +217,9 @@ async function main() {
       await watch(opts);
       break;
     default:
-      console.error("usage: quittance <fund|create|pay|settle|mark|status|record|watch> [--flag value ...]");
+      console.error(
+        "usage: quittance <fund|create|pay|acknowledge|settle|mark|status|record|watch> [--flag value ...]"
+      );
       process.exit(1);
   }
 }

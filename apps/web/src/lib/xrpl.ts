@@ -7,16 +7,36 @@
 import { XRPL } from "./config";
 import type { Invoice } from "./types";
 
+/**
+ * Calls the first XRPL endpoint that answers.
+ *
+ * Public testnet nodes are unreliable — they go offline, and they report
+ * `notSynced` / `noNetwork` while catching up, which is a successful HTTP
+ * response carrying a useless answer. Both count as failure here, so the next
+ * endpoint gets a turn rather than the whole page breaking.
+ */
 async function rpc<T = any>(method: string, params: Record<string, unknown> = {}): Promise<T> {
-  const res = await fetch(XRPL.rpc, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ method, params: [params] }),
-  });
-  if (!res.ok) throw new Error(`XRPL ${method}: HTTP ${res.status}`);
-  const body = await res.json();
-  if (body.result?.error) throw new Error(`XRPL ${method}: ${body.result.error_message ?? body.result.error}`);
-  return body.result as T;
+  const failures: string[] = [];
+
+  for (const url of XRPL.rpcs) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ method, params: [params] }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = await res.json();
+      if (body.result?.error) {
+        throw new Error(body.result.error_message ?? body.result.error);
+      }
+      return body.result as T;
+    } catch (err: any) {
+      failures.push(`${new URL(url).host}: ${err?.message ?? err}`);
+    }
+  }
+
+  throw new Error(`XRPL ${method} failed on every endpoint — ${failures.join("; ")}`);
 }
 
 export interface LedgerNow {

@@ -28,6 +28,7 @@ function toInvoice(id: bigint, raw: ethers.Result | any): Invoice {
     deadlineBlockNumber: raw.deadlineBlockNumber,
     deadlineTimestamp: raw.deadlineTimestamp,
     payerAddressHash: raw.payerAddressHash,
+    acknowledged: raw.acknowledged,
     settledByAddressHash: raw.settledByAddressHash,
     outcomeTimestamp: raw.outcomeTimestamp,
     metadataURI: raw.metadataURI,
@@ -138,7 +139,7 @@ export async function createInvoice(
  * the enclave, so this resolves when the request is on-chain, not when the score
  * is ready.
  *
- * NOTE: not usable until a TEE machine is registered for extension 65940.
+ * NOTE: not usable until a TEE machine is registered for extension 65975.
  * Build against `fixtures.scores` until then.
  */
 export async function requestScore(signer: ethers.Signer, payerAddressHash: string): Promise<string> {
@@ -180,6 +181,10 @@ export function decodeRegistryError(err: unknown): string | null {
         return "The Data Connector has not finalized this proof yet — try again shortly.";
       case "InvalidTerms":
         return `Invalid invoice terms: ${parsed.args[0]}.`;
+      case "AlreadyAcknowledged":
+        return "This debt has already been acknowledged.";
+      case "NotAcknowledgeable":
+        return "A bearer invoice names no debtor, so there is nothing to acknowledge.";
       case "TagSpaceExhausted":
         return "This registry has issued every destination tag.";
       default:

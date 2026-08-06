@@ -164,6 +164,31 @@ async function obtainProof(
 }
 
 /**
+ * The consent path: prove a payment from the debtor carrying this invoice's tag,
+ * which admits the debt. One drop is enough — it is the debtor's signature over
+ * the terms, not payment. Without it a later mark reaches no payment record.
+ */
+export async function acknowledge(
+  signer: ethers.Signer,
+  invoiceId: bigint,
+  xrplTxHash: string,
+  onProgress?: FdcProgress
+): Promise<string> {
+  onProgress?.("preparing");
+  const encoded = await prepareRequest("XRPPayment", {
+    transactionId: "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
+    proofOwner: ethers.ZeroAddress,
+  });
+
+  const proof = await obtainProof(signer, encoded, XRP_PAYMENT_RESPONSE, onProgress);
+
+  onProgress?.("submitting_outcome");
+  const receipt = await (await registryWrite(signer).acknowledge(invoiceId, proof)).wait();
+  onProgress?.("done");
+  return receipt.hash;
+}
+
+/**
  * The quittance path: prove the XRPL payment and settle the invoice.
  * Takes about two minutes, almost all of it one FDC voting round.
  */

@@ -24,6 +24,8 @@ describe.skipIf(!live)("InvoiceRegistry on Coston2", () => {
     expect(inv.amountDrops).toBe(5_000_000n);
     expect(inv.status).toBe(InvoiceStatus.Settled);
     expect(inv.settledByAddressHash).toBe(LIVE.payerHash);
+    // Paying admits the debt, so no separate acknowledgement is ever needed.
+    expect(inv.acknowledged).toBe(true);
     expect(displayStatus(inv)).toBe("settled");
   }, 20_000);
 
@@ -32,7 +34,22 @@ describe.skipIf(!live)("InvoiceRegistry on Coston2", () => {
     expect(inv.destinationTag).toBe(2);
     expect(inv.amountDrops).toBe(7_000_000n);
     expect(inv.status).toBe(InvoiceStatus.Delinquent);
+    expect(inv.acknowledged).toBe(true);
     expect(displayStatus(inv)).toBe("delinquent");
+  }, 20_000);
+
+  /**
+   * Invoice 3 names a payer who never admitted the debt. The mark is real; the
+   * record it would have touched must be untouched.
+   */
+  it("does not let a fabricated debt reach anyone's record", async () => {
+    const inv = await getInvoice(3);
+    expect(inv.acknowledged).toBe(false);
+    expect(inv.status).toBe(InvoiceStatus.Delinquent);
+
+    const victim = await getRecord(inv.payerAddressHash);
+    expect(victim.delinquentCount).toBe(0n);
+    expect(victim.delinquentDrops).toBe(0n);
   }, 20_000);
 
   it("reads the payer's accumulated record", async () => {

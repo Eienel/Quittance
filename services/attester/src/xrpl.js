@@ -26,14 +26,28 @@ async function fundNewAccount() {
   };
 }
 
+/**
+ * Runs `fn` against the first XRPL endpoint that both connects and is in sync.
+ *
+ * A node that is up but still catching up answers `notSynced`, which is a
+ * failure for our purposes — fail over rather than surfacing it as a dead end.
+ */
 async function withClient(fn) {
-  const client = new xrpl.Client(cfg.xrplWss);
-  await client.connect();
-  try {
-    return await fn(client);
-  } finally {
-    await client.disconnect();
+  const failures = [];
+
+  for (const url of cfg.xrplWssList) {
+    const client = new xrpl.Client(url, { connectionTimeout: 10_000 });
+    try {
+      await client.connect();
+      return await fn(client);
+    } catch (err) {
+      failures.push(`${url}: ${err.message ?? err}`);
+    } finally {
+      if (client.isConnected()) await client.disconnect();
+    }
   }
+
+  throw new Error(`no usable XRPL endpoint — ${failures.join("; ")}`);
 }
 
 /**

@@ -31,6 +31,7 @@ const base = (overrides: Partial<Invoice> = {}): Invoice => ({
   deadlineBlockNumber: 19_626_145n,
   deadlineTimestamp: BigInt(now() + 600),
   payerAddressHash: LIVE.payerHash,
+  acknowledged: true,
   settledByAddressHash: ZERO_HASH,
   outcomeTimestamp: 0n,
   metadataURI: "",
@@ -74,6 +75,25 @@ export const invoices = {
 
   /** A long amount, to check number formatting doesn't break the layout. */
   large: () => base({ id: 7n, destinationTag: 7, amountDrops: 1_234_567_890_123n }),
+
+  /**
+   * A debt the named payer never admitted. Anyone can write an invoice naming
+   * anyone, so this can still be marked — but it reaches no payment record, and
+   * the UI must say so rather than presenting it as a judgement.
+   */
+  unacknowledged: () =>
+    base({ id: 8n, destinationTag: 8, acknowledged: false, amountDrops: 1_000_000_000n }),
+
+  /** Marked, but never acknowledged: a claim, not a judgement. */
+  unacknowledgedMark: () =>
+    base({
+      id: 9n,
+      destinationTag: 9,
+      status: InvoiceStatus.Delinquent,
+      acknowledged: false,
+      amountDrops: 1_000_000_000n,
+      outcomeTimestamp: BigInt(now() - 60),
+    }),
 };
 
 export const list = (): Invoice[] => [
@@ -84,6 +104,8 @@ export const list = (): Invoice[] => [
   invoices.bearer(),
   invoices.open(),
   invoices.large(),
+  invoices.unacknowledged(),
+  invoices.unacknowledgedMark(),
 ];
 
 export const records: Record<string, PayerRecord> = {

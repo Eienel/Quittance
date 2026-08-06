@@ -63,6 +63,21 @@ async function getInvoice(invoiceId) {
   return registry(fdc.provider()).getInvoice(invoiceId);
 }
 
+/**
+ * Consent path: prove a payment from the debtor carrying the invoice's tag.
+ * One drop is enough — it is the debtor's signature over the debt, not payment.
+ */
+async function acknowledge(invoiceId, xrplTxHash, log = console.error) {
+  const encoded = await fdc.prepareXrpPaymentRequest(
+    "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase()
+  );
+  const proof = await fdc.obtainProof(encoded, fdc.XRP_PAYMENT_RESPONSE, log);
+  const tx = await registry().acknowledge(invoiceId, proof);
+  const receipt = await tx.wait();
+  log(`acknowledged invoice ${invoiceId} in ${receipt.hash}`);
+  return receipt.hash;
+}
+
 /** Paid path: prove the XRPL transaction and settle the invoice. */
 async function settleWithPayment(invoiceId, xrplTxHash, log = console.error) {
   const encoded = await fdc.prepareXrpPaymentRequest("0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase());
@@ -84,4 +99,12 @@ async function markDelinquent(invoiceId, log = console.error) {
   return receipt.hash;
 }
 
-module.exports = { registry, createInvoice, getInvoice, settleWithPayment, markDelinquent, ARTIFACT };
+module.exports = {
+  registry,
+  createInvoice,
+  getInvoice,
+  acknowledge,
+  settleWithPayment,
+  markDelinquent,
+  ARTIFACT,
+};

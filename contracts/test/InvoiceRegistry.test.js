@@ -279,6 +279,11 @@ describe("InvoiceRegistry", function () {
       await createInvoice();
     });
 
+    beforeEach(async function () {
+      // The debtor admits the debt: a one-drop payment carrying this invoice's tag.
+      await registry.acknowledge(1, paymentProof({ receivedAmount: 1n }));
+    });
+
     it("marks the invoice and the debtor permanently", async function () {
       await expect(registry.markDelinquent(1, nonexistenceProof()))
         .to.emit(registry, "InvoiceMarkedDelinquent")
@@ -288,7 +293,8 @@ describe("InvoiceRegistry", function () {
           PAYER,
           TERMS.amountDrops,
           TERMS.deadlineBlockNumber + 3n,
-          TERMS.deadlineTimestamp + 5n
+          TERMS.deadlineTimestamp + 5n,
+          true
         );
 
       const inv = await registry.getInvoice(1);
@@ -333,7 +339,8 @@ describe("InvoiceRegistry", function () {
           ethers.ZeroHash,
           TERMS.amountDrops,
           TERMS.deadlineBlockNumber + 3n,
-          TERMS.deadlineTimestamp + 5n
+          TERMS.deadlineTimestamp + 5n,
+          false
         );
       expect((await registry.record(ethers.ZeroHash)).delinquentCount).to.equal(0n);
     });
@@ -375,6 +382,7 @@ describe("InvoiceRegistry", function () {
     });
 
     it("cannot mark twice", async function () {
+      await registry.acknowledge(1, paymentProof({ receivedAmount: 1n }));
       await registry.markDelinquent(1, nonexistenceProof());
       await expect(
         registry.markDelinquent(1, nonexistenceProof())
@@ -415,6 +423,7 @@ describe("InvoiceRegistry", function () {
       await createInvoice(); // 1
       await createInvoice(); // 2
       await registry.settle(1, paymentProof());
+      await registry.acknowledge(2, paymentProof({ receivedAmount: 1n, destinationTag: 2n }));
       await registry.markDelinquent(2, nonexistenceProof({ destinationTag: 2n }));
 
       const rec = await registry.record(PAYER);

@@ -32,6 +32,12 @@ export interface Invoice {
   deadlineTimestamp: bigint;
   /** Zero hash means a bearer invoice: anyone may settle it, and a lapse marks nobody. */
   payerAddressHash: string;
+  /**
+   * Whether the named debtor has admitted this debt. Anyone may *name* a payer, so an
+   * unacknowledged invoice can still be marked delinquent — but the mark reaches no
+   * payment record. Surface this: an unacknowledged mark is a claim, not a judgement.
+   */
+  acknowledged: boolean;
   settledByAddressHash: string;
   outcomeTimestamp: bigint;
   metadataURI: string;

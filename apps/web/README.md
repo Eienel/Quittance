@@ -35,8 +35,12 @@ covers the states that are otherwise slow or impossible to produce by hand:
 | `records.*` | empty / live / strong / poor payment histories |
 | `scores.*` | none / thin / live / good / excellent |
 
-Drop `?fixtures=1` and the same screens read live Coston2 data. There are already two real
-invoices there — one settled, one delinquent — from an end-to-end run.
+| `unacknowledged` | a debt the named payer never admitted |
+| `unacknowledgedMark` | marked, but reaching nobody's record — a claim, not a judgement |
+
+Drop `?fixtures=1` and the same screens read live Coston2 data. **The registry was recently
+redeployed and is not yet seeded**, so expect an empty list until someone runs
+`services/attester/bin/seed-demo.js`.
 
 ## What's already built
 
@@ -94,7 +98,12 @@ the invoice's on-chain metadata (`metadata.ts`, re-hashed and checked before it 
 and `addressBook.ts` remembers every address the user types. Show the friendly name when we
 have it and a truncated hash when we don't — don't fake it.
 
-**4. `score: 0` means "no record", not a score of zero.**
+**4. An unacknowledged mark is a claim, not a judgement.**
+Anyone can name anyone as the payer on an invoice. Such an invoice can still be marked
+delinquent — the proof is true — but the contract deliberately keeps it out of that
+account's payment record. `invoice.acknowledged` distinguishes them, and the UI must too.
+
+**5. `score: 0` means "no record", not a score of zero.**
 And always show `basis`. A 700 backed by two invoices is a different claim from a 700 backed
 by forty; hiding that would be the dishonest version of that screen.
 
