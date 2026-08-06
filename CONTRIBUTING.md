@@ -36,6 +36,22 @@ gh pr create --repo Eienel/Quittance
 Keep PRs to one concern. A redesign of the pay screen is one PR; a design-system pass is
 another.
 
+## Previewing your own work on Vercel
+
+Deploy your fork to your own Vercel project so you can see changes on a real URL without
+waiting on anyone:
+
+1. Vercel → **Add New → Project** → import **your fork**.
+2. Accept every default. `vercel.json` at the repo root already sets the build command,
+   output directory and SPA rewrites — **do not override them in the dashboard.** Vercel's
+   auto-detection guesses wrong here because the app is in `apps/web`, not the root.
+3. No environment variables. Nothing this app uses is secret.
+
+Every push to a branch on your fork gets its own preview URL. Put that URL in the PR.
+
+If you see a 404 on anything except `/`, the SPA rewrites aren't being applied — that's the
+dashboard overriding `vercel.json`, not a bug in your code.
+
 ## Before you open a PR
 
 ```bash
