@@ -11,7 +11,7 @@ export default function App() {
     <>
       <nav>
         <Link to="/" className="brand">Quittance</Link>
-        <NavLink to="/" end>Invoices</NavLink>
+        <NavLink to="/invoices">Invoices</NavLink>
         <NavLink to="/create">Create</NavLink>
         <NavLink to="/record">Record</NavLink>
         <NavLink to="/score">Score</NavLink>

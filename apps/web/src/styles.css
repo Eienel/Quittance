@@ -275,6 +275,66 @@ tbody th { color: var(--dim); font-weight: 500; white-space: nowrap; width: 1%; 
 .stub { border: 1px dashed var(--line-2); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin: 0.9rem 0; background: var(--panel-2); }
 hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 
+/* ── landing page ───────────────────────────────────────────────────────── */
+.home { --gap: clamp(3rem, 8vw, 5.5rem); }
+
+.eyebrow {
+  display: inline-block; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.01em;
+  color: var(--dim); margin-bottom: 1rem;
+}
+
+.hero { text-align: center; padding: clamp(2.5rem, 8vw, 5rem) 0 clamp(2rem, 5vw, 3.5rem); }
+.hero h1 {
+  font: 600 clamp(2.6rem, 7.5vw, 4.7rem)/1.03 var(--sans);
+  letter-spacing: -0.045em; color: var(--ink); margin: 0 auto 1.4rem; max-width: 15ch;
+}
+.hero h1 .q { color: var(--settled); }
+.hero h1 .m { color: var(--delinquent); }
+.hero-sub {
+  font-size: clamp(1.05rem, 2.4vw, 1.32rem); line-height: 1.5; letter-spacing: -0.016em;
+  color: var(--dim); max-width: 56ch; margin: 0 auto 2rem;
+}
+
+.cta-row { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.72rem 1.4rem; border-radius: 980px; font: 500 0.98rem var(--sans);
+  letter-spacing: -0.01em; border: 1px solid var(--line-2); background: var(--panel); color: var(--ink);
+  transition: transform 0.08s, background 0.15s, border-color 0.15s;
+}
+.btn:hover { background: rgba(0, 0, 0, 0.04); border-color: var(--ink); color: var(--ink); }
+.btn:active { transform: scale(0.98); }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.btn.primary:hover { background: #000; color: #fff; }
+
+.home-block { padding: var(--gap) 0; border-top: 1px solid var(--line); }
+.home-block h2 { font-size: clamp(1.6rem, 3.6vw, 2.3rem); letter-spacing: -0.035em; margin-bottom: 1rem; display: block; }
+.home-block .lead { font-size: clamp(1.02rem, 2.1vw, 1.18rem); color: var(--dim); max-width: 64ch; }
+.home-block.accent { text-align: left; }
+
+/* two outcomes on the landing */
+.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; padding: var(--gap) 0 0; }
+.two-up .outcome-card { padding: 1.5rem 1.6rem; }
+.two-up .outcome-card .headline { font: 600 1.5rem/1.1 var(--sans); letter-spacing: -0.03em; color: var(--ink); margin: 0.25rem 0 0.6rem; }
+.two-up .outcome-card .sub { font-size: 0.96rem; line-height: 1.5; color: var(--text); }
+
+/* how-it-works steps */
+.steps { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 1.4rem; }
+.steps li { display: flex; gap: 1.1rem; align-items: flex-start; }
+.step-n {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; font: 600 0.95rem var(--sans);
+  color: var(--ink); background: var(--panel); border: 1px solid var(--line-2);
+}
+.steps li b { font-size: 1.05rem; letter-spacing: -0.02em; }
+.steps li p { margin: 0.25rem 0 0; color: var(--dim); max-width: 60ch; }
+
+.home-cta { text-align: center; padding: var(--gap) 0 1rem; border-top: 1px solid var(--line); }
+.home-cta h2 { justify-content: center; font-size: clamp(1.7rem, 4vw, 2.6rem); letter-spacing: -0.04em; margin: 1rem auto 1.6rem; max-width: 18ch; }
+.mark-split { width: 40px; height: 40px; border-radius: 11px; margin: 0 auto; background: linear-gradient(135deg, var(--settled) 0 50%, var(--delinquent) 50% 100%); }
+
+@media (max-width: 620px) { .two-up { grid-template-columns: 1fr; } }
+
 @media (max-width: 620px) {
   nav .brand { margin-right: 0.7rem; }
   nav a { padding: 0.42rem 0.52rem; }
