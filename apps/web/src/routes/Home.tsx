@@ -10,20 +10,25 @@ export default function Home() {
     <div className="home">
       {/* hero */}
       <header className="hero">
-        <span className="eyebrow">Invoicing protocol · Flare</span>
-        <h1>
-          Every invoice ends in a<br />
-          <span className="q">quittance</span> — or a <span className="m">mark</span>.
-        </h1>
-        <p className="hero-sub">
-          Send an invoice payable in XRP. Pay it on time and Flare proves it, issuing a
-          cryptographic receipt. Miss it and Flare proves <em>that</em> too — a permanent,
-          network-attested mark. Either outcome is real, and no one can fake or retract it.
-        </p>
-        <div className="cta-row">
-          <Link to="/create" className="btn primary">Create an invoice</Link>
-          <Link to="/invoices" className="btn">See it in action →</Link>
+        <video className="hero-video" src="/free.mp4" autoPlay muted loop playsInline preload="auto" />
+        <div className="hero-scrim" />
+        <div className="hero-inner">
+          <span className="eyebrow">Invoicing protocol · Flare</span>
+          <h1>
+            Every invoice ends in a<br />
+            <span className="q">quittance</span> — or a <span className="m">mark</span>.
+          </h1>
+          <p className="hero-sub">
+            Send an invoice payable in XRP. Pay it on time and Flare proves it, issuing a
+            cryptographic receipt. Miss it and Flare proves <em>that</em> too — a permanent,
+            network-attested mark. Either outcome is real, and no one can fake or retract it.
+          </p>
+          <div className="cta-row">
+            <Link to="/create" className="btn primary">Create an invoice</Link>
+            <Link to="/invoices" className="btn">See it in action →</Link>
+          </div>
         </div>
+        <span className="scroll-cue">Scroll ↓</span>
       </header>
 
       {/* the core insight */}

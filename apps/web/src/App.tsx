@@ -1,4 +1,5 @@
-import { NavLink, Link, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Link, Outlet, useLocation } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
 import { useFixtures } from "@/lib/fixtures";
 import { CHAIN } from "@/lib/config";
@@ -6,10 +7,22 @@ import { CHAIN } from "@/lib/config";
 export default function App() {
   const wallet = useWallet();
   const fixtures = useFixtures();
+  const location = useLocation();
+
+  // On the landing the nav floats transparently over the video hero, then goes
+  // solid once you scroll past it.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const over = location.pathname === "/" && !scrolled;
 
   return (
     <>
-      <nav>
+      <nav className={over ? "over" : ""}>
         <Link to="/" className="brand">Quittance</Link>
         <NavLink to="/invoices">Invoices</NavLink>
         <NavLink to="/create">Create</NavLink>
