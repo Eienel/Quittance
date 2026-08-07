@@ -314,8 +314,7 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   letter-spacing: -0.045em; color: #fff; margin: 0 auto 1.5rem; max-width: 15ch;
   text-shadow: 0 2px 30px rgba(0,0,0,0.35);
 }
-.hero h1 .q { color: #4ade80; }
-.hero h1 .m { color: #ff6b60; }
+.hero h1 .q, .hero h1 .m { color: #fff; }
 .hero-sub {
   font-size: clamp(1.05rem, 2.3vw, 1.3rem); line-height: 1.5; letter-spacing: -0.016em;
   color: rgba(255,255,255,0.86); max-width: 56ch; margin: 0 auto 2.1rem;
