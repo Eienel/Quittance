@@ -207,6 +207,10 @@ export function decodeRegistryError(err: unknown): string | null {
         return "This debt has already been acknowledged.";
       case "NotAcknowledgeable":
         return "A bearer invoice names no debtor, so there is nothing to acknowledge.";
+      case "WrongSourceChain":
+        return "That proof is about a different XRPL network than this registry serves.";
+      case "WrongAttestationType":
+        return "That proof is the wrong kind of attestation for this action.";
       case "ZeroBond":
         return "A bond has to be more than zero.";
       case "BondPostedByAnother":

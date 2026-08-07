@@ -5,6 +5,11 @@
         "internalType": "address",
         "name": "_fdcVerificationOverride",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_sourceId",
+        "type": "bytes32"
       }
     ],
     "stateMutability": "nonpayable",
@@ -175,6 +180,38 @@
       }
     ],
     "name": "TransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "got",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "expected",
+        "type": "bytes32"
+      }
+    ],
+    "name": "WrongAttestationType",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "got",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "expected",
+        "type": "bytes32"
+      }
+    ],
+    "name": "WrongSourceChain",
     "type": "error"
   },
   {
@@ -1315,6 +1352,19 @@
     "name": "settle",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sourceId",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

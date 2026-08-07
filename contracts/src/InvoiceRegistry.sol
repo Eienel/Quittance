@@ -106,6 +106,32 @@ contract InvoiceRegistry {
     ///      "resolve through FlareContractRegistry", which is the production path.
     address public immutable fdcVerificationOverride;
 
+    /**
+     * @notice The one XRPL network this registry's proofs may come from.
+     *
+     * @dev The FDC confirms attestations against whichever chain the request named, and a
+     *      proof carries that chain in `sourceId`. Verifying the Merkle proof therefore
+     *      establishes that the attestation is genuine — not that it is about the ledger
+     *      this invoice lives on.
+     *
+     *      Left unchecked that is a fund-loss bug rather than a nicety: against an invoice
+     *      genuinely paid on testXRP, anyone could request a *nonexistence* attestation
+     *      over XRP mainnet with the identical payee hash, amount, tag and ledger range.
+     *      No such payment exists there, so the attestation is legitimately confirmed, its
+     *      leaf is in the root, and every request-body field we compare matches. The
+     *      invoice would be marked, the payer's record damaged, and the bond handed to the
+     *      issuer — on a proof that is perfectly true about the wrong chain.
+     *
+     *      Immutable, and set per deployment, so the same code serves testnet and mainnet.
+     */
+    bytes32 public immutable sourceId;
+
+    /// @dev Attestation type ids, as the FDC encodes them: right-padded utf8.
+    bytes32 private constant ATT_XRP_PAYMENT =
+        0x5852505061796d656e7400000000000000000000000000000000000000000000;
+    bytes32 private constant ATT_XRP_PAYMENT_NONEXISTENCE =
+        0x5852505061796d656e744e6f6e6578697374656e636500000000000000000000;
+
     // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
@@ -178,6 +204,8 @@ contract InvoiceRegistry {
     error PaymentFailed(uint8 status);
     error PaidAfterDeadline(uint64 xrplTimestamp, uint64 deadlineTimestamp);
     error TagSpaceExhausted();
+    error WrongSourceChain(bytes32 got, bytes32 expected);
+    error WrongAttestationType(bytes32 got, bytes32 expected);
     error NotAcknowledgeable(string why);
     error AlreadyAcknowledged(uint256 invoiceId);
     error NoBond(uint256 invoiceId);
@@ -187,8 +215,32 @@ contract InvoiceRegistry {
     error TransferFailed(address to, uint256 amount);
     error ReclaimTooEarly(uint64 reclaimableAt);
 
-    constructor(address _fdcVerificationOverride) {
+    /**
+     * @param _fdcVerificationOverride Zero to resolve FdcVerification through
+     *        FlareContractRegistry, which is the production path.
+     * @param _sourceId The XRPL network this registry accepts proofs from — `testXRP` or
+     *        `XRP`, right-padded utf8. Immutable: a registry that could be pointed at a
+     *        second ledger mid-life would accept proofs about the wrong one.
+     */
+    constructor(address _fdcVerificationOverride, bytes32 _sourceId) {
+        if (_sourceId == bytes32(0)) revert InvalidTerms("sourceId");
         fdcVerificationOverride = _fdcVerificationOverride;
+        sourceId = _sourceId;
+    }
+
+    /**
+     * @dev Every proof must be about the chain this registry serves, and be the type we
+     *      think we are reading. Verifying the Merkle proof shows an attestation is
+     *      genuine; only this shows it is genuinely about *us*.
+     */
+    function _requireOrigin(bytes32 attestationType, bytes32 proofSourceId, bytes32 expectedType)
+        private
+        view
+    {
+        if (attestationType != expectedType) {
+            revert WrongAttestationType(attestationType, expectedType);
+        }
+        if (proofSourceId != sourceId) revert WrongSourceChain(proofSourceId, sourceId);
     }
 
     // -------------------------------------------------------------------------
@@ -383,6 +435,7 @@ contract InvoiceRegistry {
         if (inv.payerAddressHash == bytes32(0)) revert NotAcknowledgeable("bearer invoice");
         if (inv.acknowledged) revert AlreadyAcknowledged(invoiceId);
 
+        _requireOrigin(proof.data.attestationType, proof.data.sourceId, ATT_XRP_PAYMENT);
         if (!_xrpPaymentVerification().verifyXRPPayment(proof)) revert InvalidProof();
 
         IXRPPayment.ResponseBody calldata rb = proof.data.responseBody;
@@ -424,6 +477,7 @@ contract InvoiceRegistry {
     function settle(uint256 invoiceId, IXRPPayment.Proof calldata proof) external {
         Invoice storage inv = _open(invoiceId);
 
+        _requireOrigin(proof.data.attestationType, proof.data.sourceId, ATT_XRP_PAYMENT);
         if (!_xrpPaymentVerification().verifyXRPPayment(proof)) revert InvalidProof();
 
         IXRPPayment.ResponseBody calldata rb = proof.data.responseBody;
@@ -492,6 +546,11 @@ contract InvoiceRegistry {
     {
         Invoice storage inv = _open(invoiceId);
 
+        _requireOrigin(
+            proof.data.attestationType,
+            proof.data.sourceId,
+            ATT_XRP_PAYMENT_NONEXISTENCE
+        );
         if (!_xrpNonexistenceVerification().verifyXRPPaymentNonexistence(proof)) {
             revert InvalidProof();
         }

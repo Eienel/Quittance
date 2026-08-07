@@ -118,7 +118,7 @@ describe("bond escrow", function () {
     mock = await (await ethers.getContractFactory("MockFdcVerification")).deploy();
     registry = await (
       await ethers.getContractFactory("InvoiceRegistry")
-    ).deploy(await mock.getAddress());
+    ).deploy(await mock.getAddress(), SOURCE_TESTXRP);
     await createInvoice();
   });
 

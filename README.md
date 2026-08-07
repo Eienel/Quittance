@@ -114,6 +114,23 @@ An unacknowledged invoice can still be marked — the mark is true — but it to
 payment record. The invoice carries the outcome; the record stays trustworthy, because
 third parties lend against it.
 
+### Which chain the proof is about
+
+Verifying a Merkle proof establishes that an attestation is genuine. It does **not**
+establish that the attestation is about the ledger this invoice lives on: the FDC confirms
+a request against whichever chain the request named, and carries that chain in `sourceId`.
+
+Unchecked, that is a fund-loss bug. Against an invoice genuinely paid on testXRP, anyone
+could request a *nonexistence* attestation over XRP mainnet with the identical payee hash,
+amount, destination tag and ledger range. No such payment exists there, so the attestation
+is legitimately confirmed and its leaf sits in the Merkle root. Every request-body field
+the contract compares would match. The invoice would be marked, the payer's record damaged
+and the bond handed to the issuer — on a proof that is perfectly true about the wrong chain.
+
+So the registry pins its source chain at deployment (`sourceId`, immutable) and rejects any
+proof that does not carry it, alongside an explicit attestation-type check. See
+`ProofOrigin.test.js`.
+
 ### The bond: making the proof do something
 
 A proof of non-payment, on its own, only *says* something. Nobody has to read it and
@@ -163,15 +180,15 @@ PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
 | Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
 | Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
 | Coston2 deployment + full E2E, both outcomes | **Done** — see below |
-| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `66012` live on Coston2 ([`fce/`](fce/)) |
+| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `66014` live on Coston2 ([`fce/`](fce/)) |
 | FCE reproducible image + TEE machine registration | Needs Docker + a Confidential Space VM |
 
 ## Deployed (Coston2)
 
 | Contract | Address |
 | --- | --- |
-| `InvoiceRegistry` | [`0x1267431d069c0F3587dbAA05c41d76e677bFaA4c`](https://coston2-explorer.flare.network/address/0x1267431d069c0F3587dbAA05c41d76e677bFaA4c) |
-| `ScoreInstructionSender` (FCE `66012`) | [`0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347`](https://coston2-explorer.flare.network/address/0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347) |
+| `InvoiceRegistry` | [`0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99`](https://coston2-explorer.flare.network/address/0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99) |
+| `ScoreInstructionSender` (FCE `66014`) | [`0xCf55db970F78adfD824B4B87f3b55c8901B47766`](https://coston2-explorer.flare.network/address/0xCf55db970F78adfD824B4B87f3b55c8901B47766) |
 
 Both outcomes were exercised end-to-end against the XRPL testnet on the predecessor
 deployment (`0xC07009…2d00A`, before acknowledgement was added):
@@ -202,7 +219,7 @@ cross the boundary, and the machine's attested identity is what makes that check
 rather than merely promised.
 
 Registration turned out to be **permissionless on Coston2** — the same network as the
-registry, not Songbird as expected — so extension `66012` is registered and owned by us,
+registry, not Songbird as expected — so extension `66014` is registered and owned by us,
 with no Foundation involvement. Details, scoring model, and the live verification against
 real Coston2 data are in [`fce/README.md`](fce/README.md).
 

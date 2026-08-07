@@ -9,6 +9,10 @@ const { ethers, network } = require("hardhat");
  */
 async function main() {
   const override = process.env.FDC_VERIFICATION || ethers.ZeroAddress;
+  // Which XRPL network this registry accepts proofs about. A proof from the wrong
+  // chain can be perfectly valid and completely wrong for us.
+  const sourceName = process.env.XRPL_SOURCE || "testXRP";
+  const sourceId = ethers.encodeBytes32String(sourceName);
   const [deployer] = await ethers.getSigners();
 
   console.log(`network:  ${network.name}`);
@@ -16,10 +20,11 @@ async function main() {
   console.log(
     `verifier: ${override === ethers.ZeroAddress ? "FlareContractRegistry (runtime lookup)" : override}`
   );
+  console.log(`source:   ${sourceName}`);
 
   const registry = await (
     await ethers.getContractFactory("InvoiceRegistry")
-  ).deploy(override);
+  ).deploy(override, sourceId);
   await registry.waitForDeployment();
 
   console.log(`InvoiceRegistry: ${await registry.getAddress()}`);

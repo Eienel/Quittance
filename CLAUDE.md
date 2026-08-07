@@ -42,9 +42,9 @@ for two bounties: Interoperable Asset Products, and Confidential Compute Apps.
 | Thing | Where |
 | --- | --- |
 | Deployed app | https://quittance-azure.vercel.app |
-| `InvoiceRegistry` (Coston2) | `0x1267431d069c0F3587dbAA05c41d76e677bFaA4c` |
-| `ScoreInstructionSender` (Coston2) | `0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347` |
-| Flare Compute Extension ID | `66012` |
+| `InvoiceRegistry` (Coston2) | `0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99` |
+| `ScoreInstructionSender` (Coston2) | `0xCf55db970F78adfD824B4B87f3b55c8901B47766` |
+| Flare Compute Extension ID | `66014` |
 | Chain | Flare Coston2 testnet, chainId **114** |
 | Explorer | https://coston2-explorer.flare.network |
 
@@ -167,7 +167,14 @@ marked delinquent — the proof is true — but it deliberately does not touch t
 payment record. `invoice.acknowledged` tells you which kind you are looking at, and the UI
 must not present the two identically. Fixtures: `unacknowledged`, `unacknowledgedMark`.
 
-**6. The bond is the demo.**
+**6. A true proof is not automatically a proof about us.**
+The FDC confirms attestations against whichever chain the request named. The registry pins
+its `sourceId` (testXRP) at deployment and rejects proofs from any other chain — otherwise
+a mainnet nonexistence proof could mark a testnet invoice that was actually paid. Nothing
+for the UI to do beyond surfacing `WrongSourceChain` if it ever appears, but it explains
+why `settle`/`acknowledge`/`markDelinquent` can reject a proof that looks valid.
+
+**7. The bond is the demo.**
 `invoice.bondAmount` (wei) and `invoice.bondPoster` are the stake. A judge watching FLR
 actually move when a deadline is missed is the entire pitch in one shot — make it legible
 *before* the deadline, not only after. Note `bondAmount` is zeroed once an outcome
@@ -175,7 +182,7 @@ resolves; the `BondResolved` event carries where it went and how much. Fixtures:
 `bondForfeited`. Proceeds are pulled, not pushed — a recipient calls `withdraw()`, which is
 also why an outcome can never be blocked by a hostile address.
 
-**7. `score: 0` means "no record", not a score of zero.**
+**8. `score: 0` means "no record", not a score of zero.**
 And always display `basis` (how many attested outcomes back the score). A 700 from two
 invoices is a different claim from a 700 from forty. Hiding that would be the dishonest
 version of that screen, and a judge will poke at exactly it.
@@ -188,6 +195,7 @@ version of that screen, and a judge will poke at exactly it.
 | --- | --- |
 | `InvoiceRegistry`, both proof paths | Live on Coston2, exercised end-to-end |
 | Bond escrow — post, resolve, withdraw, grace reclaim | Live, 17 tests |
+| Proof origin binding (source chain + attestation type) | Live, 8 tests |
 | Browser-side FDC pipeline | Live, tested |
 | XRPL payment detection | Live, client-side |
 | Web app data layer | Done, 18 tests |
