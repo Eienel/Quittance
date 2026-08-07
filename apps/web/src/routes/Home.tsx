@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
@@ -6,11 +7,30 @@ import { Link } from "react-router-dom";
  * weight → how it works → the confidential score → CTA.
  */
 export default function Home() {
+  // React can drop the `muted` attribute, which makes the browser block
+  // muted-autoplay and show a play button — force muted + play() via the ref.
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.play().catch(() => {});
+  }, []);
+
   return (
     <div className="home">
       {/* hero */}
       <header className="hero">
-        <video className="hero-video" src="/free.mp4" autoPlay muted loop playsInline preload="auto" />
+        <video
+          ref={videoRef}
+          className="hero-video"
+          src="/free.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
         <div className="hero-scrim" />
         <div className="hero-inner">
           <span className="eyebrow">Invoicing protocol · Flare</span>
