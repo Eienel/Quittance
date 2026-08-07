@@ -39,9 +39,8 @@ export default function Home() {
             <span className="q">quittance</span> — or a <span className="m">mark</span>.
           </h1>
           <p className="hero-sub">
-            Send an invoice payable in XRP. Pay it on time and Flare proves it, issuing a
-            cryptographic receipt. Miss it and Flare proves <em>that</em> too — a permanent,
-            network-attested mark. Either outcome is real, and no one can fake or retract it.
+            Invoices in XRP that settle themselves — proven paid, or proven unpaid.
+            Either way, permanent.
           </p>
           <div className="cta-row">
             <Link to="/create" className="btn primary">Create an invoice</Link>
