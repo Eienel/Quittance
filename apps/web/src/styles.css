@@ -87,11 +87,6 @@ nav .brand {
   display: flex; align-items: center; gap: 0.5rem;
 }
 nav .brand:hover { color: var(--ink); }
-nav .brand::before {
-  content: "";
-  width: 16px; height: 16px; border-radius: 5px;
-  background: linear-gradient(135deg, var(--settled) 0 50%, var(--delinquent) 50% 100%);
-}
 nav a {
   color: var(--dim); font-size: 0.92rem; font-weight: 500;
   padding: 0.42rem 0.72rem; border-radius: 9px; letter-spacing: -0.01em;
