@@ -7,7 +7,7 @@ import type { DisplayStatus } from "@/lib/types";
  */
 const LABEL: Record<DisplayStatus, string> = {
   open: "open",
-  lapsed: "lapsed — proving",
+  lapsed: "lapsed · proving",
   settled: "settled ✓",
   delinquent: "delinquent ✗",
 };

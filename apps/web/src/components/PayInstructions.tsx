@@ -30,7 +30,7 @@ export default function PayInstructions({
     <div>
       <h3>Pay this invoice</h3>
       <p className="dim" style={{ marginTop: 0 }}>
-        Payable from any XRPL wallet or exchange — nothing to install.
+        Payable from any XRPL wallet or exchange. Nothing to install.
       </p>
 
       {/* 1 — amount */}
@@ -51,7 +51,7 @@ export default function PayInstructions({
 
       {/* 3 — the destination tag: the hero, and the single most-missed field */}
       <div className="tag-hero">
-        <div className="tag-label">Destination tag — required</div>
+        <div className="tag-label">Destination tag · required</div>
         <div className="tag-value">{invoice.destinationTag}</div>
         <button className="copy" onClick={() => copy(String(invoice.destinationTag))}>
           Copy tag
@@ -62,7 +62,7 @@ export default function PayInstructions({
         <span className="icon">⚠</span>
         <span>
           <b>Include the destination tag.</b> A payment sent without it can&apos;t be
-          matched to this invoice — the money still reaches the payee, but the invoice
+          matched to this invoice. The money still reaches the payee, but the invoice
           lapses and goes to a permanent <b>Mark</b> anyway.
         </span>
       </div>

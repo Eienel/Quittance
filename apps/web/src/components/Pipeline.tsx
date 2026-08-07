@@ -41,7 +41,7 @@ export default function Pipeline({ pipeline }: { pipeline: PipelineType }) {
       {pipeline.stage === "proving" && (
         <p className="dim small" style={{ marginTop: "0.9rem" }}>
           The Flare Data Connector is voting on this outcome. Rounds take about{" "}
-          {TIMING.fdcRound}s, occasionally up to {TIMING.fdcRoundWorstCase}s — the wait is
+          {TIMING.fdcRound}s, occasionally up to {TIMING.fdcRoundWorstCase}s. The wait is
           in the protocol, not the page.
         </p>
       )}

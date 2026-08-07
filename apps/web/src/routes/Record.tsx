@@ -44,7 +44,7 @@ export default function Record() {
         <div style={{ marginTop: "1.1rem" }}>
           <p style={{ margin: 0, fontWeight: 600, color: "var(--ink)" }}>No record</p>
           <p className="dim" style={{ marginTop: "0.3rem" }}>
-            No attested outcomes for this account — <b>not</b> the same as a clean record.
+            No attested outcomes for this account. <b>Not</b> the same as a clean record.
             A lender sees the absence of history, not proof of good standing.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function Record() {
           </div>
           <p className="dim small" style={{ marginTop: "0.8rem" }}>
             Last outcome {formatTimestamp(data.lastOutcomeTimestamp)}. Every entry is
-            network-attested and permanent — no one can retract it, including the issuer.
+            network-attested and permanent. No one can retract it, including the issuer.
           </p>
         </>
       )}

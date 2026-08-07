@@ -36,10 +36,10 @@ export default function Home() {
           <span className="eyebrow">Invoicing protocol · Flare</span>
           <h1>
             Every invoice ends in a<br />
-            <span className="q">quittance</span> — or a <span className="m">mark</span>.
+            <span className="q">quittance</span>, or a <span className="m">mark</span>.
           </h1>
           <p className="hero-sub">
-            Invoices in XRP that settle themselves — proven paid, or proven unpaid.
+            Invoices in XRP that settle themselves. Proven paid, or proven unpaid.
             Either way, permanent.
           </p>
           <div className="cta-row">
@@ -52,11 +52,11 @@ export default function Home() {
 
       {/* the core insight */}
       <section className="home-block">
-        <h2>Proof of absence — the part nobody else has</h2>
+        <h2>Proof nobody else can give</h2>
         <p className="lead">
           Plenty of systems can prove a payment <em>happened</em>. Almost nothing can prove one
           <em> didn&apos;t</em>. Flare&apos;s Data Connector can attest that no matching XRPL payment
-          exists in a given window — so non-payment becomes a network-attested fact, not one
+          exists in a given window, so non-payment becomes a network-attested fact, not one
           party&apos;s word. That&apos;s what makes a payment record worth anything to a third party
           who trusts neither side.
         </p>
@@ -69,7 +69,7 @@ export default function Home() {
           <div className="headline">Paid, on time</div>
           <p className="sub">
             The XRPL payment landed before the deadline. Settled with an FDC
-            <span className="mono"> XRPPayment</span> proof — a permanent receipt.
+            <span className="mono"> XRPPayment</span> proof. A permanent receipt.
           </p>
         </div>
         <div className="outcome-card delinquent">
@@ -77,7 +77,7 @@ export default function Home() {
           <div className="headline">Proven unpaid</div>
           <p className="sub">
             No such payment exists anywhere in the window. Marked with an FDC
-            <span className="mono"> XRPPaymentNonexistence</span> proof — permanent, and no one&apos;s to retract.
+            <span className="mono"> XRPPaymentNonexistence</span> proof. Permanent, and no one&apos;s to retract.
           </p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function Home() {
             <span className="step-n">3</span>
             <div>
               <b>Prove</b>
-              <p>Flare&apos;s Data Connector votes on the outcome and returns an on-chain proof — about two minutes, and visible the whole way.</p>
+              <p>Flare&apos;s Data Connector votes on the outcome and returns an on-chain proof in about two minutes, visible the whole way.</p>
             </div>
           </li>
           <li>
@@ -124,7 +124,7 @@ export default function Home() {
         <p className="lead">
           A payment record is commercially sensitive, but a lender needs the judgement, not the
           ledger. So an account can be scored <b>inside a TEE</b>: the enclave reads the full
-          history — every invoice, amount and date — and only <span className="mono">{"{ score, band, basis }"}</span> comes
+          history (every invoice, amount and date), and only <span className="mono">{"{ score, band, basis }"}</span> comes
           out. The raw history never crosses the boundary.
         </p>
         <Link to="/score" className="btn">Try the score →</Link>

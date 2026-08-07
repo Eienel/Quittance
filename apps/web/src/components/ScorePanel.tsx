@@ -18,7 +18,7 @@ export default function ScorePanel({ score }: { score: Score }) {
       <div style={{ marginTop: "1rem" }}>
         <p style={{ margin: 0, fontWeight: 600, color: "var(--ink)" }}>No record</p>
         <p className="dim" style={{ marginTop: "0.3rem" }}>
-          This account has no attested outcomes — <b>not</b> the same as a clean record,
+          This account has no attested outcomes. <b>Not</b> the same as a clean record,
           and not a score of zero. There is simply nothing yet to score.
         </p>
       </div>
@@ -41,7 +41,7 @@ export default function ScorePanel({ score }: { score: Score }) {
       <div className="enclave">
         <div className="side private">
           <div className="tagline">Never exposed</div>
-          Every invoice, amount, date and counterparty — the full history stays inside the enclave.
+          Every invoice, amount, date and counterparty. The full history stays inside the enclave.
         </div>
         <div className="arrow">→</div>
         <div className="side">

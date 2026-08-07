@@ -41,12 +41,12 @@ export default function App() {
       <main>
         {fixtures && (
           <p className="dim small" style={{ marginTop: 0 }}>
-            Fixture mode — all data is fake. Remove <code>?fixtures=1</code> to read {CHAIN.name}.
+            Fixture mode. All data is fake. Remove <code>?fixtures=1</code> to read {CHAIN.name}.
           </p>
         )}
         {wallet.error && <p className="error">{wallet.error}</p>}
         {wallet.address && !wallet.isCorrectChain && (
-          <p className="error">Wrong network — switch to {CHAIN.name}.</p>
+          <p className="error">Wrong network. Switch to {CHAIN.name}.</p>
         )}
         <Outlet context={wallet} />
       </main>
