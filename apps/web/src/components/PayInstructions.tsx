@@ -27,35 +27,54 @@ export default function PayInstructions({
   const copy = (text: string) => void navigator.clipboard?.writeText(text);
 
   return (
-    <div className="stub">
-      <p className="dim">Payable from any XRPL wallet or exchange — nothing to install.</p>
-
-      <p>
-        Send <b>{dropsToXrp(invoice.amountDrops)} XRP</b> to:
-      </p>
-      <p className="mono">
-        {payeeAddress} <button onClick={() => copy(payeeAddress)}>copy</button>
+    <div>
+      <h3>Pay this invoice</h3>
+      <p className="dim" style={{ marginTop: 0 }}>
+        Payable from any XRPL wallet or exchange — nothing to install.
       </p>
 
-      <p style={{ marginTop: "1rem" }}>with destination tag:</p>
-      <p>
-        <b className="mono" style={{ fontSize: "2rem" }}>
-          {invoice.destinationTag}
-        </b>{" "}
-        <button onClick={() => copy(String(invoice.destinationTag))}>copy</button>
-      </p>
+      {/* 1 — amount */}
+      <label>Send exactly</label>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
+        <span style={{ font: "700 1.6rem/1 var(--sans)", color: "var(--ink)" }}>
+          {dropsToXrp(invoice.amountDrops)}
+        </span>
+        <span className="dim">XRP</span>
+      </div>
 
-      <p className="error" style={{ marginTop: "1rem" }}>
-        Without this tag the payment cannot be matched and the invoice will still
-        be marked delinquent.
-      </p>
+      {/* 2 — destination address */}
+      <label>To address</label>
+      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+        <span className="mono" style={{ wordBreak: "break-all" }}>{payeeAddress}</span>
+        <button className="copy" onClick={() => copy(payeeAddress)}>Copy</button>
+      </div>
 
-      <p className="dim" style={{ marginTop: "1rem" }}>
-        Time remaining: <Countdown deadlineTimestamp={invoice.deadlineTimestamp} />
-      </p>
+      {/* 3 — the destination tag: the hero, and the single most-missed field */}
+      <div className="tag-hero">
+        <div className="tag-label">Destination tag — required</div>
+        <div className="tag-value">{invoice.destinationTag}</div>
+        <button className="copy" onClick={() => copy(String(invoice.destinationTag))}>
+          Copy tag
+        </button>
+      </div>
 
-      {/* TODO(design): render this as a QR code instead of a link. */}
-      <p className="dim mono">{uri}</p>
+      <div className="callout">
+        <span className="icon">⚠</span>
+        <span>
+          <b>Include the destination tag.</b> A payment sent without it can&apos;t be
+          matched to this invoice — the money still reaches the payee, but the invoice
+          lapses and goes to a permanent <b>Mark</b> anyway.
+        </span>
+      </div>
+
+      {/* 4 — countdown + wallet URI */}
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", marginTop: "0.6rem" }}>
+        <span className="dim">
+          Time remaining · <Countdown deadlineTimestamp={invoice.deadlineTimestamp} />
+        </span>
+        {/* TODO(design): render `uri` as a QR code (library pre-approved). */}
+        <a className="dim mono small" href={uri} style={{ wordBreak: "break-all", borderBottom: "none" }}>{uri}</a>
+      </div>
     </div>
   );
 }

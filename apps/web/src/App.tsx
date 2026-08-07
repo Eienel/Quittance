@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Link, Outlet } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
 import { useFixtures } from "@/lib/fixtures";
 import { CHAIN } from "@/lib/config";
@@ -11,18 +11,23 @@ export default function App() {
     <>
       <nav>
         <Link to="/" className="brand">Quittance</Link>
-        <Link to="/">Invoices</Link>
-        <Link to="/create">Create</Link>
-        <Link to="/record">Record</Link>
-        <Link to="/score">Score</Link>
-        <button onClick={wallet.connect} disabled={wallet.connecting}>
+        <NavLink to="/" end>Invoices</NavLink>
+        <NavLink to="/create">Create</NavLink>
+        <NavLink to="/record">Record</NavLink>
+        <NavLink to="/score">Score</NavLink>
+        <span className="spacer" />
+        <span className="chip" title={`${CHAIN.name} · chainId ${CHAIN.id}`}>
+          <span className="dot" style={{ background: fixtures ? "var(--lapsed)" : "var(--settled)" }} />
+          {fixtures ? "Fixture data" : CHAIN.name}
+        </span>
+        <button className="ghost" onClick={wallet.connect} disabled={wallet.connecting}>
           {wallet.address ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "Connect"}
         </button>
       </nav>
 
       <main>
         {fixtures && (
-          <p className="dim">
+          <p className="dim small" style={{ marginTop: 0 }}>
             Fixture mode — all data is fake. Remove <code>?fixtures=1</code> to read {CHAIN.name}.
           </p>
         )}
