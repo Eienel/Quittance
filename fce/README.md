@@ -57,8 +57,8 @@ Registered and live on Coston2:
 
 | Thing | Value |
 | --- | --- |
-| `ScoreInstructionSender` | `0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44` |
-| Extension ID | `65975` |
+| `ScoreInstructionSender` | `0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347` |
+| Extension ID | `66012` |
 | Registration tx | `0xd8cfaabeb085a710e352f7962f81070180339aac5f338fcf27718f46ca7aa798` |
 | `FlareTeeManager` (Coston2) | `0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE` |
 

@@ -114,6 +114,31 @@ An unacknowledged invoice can still be marked — the mark is true — but it to
 payment record. The invoice carries the outcome; the record stays trustworthy, because
 third parties lend against it.
 
+### The bond: making the proof do something
+
+A proof of non-payment, on its own, only *says* something. Nobody has to read it and
+nothing follows from it — which is the difference between a credit bureau, whose reports
+gate access to credit, and a diary. A registry with three invoices in it is worth nothing
+to a lender no matter how good the cryptography, so the value of a pure record arrives only
+at adoption scale that a new protocol does not have.
+
+So an obligation can carry a **bond**: native FLR locked by the payer, or by a third party
+guaranteeing them. Settlement returns it to whoever posted it. A mark hands it to the
+issuer — released by the very same attestation that records the mark, in the same
+transaction.
+
+That changes what the protocol is worth on day one. The first invoice ever issued is useful
+to its two parties, because the outcome moves money between them and needs no audience. The
+payment record becomes something that accrues quietly in the background rather than the
+thing that has to be bootstrapped before anything works.
+
+Bond proceeds are **pulled, not pushed**: `withdraw()` credits, never transfers inline. If
+proceeds were pushed, a creditor whose address rejects payment could make their own invoice
+impossible to settle, and a debtor could block their own mark. And because an outcome nobody
+proves would otherwise strand the money forever, the poster can reclaim an unresolved bond
+after a 30-day grace period past the deadline — far enough out that waiting is never cheaper
+than proving.
+
 ## Running it
 
 ```bash
@@ -138,15 +163,15 @@ PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
 | Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
 | Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
 | Coston2 deployment + full E2E, both outcomes | **Done** — see below |
-| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `65975` live on Coston2 ([`fce/`](fce/)) |
+| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `66012` live on Coston2 ([`fce/`](fce/)) |
 | FCE reproducible image + TEE machine registration | Needs Docker + a Confidential Space VM |
 
 ## Deployed (Coston2)
 
 | Contract | Address |
 | --- | --- |
-| `InvoiceRegistry` | [`0x14E50b59fA00c252155E5c532580d9581933D7b9`](https://coston2-explorer.flare.network/address/0x14E50b59fA00c252155E5c532580d9581933D7b9) |
-| `ScoreInstructionSender` (FCE `65975`) | [`0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44`](https://coston2-explorer.flare.network/address/0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44) |
+| `InvoiceRegistry` | [`0x1267431d069c0F3587dbAA05c41d76e677bFaA4c`](https://coston2-explorer.flare.network/address/0x1267431d069c0F3587dbAA05c41d76e677bFaA4c) |
+| `ScoreInstructionSender` (FCE `66012`) | [`0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347`](https://coston2-explorer.flare.network/address/0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347) |
 
 Both outcomes were exercised end-to-end against the XRPL testnet on the predecessor
 deployment (`0xC07009…2d00A`, before acknowledgement was added):
@@ -177,7 +202,7 @@ cross the boundary, and the machine's attested identity is what makes that check
 rather than merely promised.
 
 Registration turned out to be **permissionless on Coston2** — the same network as the
-registry, not Songbird as expected — so extension `65975` is registered and owned by us,
+registry, not Songbird as expected — so extension `66012` is registered and owned by us,
 with no Foundation involvement. Details, scoring model, and the live verification against
 real Coston2 data are in [`fce/README.md`](fce/README.md).
 

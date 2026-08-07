@@ -16,10 +16,10 @@ export const CHAIN = {
 } as const;
 
 export const CONTRACTS = {
-  invoiceRegistry: "0x14E50b59fA00c252155E5c532580d9581933D7b9",
-  scoreInstructionSender: "0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44",
+  invoiceRegistry: "0x1267431d069c0F3587dbAA05c41d76e677bFaA4c",
+  scoreInstructionSender: "0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347",
   /** Registered Flare Compute Extension id for the confidential scorer. */
-  fceExtensionId: 65975,
+  fceExtensionId: 66012,
 } as const;
 
 export const XRPL = {

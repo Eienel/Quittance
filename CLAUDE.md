@@ -20,7 +20,13 @@ nothing can prove one *didn't*. Flare's `XRPPaymentNonexistence` attestation mak
 non-payment a network-attested fact rather than one party's claim — which is what makes a
 payment record worth anything to a third party who trusts neither side.
 
-Outcomes accumulate into a permanent per-account payment record. A second component
+**An outcome can move money.** A payer (or a third-party guarantor) may lock FLR against
+an invoice as a bond. Settlement returns it; a mark hands it to the issuer, released by the
+very same attestation that records the mark. This matters more than it sounds: without it a
+mark is only a *statement*, consequential just if some stranger later reads the registry —
+which nobody does on day one. The bond makes the first invoice ever issued worth using.
+
+Outcomes also accumulate into a permanent per-account payment record. A second component
 (**Quittance Confidential**) scores that record inside a TEE, so a lender gets the judgement
 without ever seeing the history.
 
@@ -36,9 +42,9 @@ for two bounties: Interoperable Asset Products, and Confidential Compute Apps.
 | Thing | Where |
 | --- | --- |
 | Deployed app | https://quittance-azure.vercel.app |
-| `InvoiceRegistry` (Coston2) | `0x14E50b59fA00c252155E5c532580d9581933D7b9` |
-| `ScoreInstructionSender` (Coston2) | `0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44` |
-| Flare Compute Extension ID | `65975` |
+| `InvoiceRegistry` (Coston2) | `0x1267431d069c0F3587dbAA05c41d76e677bFaA4c` |
+| `ScoreInstructionSender` (Coston2) | `0x3Fa4d7E94a5c28Ab40f2605Fbfc5A8bFd3709347` |
+| Flare Compute Extension ID | `66012` |
 | Chain | Flare Coston2 testnet, chainId **114** |
 | Explorer | https://coston2-explorer.flare.network |
 
@@ -89,12 +95,17 @@ One constraint that is easy to break: the DA layer's CORS allowlist does **not**
 
 **Not yours — coordinate before changing:**
 - `apps/web/src/lib/` and `apps/web/src/hooks/` — the data layer. Tested against the live
-  chain and live Flare services (18 tests). If you need it to expose something it doesn't,
-  ask rather than reworking the fetching.
+  chain and live Flare services. If you need it to expose something it doesn't, ask rather
+  than reworking the fetching.
 - `contracts/`, `services/`, `fce/` — backend.
 
 Anything wrapped in a `.stub` CSS class is a placeholder that labels itself on screen. Those
-are exactly the things to replace.
+are exactly the things to replace. In rough order of how much they matter:
+
+1. **`PayInstructions`** — what a judge actually uses. The destination tag has to dominate it.
+2. **`BondPanel`** — the stake. Show both futures before the deadline, not just the outcome after.
+3. **`Pipeline`** / **`OutcomeAction`** — the ~2 minute attestation wait, made legible.
+4. **`ScorePanel`** — the privacy story.
 
 ---
 
@@ -156,7 +167,15 @@ marked delinquent — the proof is true — but it deliberately does not touch t
 payment record. `invoice.acknowledged` tells you which kind you are looking at, and the UI
 must not present the two identically. Fixtures: `unacknowledged`, `unacknowledgedMark`.
 
-**6. `score: 0` means "no record", not a score of zero.**
+**6. The bond is the demo.**
+`invoice.bondAmount` (wei) and `invoice.bondPoster` are the stake. A judge watching FLR
+actually move when a deadline is missed is the entire pitch in one shot — make it legible
+*before* the deadline, not only after. Note `bondAmount` is zeroed once an outcome
+resolves; the `BondResolved` event carries where it went and how much. Fixtures: `bonded`,
+`bondForfeited`. Proceeds are pulled, not pushed — a recipient calls `withdraw()`, which is
+also why an outcome can never be blocked by a hostile address.
+
+**7. `score: 0` means "no record", not a score of zero.**
 And always display `basis` (how many attested outcomes back the score). A 700 from two
 invoices is a different claim from a 700 from forty. Hiding that would be the dishonest
 version of that screen, and a judge will poke at exactly it.
@@ -168,6 +187,7 @@ version of that screen, and a judge will poke at exactly it.
 | Component | State |
 | --- | --- |
 | `InvoiceRegistry`, both proof paths | Live on Coston2, exercised end-to-end |
+| Bond escrow — post, resolve, withdraw, grace reclaim | Live, 17 tests |
 | Browser-side FDC pipeline | Live, tested |
 | XRPL payment detection | Live, client-side |
 | Web app data layer | Done, 18 tests |

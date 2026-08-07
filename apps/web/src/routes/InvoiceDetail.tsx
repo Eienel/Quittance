@@ -7,6 +7,7 @@ import StatusBadge from "@/components/StatusBadge";
 import PayInstructions from "@/components/PayInstructions";
 import Pipeline from "@/components/Pipeline";
 import OutcomeAction from "@/components/OutcomeAction";
+import BondPanel from "@/components/BondPanel";
 import { verifyPayee, decodeMeta } from "@/lib/metadata";
 import type { useWallet } from "@/hooks/useWallet";
 
@@ -49,6 +50,8 @@ export default function InvoiceDetail() {
           seen it, so pay instructions cannot be shown. The chain stores only a hash.
         </p>
       )}
+
+      <BondPanel invoice={invoice} signer={wallet.signer} onDone={refresh} />
 
       <OutcomeAction
         invoice={invoice}

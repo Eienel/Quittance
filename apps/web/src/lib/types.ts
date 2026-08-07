@@ -38,6 +38,15 @@ export interface Invoice {
    * payment record. Surface this: an unacknowledged mark is a claim, not a judgement.
    */
   acknowledged: boolean;
+  /**
+   * Native FLR locked against this obligation, in wei. Settlement returns it to the
+   * poster; a mark hands it to the issuer. A bonded invoice is the only kind whose
+   * outcome moves money, which is what makes it matter without anyone else reading
+   * the registry.
+   */
+  bondAmount: bigint;
+  /** Who gets it back on settlement — not necessarily the payer; guarantors are allowed. */
+  bondPoster: string;
   settledByAddressHash: string;
   outcomeTimestamp: bigint;
   metadataURI: string;
