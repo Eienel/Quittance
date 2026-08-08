@@ -399,8 +399,10 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   width: var(--w);
   margin-inline: calc((100% - var(--w)) / 2);
   margin-top: clamp(1.5rem, 4vw, 3.5rem);
-  display: grid; grid-template-columns: 1.2fr 0.8fr; gap: clamp(2.6rem, 6vw, 6rem); align-items: center;
+  display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(2.6rem, 6vw, 6rem); align-items: center;
 }
+.split-text { order: 1; }
+.split-media { order: 2; }
 .split-media { overflow: hidden; }
 .split-media img { width: 100%; height: auto; display: block; }
 .split-text h2 { margin-bottom: 1rem; }
@@ -410,25 +412,24 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
     grid-template-columns: 1fr; gap: 2.8rem; width: auto; margin-inline: 0;
     margin-top: 1.5rem;
   }
+  .split-media, .split-text { order: 0; }
   .split-text h2 { margin-bottom: 0.6rem; }
   .split-text .lead { font-size: 1.06rem; }
 }
 
 /* two outcomes on the landing */
 .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); padding: var(--gap) 0; position: relative; }
-.two-up::before {
-  content: ""; position: absolute; left: 50%; top: var(--gap); bottom: var(--gap);
-  width: 1px; transform: translateX(-50%);
+.two-up::before, .two-up::after {
+  content: ""; position: absolute; top: var(--gap); bottom: var(--gap); width: 1px;
   background: linear-gradient(180deg, transparent, var(--line-2) 16%, var(--line-2) 84%, transparent);
 }
+.two-up::before { left: calc(50% - 2.5px); }
+.two-up::after { left: calc(50% + 2.5px); }
 .two-up .outcome-card {
   padding: 0; border: none; border-radius: 0; background: transparent; text-align: center;
 }
 .two-up .outcome-card.settled, .two-up .outcome-card.delinquent { background: transparent; border: none; }
 .two-up .outcome-card .k { margin-bottom: 0.15rem; }
-.outcome-icon { display: block; margin: 0 auto 1.1rem; }
-.outcome-card.settled .outcome-icon { color: var(--settled); }
-.outcome-card.delinquent .outcome-icon { color: var(--delinquent); }
 .two-up .outcome-card .headline { font: 600 1.5rem/1.1 var(--sans); letter-spacing: -0.03em; color: var(--ink); margin: 0.25rem 0 0.7rem; }
 .two-up .outcome-card .sub { font-size: 0.96rem; line-height: 1.5; color: var(--text); }
 
@@ -499,5 +500,5 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 @media (max-width: 620px) {
   .outcomes, .enclave { grid-template-columns: 1fr; }
   .enclave .arrow { transform: rotate(90deg); justify-self: center; }
-  .two-up::before { display: none; }
+  .two-up::before, .two-up::after { display: none; }
 }
