@@ -138,6 +138,19 @@ nav.over .nav-toggle { color: #fff; }
 
 main { max-width: 940px; margin: 0 auto; padding: clamp(1.4rem, 4vw, 2.6rem) clamp(1rem, 4vw, 2rem) 5rem; }
 
+/* floating notices — sit below the nav, never in the page flow */
+.toasts {
+  position: fixed; top: calc(var(--nav-h) + 10px); left: 50%; transform: translateX(-50%);
+  z-index: 50; width: min(560px, 92vw); display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toasts:empty { display: none; }
+.toasts > * { margin: 0; pointer-events: auto; box-shadow: var(--shadow-lg); }
+.toast-note {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 0.62rem 0.9rem; font-size: 0.82rem; color: var(--dim); text-align: center;
+}
+
 /* ── surfaces ───────────────────────────────────────────────────────────── */
 section {
   background: var(--panel);

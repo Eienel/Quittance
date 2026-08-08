@@ -61,9 +61,10 @@ export default function App() {
       </nav>
       {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)} />}
 
-      <main>
+      {/* Floating notices — kept out of the page flow so they never shift the hero. */}
+      <div className="toasts">
         {fixtures && (
-          <p className="dim small" style={{ marginTop: 0 }}>
+          <p className="toast-note">
             Fixture mode. All data is fake. Remove <code>?fixtures=1</code> to read {CHAIN.name}.
           </p>
         )}
@@ -71,6 +72,9 @@ export default function App() {
         {wallet.address && !wallet.isCorrectChain && (
           <p className="error">Wrong network. Switch to {CHAIN.name}.</p>
         )}
+      </div>
+
+      <main>
         <Outlet context={wallet} />
       </main>
     </>
