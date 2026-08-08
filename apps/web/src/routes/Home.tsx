@@ -122,13 +122,10 @@ export default function Home() {
           <img src="/confidential.jpg" alt="" loading="lazy" />
         </div>
         <div className="split-text">
-          <span className="eyebrow">Quittance Confidential</span>
           <h2>A credit score that never sees your history</h2>
           <p className="lead">
-            A payment record is commercially sensitive, but a lender needs the judgement, not the
-            ledger. So an account can be scored <b>inside a TEE</b>: the enclave reads the full
-            history (every invoice, amount and date), and only <span className="mono">{"{ score, band, basis }"}</span> comes
-            out. The raw history never crosses the boundary.
+            A lender needs the judgement, not the ledger. So a <b>TEE</b> reads your full
+            history and returns only the score. The raw data never leaves the enclave.
           </p>
           <Link to="/score" className="btn" style={{ marginTop: "0.5rem" }}>Try the score →</Link>
         </div>
