@@ -415,7 +415,7 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 }
 
 /* two outcomes on the landing */
-.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; padding: var(--gap) 0 0; }
+.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; padding: var(--gap) 0; }
 .two-up .outcome-card {
   padding: 0; border: none; border-radius: 0; background: transparent; text-align: center;
 }
