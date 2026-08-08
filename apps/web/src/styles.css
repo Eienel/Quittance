@@ -122,6 +122,7 @@ nav.over .nav-toggle { color: #fff; }
 .nav-toggle .bars i:nth-child(2) { top: 10px; }
 .nav-toggle.open .bars i:nth-child(1) { top: 7px; transform: rotate(45deg); }
 .nav-toggle.open .bars i:nth-child(2) { top: 7px; transform: rotate(-45deg); }
+.drawer-connect { display: none; }
 .nav-backdrop { position: fixed; inset: 0; z-index: 25; background: rgba(0, 0, 0, 0.14); animation: navfade 0.3s ease; }
 @keyframes navfade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -427,6 +428,12 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   }
   .drawer-close:hover { background: rgba(255, 255, 255, 0.2); }
   .drawer-close .xicon i { background: #fff; }
+  .bar-connect { display: none; }
+  .drawer-connect {
+    display: block; width: 100%; margin-top: auto;
+    background: #fff; color: #111; border-color: #fff; padding: 0.85rem 1.2rem; font-size: 1rem;
+  }
+  .drawer-connect:hover:not(:disabled) { background: rgba(255, 255, 255, 0.88); }
 
   /* hero fits a phone */
   .hero { min-height: 86vh; padding: calc(var(--nav-h) + 2rem) 1.2rem 3.4rem; }

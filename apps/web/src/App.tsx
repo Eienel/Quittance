@@ -22,6 +22,9 @@ export default function App() {
   // close the mobile menu whenever the route changes
   useEffect(() => setMenuOpen(false), [location.pathname]);
   const over = location.pathname === "/" && !scrolled && !menuOpen;
+  const walletLabel = wallet.address
+    ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`
+    : "Connect";
 
   return (
     <>
@@ -35,14 +38,17 @@ export default function App() {
           <NavLink to="/create">Create</NavLink>
           <NavLink to="/record">Record</NavLink>
           <NavLink to="/score">Score</NavLink>
+          <button className="ghost drawer-connect" onClick={wallet.connect} disabled={wallet.connecting}>
+            {walletLabel}
+          </button>
         </div>
         <span className="spacer" />
         <span className="chip" title={`${CHAIN.name} · chainId ${CHAIN.id}`}>
           <span className="dot" style={{ background: fixtures ? "var(--lapsed)" : "var(--settled)" }} />
           {fixtures ? "Fixture data" : CHAIN.name}
         </span>
-        <button className="ghost" onClick={wallet.connect} disabled={wallet.connecting}>
-          {wallet.address ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "Connect"}
+        <button className="ghost bar-connect" onClick={wallet.connect} disabled={wallet.connecting}>
+          {walletLabel}
         </button>
         <button
           className={`nav-toggle${menuOpen ? " open" : ""}`}
