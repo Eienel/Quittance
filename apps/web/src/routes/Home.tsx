@@ -57,8 +57,8 @@ export default function Home() {
           <h2>Proof nobody else can give</h2>
           <p className="lead">
             Anyone can prove a payment <em>happened</em>. Almost nothing can prove one
-            <em> didn&apos;t</em>. Flare does, turning non-payment into a network-attested fact,
-            not one party&apos;s word.
+            <em> didn&apos;t</em>. Flare can, so a missed payment becomes a fact anyone can verify,
+            not just your word against theirs.
           </p>
         </div>
       </div>
