@@ -33,7 +33,6 @@ export default function Home() {
         />
         <div className="hero-scrim" />
         <div className="hero-inner">
-          <span className="eyebrow">Invoicing protocol · Flare</span>
           <h1>
             Every invoice ends in a<br />
             <span className="q">quittance</span>, or a <span className="m">mark</span>.
