@@ -66,16 +66,14 @@ export default function Home() {
       {/* two outcomes, equal weight */}
       <div className="two-up">
         <div className="outcome-card settled">
-          <div className="k">Quittance</div>
-          <div className="headline">Paid, on time</div>
+          <div className="headline">Paid, on time <span className="k">Quittance</span></div>
           <p className="sub">
             The XRPL payment landed before the deadline. Settled with an FDC
             <span className="mono"> XRPPayment</span> proof. A permanent receipt.
           </p>
         </div>
         <div className="outcome-card delinquent">
-          <div className="k">Mark</div>
-          <div className="headline">Proven unpaid</div>
+          <div className="headline">Proven unpaid <span className="k">Mark</span></div>
           <p className="sub">
             No such payment exists anywhere in the window. Marked with an FDC
             <span className="mono"> XRPPaymentNonexistence</span> proof. Permanent, and no one&apos;s to retract.

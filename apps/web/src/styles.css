@@ -405,7 +405,9 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 .split-media { order: 2; }
 .split-media { overflow: hidden; }
 .split-media img { width: 100%; height: auto; display: block; }
-.split-text h2 { margin-bottom: 1rem; }
+.split-text { text-align: center; }
+.split-text h2 { margin-bottom: 1rem; justify-content: center; }
+.split-text .lead { margin-inline: auto; }
 .split-text .lead em { font-size: 0.9em; font-style: italic; }
 @media (max-width: 720px) {
   .split {
@@ -429,8 +431,11 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   padding: 0; border: none; border-radius: 0; background: transparent; text-align: center;
 }
 .two-up .outcome-card.settled, .two-up .outcome-card.delinquent { background: transparent; border: none; }
-.two-up .outcome-card .k { margin-bottom: 0.15rem; }
-.two-up .outcome-card .headline { font: 600 1.5rem/1.1 var(--sans); letter-spacing: -0.03em; color: var(--ink); margin: 0.25rem 0 0.7rem; }
+.two-up .outcome-card .headline { font: 600 1.5rem/1.2 var(--sans); letter-spacing: -0.03em; color: var(--ink); margin: 0 0 0.8rem; }
+.two-up .outcome-card .headline .k {
+  margin-left: 0.5rem; font-size: 0.64rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--dim); vertical-align: middle;
+}
 .two-up .outcome-card .sub { font-size: 0.96rem; line-height: 1.5; color: var(--text); }
 
 /* how-it-works steps */
