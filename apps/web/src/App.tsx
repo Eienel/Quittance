@@ -41,10 +41,16 @@ export default function App() {
         <button className="ghost" onClick={wallet.connect} disabled={wallet.connecting}>
           {wallet.address ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "Connect"}
         </button>
-        <button className="nav-toggle" aria-label="Menu" onClick={() => setMenuOpen((o) => !o)}>
-          {menuOpen ? "✕" : "☰"}
+        <button
+          className={`nav-toggle${menuOpen ? " open" : ""}`}
+          aria-label="Menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          <span className="bars"><i /><i /></span>
         </button>
       </nav>
+      {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)} />}
 
       <main>
         {fixtures && (
