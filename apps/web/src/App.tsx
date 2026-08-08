@@ -45,7 +45,7 @@ export default function App() {
         <span className="spacer" />
         <span className="chip" title={`${CHAIN.name} · chainId ${CHAIN.id}`}>
           <span className="dot" style={{ background: fixtures ? "var(--lapsed)" : "var(--settled)" }} />
-          {fixtures ? "Fixture data" : CHAIN.name}
+          {fixtures ? "Fixtures" : "Coston2"}
         </span>
         <button className="ghost bar-connect" onClick={wallet.connect} disabled={wallet.connecting}>
           {walletLabel}
