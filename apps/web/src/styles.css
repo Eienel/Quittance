@@ -45,12 +45,13 @@
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 
 body {
   margin: 0;
   background: var(--bg);
   min-height: 100vh;
+  overflow-x: clip;
   color: var(--text);
   font: 400 15.5px/1.6 var(--sans);
   letter-spacing: -0.011em;
@@ -420,6 +421,8 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
     font-size: 1.1rem; font-weight: 500; letter-spacing: -0.018em;
   }
   .nav-links a:hover, .nav-links a.active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+  nav.menu-open { background: rgba(14, 14, 16, 0.97); border-bottom-color: rgba(255, 255, 255, 0.08); }
+  nav.menu-open .brand { color: #fff; }
   nav.menu-open .nav-toggle { display: none; }
   .drawer-close {
     display: inline-flex; align-items: center; justify-content: center;
