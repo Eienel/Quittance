@@ -415,7 +415,12 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 }
 
 /* two outcomes on the landing */
-.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; padding: var(--gap) 0; }
+.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); padding: var(--gap) 0; position: relative; }
+.two-up::before {
+  content: ""; position: absolute; left: 50%; top: var(--gap); bottom: var(--gap);
+  width: 1px; transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, var(--line-2) 16%, var(--line-2) 84%, transparent);
+}
 .two-up .outcome-card {
   padding: 0; border: none; border-radius: 0; background: transparent; text-align: center;
 }
@@ -494,4 +499,5 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 @media (max-width: 620px) {
   .outcomes, .enclave { grid-template-columns: 1fr; }
   .enclave .arrow { transform: rotate(90deg); justify-self: center; }
+  .two-up::before { display: none; }
 }
