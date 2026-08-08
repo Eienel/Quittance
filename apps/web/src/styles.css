@@ -105,6 +105,14 @@ nav.over .chip { color: #fff; border-color: rgba(255, 255, 255, 0.3); background
 nav.over button.ghost { color: #fff; border-color: rgba(255, 255, 255, 0.42); background: rgba(255, 255, 255, 0.1); }
 nav.over button.ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); }
 
+.nav-links { display: flex; gap: 0.3rem; align-items: center; }
+.nav-toggle {
+  display: none; background: transparent; border: none; color: var(--ink);
+  font-size: 1.3rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 8px; cursor: pointer;
+}
+.nav-toggle:hover:not(:disabled) { background: rgba(0, 0, 0, 0.05); }
+nav.over .nav-toggle { color: #fff; }
+
 main { max-width: 940px; margin: 0 auto; padding: clamp(1.4rem, 4vw, 2.6rem) clamp(1rem, 4vw, 2rem) 5rem; }
 
 /* ── surfaces ───────────────────────────────────────────────────────────── */
@@ -371,9 +379,30 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 
 @media (max-width: 620px) { .two-up { grid-template-columns: 1fr; } }
 
+@media (max-width: 720px) {
+  /* collapse the nav into a menu */
+  nav .brand { margin-right: auto; }
+  .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .chip, .spacer { display: none; }
+  .nav-links {
+    position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0.1rem;
+    background: var(--panel); border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow); padding: 0.5rem; display: none;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { color: var(--ink); padding: 0.75rem 0.85rem; border-radius: 10px; font-size: 1rem; }
+  .nav-links a:hover, .nav-links a.active { background: rgba(0, 0, 0, 0.05); color: var(--ink); }
+
+  /* hero fits a phone */
+  .hero { --nav-h: 56px; min-height: 86vh; padding: calc(var(--nav-h) + 2rem) 1.2rem 3.4rem; }
+  .hero h1 { font-size: clamp(2.15rem, 8.6vw, 3.2rem); letter-spacing: -0.04em; }
+  .hero-sub { font-size: 1.04rem; }
+  .cta-row { width: 100%; }
+  .cta-row .btn { flex: 1 1 40%; justify-content: center; }
+}
+
 @media (max-width: 620px) {
-  nav .brand { margin-right: 0.7rem; }
-  nav a { padding: 0.42rem 0.52rem; }
   .outcomes, .enclave { grid-template-columns: 1fr; }
   .enclave .arrow { transform: rotate(90deg); justify-self: center; }
 }
