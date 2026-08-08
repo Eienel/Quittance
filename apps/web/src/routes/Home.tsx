@@ -48,16 +48,21 @@ export default function Home() {
         <span className="scroll-cue">Scroll ↓</span>
       </header>
 
-      {/* the core insight */}
-      <section className="home-block">
-        <h2>Proof nobody else can give</h2>
-        <p className="lead">
-          Plenty of systems can prove a payment <em>happened</em>. Almost nothing can prove one
-          <em> didn&apos;t</em>. Flare&apos;s Data Connector can attest that no matching XRPL payment
-          exists in a given window, so non-payment becomes a network-attested fact, not one
-          party&apos;s word. That&apos;s what makes a payment record worth anything to a third party
-          who trusts neither side.
-        </p>
+      {/* the core insight — image left, text right */}
+      <section className="home-block split">
+        <div className="split-media">
+          <img src="/insight.jpg" alt="" loading="lazy" />
+        </div>
+        <div className="split-text">
+          <h2>Proof nobody else can give</h2>
+          <p className="lead">
+            Plenty of systems can prove a payment <em>happened</em>. Almost nothing can prove one
+            <em> didn&apos;t</em>. Flare&apos;s Data Connector can attest that no matching XRPL payment
+            exists in a given window, so non-payment becomes a network-attested fact, not one
+            party&apos;s word. That&apos;s what makes a payment record worth anything to a third party
+            who trusts neither side.
+          </p>
+        </div>
       </section>
 
       {/* two outcomes, equal weight */}
