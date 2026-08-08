@@ -49,7 +49,7 @@ export default function Home() {
       </header>
 
       {/* the core insight — image left, text right */}
-      <section className="home-block split">
+      <div className="home-block split">
         <div className="split-media">
           <img src="/insight.jpg" alt="" loading="lazy" />
         </div>
@@ -63,7 +63,7 @@ export default function Home() {
             who trusts neither side.
           </p>
         </div>
-      </section>
+      </div>
 
       {/* two outcomes, equal weight */}
       <div className="two-up">
