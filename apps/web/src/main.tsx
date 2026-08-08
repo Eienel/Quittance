@@ -7,6 +7,7 @@ import Create from "./routes/Create";
 import InvoiceDetail from "./routes/InvoiceDetail";
 import Record from "./routes/Record";
 import Score from "./routes/Score";
+import Attacks from "./routes/Attacks";
 import "./styles.css";
 
 const router = createBrowserRouter([
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
       { path: "invoice/:id", element: <InvoiceDetail /> },
       { path: "record", element: <Record /> },
       { path: "score", element: <Score /> },
+      { path: "attacks", element: <Attacks /> },
     ],
   },
 ]);

@@ -15,6 +15,7 @@ export default function App() {
         <Link to="/create">Create</Link>
         <Link to="/record">Record</Link>
         <Link to="/score">Score</Link>
+        <Link to="/attacks">Attacks</Link>
         <button onClick={wallet.connect} disabled={wallet.connecting}>
           {wallet.address ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "Connect"}
         </button>

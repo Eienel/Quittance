@@ -72,35 +72,54 @@ async function protocolContract(name, abi, runner) {
   return new ethers.Contract(addr, abi, runner);
 }
 
-/** Ask the verifier to encode + integrity-check an attestation request. */
-async function prepareRequest(attestationName, sourcePath, requestBody) {
+/**
+ * Ask the verifier to encode + integrity-check an attestation request.
+ *
+ * A freshly submitted XRPL transaction is not attestable yet: the verifier requires
+ * finality (3 confirmations, ~12 s) and answers `TRANSACTION DOES NOT EXIST` until then.
+ * That is a race, not a rejection, so it is worth waiting out — whereas a genuinely
+ * malformed request fails the same way every time and should surface immediately.
+ */
+async function prepareRequest(attestationName, sourcePath, requestBody, log = () => {}) {
   const url = `${cfg.verifierBase}/verifier/xrp/${attestationName}/prepareRequest`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "X-API-KEY": cfg.verifierApiKey,
-    },
-    body: JSON.stringify({
-      attestationType: toBytes32(attestationName),
-      sourceId: SOURCE_TESTXRP,
-      requestBody,
-    }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok || body.status !== "VALID") {
-    throw new Error(
-      `verifier rejected ${attestationName}: ${res.status} ${JSON.stringify(body)}`
-    );
+
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "X-API-KEY": cfg.verifierApiKey,
+      },
+      body: JSON.stringify({
+        attestationType: toBytes32(attestationName),
+        sourceId: SOURCE_TESTXRP,
+        requestBody,
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+
+    if (res.ok && body.status === "VALID") return body.abiEncodedRequest;
+
+    const notYetFinal =
+      typeof body.status === "string" && body.status.includes("DOES NOT EXIST");
+    if (!notYetFinal || attempt >= 10) {
+      throw new Error(
+        `verifier rejected ${attestationName}: ${res.status} ${JSON.stringify(body)}`
+      );
+    }
+
+    log(`waiting for XRPL finality before attesting (${body.status})`);
+    await new Promise((r) => setTimeout(r, 6_000));
   }
-  return body.abiEncodedRequest;
 }
 
-function prepareXrpPaymentRequest(transactionId) {
-  return prepareRequest("XRPPayment", "xrp", {
-    transactionId,
-    proofOwner: ethers.ZeroAddress,
-  });
+function prepareXrpPaymentRequest(transactionId, log) {
+  return prepareRequest(
+    "XRPPayment",
+    "xrp",
+    { transactionId, proofOwner: ethers.ZeroAddress },
+    log
+  );
 }
 
 /**
