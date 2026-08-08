@@ -405,9 +405,7 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 .split-media { order: 2; }
 .split-media { overflow: hidden; }
 .split-media img { width: 100%; height: auto; display: block; }
-.split-text { text-align: center; }
-.split-text h2 { margin-bottom: 1rem; justify-content: center; }
-.split-text .lead { margin-inline: auto; }
+.split-text h2 { margin-bottom: 1rem; }
 .split-text .lead em { font-size: 0.9em; font-style: italic; }
 @media (max-width: 720px) {
   .split {
