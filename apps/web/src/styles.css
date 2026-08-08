@@ -421,6 +421,9 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 }
 .two-up .outcome-card.settled, .two-up .outcome-card.delinquent { background: transparent; border: none; }
 .two-up .outcome-card .k { margin-bottom: 0.15rem; }
+.outcome-icon { display: block; margin: 0 auto 1.1rem; }
+.outcome-card.settled .outcome-icon { color: var(--settled); }
+.outcome-card.delinquent .outcome-icon { color: var(--delinquent); }
 .two-up .outcome-card .headline { font: 600 1.5rem/1.1 var(--sans); letter-spacing: -0.03em; color: var(--ink); margin: 0.25rem 0 0.7rem; }
 .two-up .outcome-card .sub { font-size: 0.96rem; line-height: 1.5; color: var(--text); }
 

@@ -66,6 +66,10 @@ export default function Home() {
       {/* two outcomes, equal weight */}
       <div className="two-up">
         <div className="outcome-card settled">
+          <svg className="outcome-icon" viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M8 12.4l2.6 2.6L16 9.4" />
+          </svg>
           <div className="k">Quittance</div>
           <div className="headline">Paid, on time</div>
           <p className="sub">
@@ -74,6 +78,10 @@ export default function Home() {
           </p>
         </div>
         <div className="outcome-card delinquent">
+          <svg className="outcome-icon" viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" />
+          </svg>
           <div className="k">Mark</div>
           <div className="headline">Proven unpaid</div>
           <p className="sub">
