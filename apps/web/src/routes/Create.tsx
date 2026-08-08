@@ -6,6 +6,8 @@ import { deadlineFromMinutes } from "@/lib/xrpl";
 import { remember } from "@/lib/addressBook";
 import { looksLikeXrplAddress, xrpToDrops, ZERO_HASH } from "@/lib/format";
 import { encodeMeta } from "@/lib/metadata";
+import { OBLIGATIONS, framingFor } from "@/lib/obligations";
+import type { ObligationKind } from "@/lib/types";
 
 type Wallet = ReturnType<typeof useWallet>;
 
@@ -13,6 +15,7 @@ export default function Create() {
   const wallet = useOutletContext<Wallet>();
   const navigate = useNavigate();
 
+  const [kind, setKind] = useState<ObligationKind>("invoice");
   const [payee, setPayee] = useState("");
   const [payer, setPayer] = useState("");
   const [bearer, setBearer] = useState(false);
@@ -21,6 +24,8 @@ export default function Create() {
   const [memo, setMemo] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const framing = framingFor(kind);
 
   const valid = looksLikeXrplAddress(payee) && (bearer || looksLikeXrplAddress(payer)) && Number(xrp) > 0;
 
@@ -38,7 +43,7 @@ export default function Create() {
         ...deadline,
         // Publish the payee address so a shared invoice link is payable by
         // someone who has never seen it. The chain stores only its hash.
-        metadataURI: encodeMeta({ payee, memo: memo || undefined }),
+        metadataURI: encodeMeta({ payee, memo: memo || undefined, kind }),
       });
       navigate(`/invoice/${invoiceId}`);
     } catch (err) {
@@ -50,7 +55,34 @@ export default function Create() {
 
   return (
     <section>
-      <h2>Create invoice</h2>
+      <h2>Issue an obligation</h2>
+
+      <label>Kind (the same contract, framed for the user)</label>
+      <select
+        value={kind}
+        onChange={(e) => setKind(e.target.value as ObligationKind)}
+        style={{
+          width: "100%",
+          padding: ".45rem .6rem",
+          borderRadius: "6px",
+          border: "1px solid var(--line)",
+          background: "var(--bg)",
+          color: "var(--text)",
+          font: "inherit",
+        }}
+      >
+        {OBLIGATIONS.map((o) => (
+          <option key={o.kind} value={o.kind}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <p className="dim">
+        {framing.summary} Obligor: {framing.obligor}; obligee: {framing.obligee}. Same{" "}
+        <span className="mono">createInvoice</span> / <span className="mono">settle</span> /{" "}
+        <span className="mono">markDelinquent</span> underneath — see the{" "}
+        <a href="/primitive">primitive</a> page.
+      </p>
 
       <label>Payee XRPL address (gets paid)</label>
       <input value={payee} onChange={(e) => setPayee(e.target.value)} placeholder="r…" />
@@ -92,7 +124,7 @@ export default function Create() {
 
       <p style={{ marginTop: ".9rem" }}>
         <button onClick={submit} disabled={!valid || busy || !wallet.address}>
-          {busy ? "Issuing…" : "Issue invoice"}
+          {busy ? "Issuing…" : `Issue ${framing.label.toLowerCase()}`}
         </button>
       </p>
       {error && <p className="error">{error}</p>}
