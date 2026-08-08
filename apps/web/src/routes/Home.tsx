@@ -56,11 +56,9 @@ export default function Home() {
         <div className="split-text">
           <h2>Proof nobody else can give</h2>
           <p className="lead">
-            Plenty of systems can prove a payment <em>happened</em>. Almost nothing can prove one
-            <em> didn&apos;t</em>. Flare&apos;s Data Connector can attest that no matching XRPL payment
-            exists in a given window, so non-payment becomes a network-attested fact, not one
-            party&apos;s word. That&apos;s what makes a payment record worth anything to a third party
-            who trusts neither side.
+            Anyone can prove a payment <em>happened</em>. Almost nothing can prove one
+            <em> didn&apos;t</em>. Flare does, turning non-payment into a network-attested fact,
+            not one party&apos;s word.
           </p>
         </div>
       </div>
