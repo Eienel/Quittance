@@ -24,7 +24,7 @@ export default function Home() {
         <video
           ref={videoRef}
           className="hero-video"
-          src="/hero.mp4"
+          src="/hero.mp4?v=2"
           autoPlay
           muted
           loop
