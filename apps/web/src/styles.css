@@ -423,11 +423,11 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   nav.menu-open .nav-toggle { display: none; }
   .drawer-close {
     display: inline-flex; align-items: center; justify-content: center;
-    position: absolute; top: calc(var(--nav-h) + 0.5rem); right: 14px;
-    width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.12);
+    position: absolute; top: calc(var(--nav-h) + 0.5rem); right: 16px; padding: 6px;
   }
-  .drawer-close:hover { background: rgba(255, 255, 255, 0.2); }
-  .drawer-close .xicon i { background: #fff; }
+  .drawer-close .xicon { width: 20px; height: 20px; }
+  .drawer-close .xicon i { background: rgba(255, 255, 255, 0.85); top: 9px; }
+  .drawer-close:hover .xicon i { background: #fff; }
   .bar-connect { display: none; }
   .drawer-connect {
     display: block; width: 100%; margin-top: auto;
