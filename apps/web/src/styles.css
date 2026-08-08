@@ -418,10 +418,9 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; padding: var(--gap) 0 0; }
 .two-up .outcome-card {
   padding: 2.2rem 2.3rem; border-radius: 0; background: var(--panel);
-  border: 1px solid var(--line); border-top: 3px solid var(--line);
+  border: 1px solid var(--line);
 }
-.two-up .outcome-card.settled { background: var(--panel); border-top-color: var(--settled); }
-.two-up .outcome-card.delinquent { background: var(--panel); border-top-color: var(--delinquent); }
+.two-up .outcome-card.settled, .two-up .outcome-card.delinquent { background: var(--panel); border-color: var(--line); }
 .two-up .outcome-card .k { margin-bottom: 0.15rem; }
 .two-up .outcome-card .headline { font: 600 1.5rem/1.1 var(--sans); letter-spacing: -0.03em; color: var(--ink); margin: 0.25rem 0 0.7rem; }
 .two-up .outcome-card .sub { font-size: 0.96rem; line-height: 1.5; color: var(--text); }
