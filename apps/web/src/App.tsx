@@ -25,9 +25,12 @@ export default function App() {
 
   return (
     <>
-      <nav className={over ? "over" : ""}>
+      <nav className={`${over ? "over" : ""}${menuOpen ? " menu-open" : ""}`.trim()}>
         <Link to="/" className="brand">Quittance</Link>
         <div className={`nav-links${menuOpen ? " open" : ""}`}>
+          <button className="drawer-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
+            <span className="xicon"><i /><i /></span>
+          </button>
           <NavLink to="/invoices">Invoices</NavLink>
           <NavLink to="/create">Create</NavLink>
           <NavLink to="/record">Record</NavLink>

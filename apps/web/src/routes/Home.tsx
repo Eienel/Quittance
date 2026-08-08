@@ -39,7 +39,6 @@ export default function Home() {
           </h1>
           <p className="hero-sub">
             Invoices in XRP that settle themselves. Proven paid, or proven unpaid.
-            Either way, permanent.
           </p>
           <div className="cta-row">
             <Link to="/create" className="btn primary">Create an invoice</Link>
