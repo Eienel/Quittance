@@ -21,6 +21,15 @@ export default function App() {
   }, []);
   // close the mobile menu whenever the route changes
   useEffect(() => setMenuOpen(false), [location.pathname]);
+
+  // wallet errors auto-dismiss so they don't linger on screen
+  const [errVisible, setErrVisible] = useState(false);
+  useEffect(() => {
+    if (!wallet.error) return;
+    setErrVisible(true);
+    const t = setTimeout(() => setErrVisible(false), 5000);
+    return () => clearTimeout(t);
+  }, [wallet.error]);
   const over = location.pathname === "/" && !scrolled && !menuOpen;
   const walletLabel = wallet.address
     ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`
@@ -68,7 +77,11 @@ export default function App() {
             Fixture mode. All data is fake. Remove <code>?fixtures=1</code> to read {CHAIN.name}.
           </p>
         )}
-        {wallet.error && <p className="error">{wallet.error}</p>}
+        {wallet.error && errVisible && (
+          <p className="error dismissable" onClick={() => setErrVisible(false)} title="Dismiss">
+            {wallet.error}
+          </p>
+        )}
         {wallet.address && !wallet.isCorrectChain && (
           <p className="error">Wrong network. Switch to {CHAIN.name}.</p>
         )}
