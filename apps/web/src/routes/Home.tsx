@@ -133,7 +133,6 @@ export default function Home() {
 
       {/* footer cta */}
       <footer className="home-cta">
-        <div className="mark-split" />
         <h2>Every invoice ends in a quittance or a mark.</h2>
         <div className="cta-row">
           <Link to="/create" className="btn primary">Create an invoice</Link>
