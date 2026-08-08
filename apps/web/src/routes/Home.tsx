@@ -75,8 +75,8 @@ export default function Home() {
         <div className="outcome-card delinquent">
           <div className="headline">Proven unpaid <span className="k">Mark</span></div>
           <p className="sub">
-            No such payment exists anywhere in the window. Marked with an FDC
-            <span className="mono"> XRPPaymentNonexistence</span> proof. Permanent, and no one&apos;s to retract.
+            No payment exists anywhere in the window. Marked with an FDC
+            <span className="mono"> XRPPaymentNonexistence</span> proof. A permanent mark.
           </p>
         </div>
       </div>
