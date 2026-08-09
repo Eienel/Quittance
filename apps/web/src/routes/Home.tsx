@@ -17,6 +17,29 @@ export default function Home() {
     v.play().catch(() => {});
   }, []);
 
+  // Scroll-reveal: fade + rise elements in as they enter the viewport.
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !("IntersectionObserver" in window)) {
+      els.forEach((el) => el.classList.add("in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="home">
       {/* hero */}
@@ -50,10 +73,10 @@ export default function Home() {
 
       {/* the core insight — image left, text right */}
       <div className="home-block split">
-        <div className="split-media">
+        <div className="split-media reveal">
           <img src="/insight.jpg" alt="" loading="lazy" />
         </div>
-        <div className="split-text">
+        <div className="split-text reveal">
           <h2>Proof nobody else can give</h2>
           <p className="lead">
             Anyone can prove a payment <em>happened</em>. Almost nothing can prove one
@@ -65,14 +88,14 @@ export default function Home() {
 
       {/* two outcomes, equal weight */}
       <div className="two-up">
-        <div className="outcome-card settled">
+        <div className="outcome-card settled reveal">
           <div className="headline">Paid, on time <span className="k">Quittance</span></div>
           <p className="sub">
             The XRPL payment landed before the deadline. Settled with an FDC
             <span className="mono"> XRPPayment</span> proof. A permanent receipt.
           </p>
         </div>
-        <div className="outcome-card delinquent">
+        <div className="outcome-card delinquent reveal">
           <div className="headline">Proven unpaid <span className="k">Mark</span></div>
           <p className="sub">
             No payment exists anywhere in the window. Marked with an FDC
@@ -83,30 +106,30 @@ export default function Home() {
 
       {/* how it works */}
       <div className="home-block hiw">
-        <h2>How it works</h2>
+        <h2 className="reveal">How it works</h2>
         <ol className="steps">
-          <li>
+          <li className="reveal">
             <span className="step-n">I</span>
             <div>
               <b>Issue</b>
               <p>Create an invoice payable in XRP with a deadline. The registry mints a unique destination tag.</p>
             </div>
           </li>
-          <li>
+          <li className="reveal">
             <span className="step-n">II</span>
             <div>
               <b>Pay</b>
               <p>The payer sends ordinary XRP from any wallet or exchange, tagged with that number. Nothing to install, no bridging, no custody.</p>
             </div>
           </li>
-          <li>
+          <li className="reveal">
             <span className="step-n">III</span>
             <div>
               <b>Prove</b>
               <p>Flare&apos;s Data Connector votes on the outcome and returns an on-chain proof in about two minutes, visible the whole way.</p>
             </div>
           </li>
-          <li>
+          <li className="reveal">
             <span className="step-n">IV</span>
             <div>
               <b>Settle or mark</b>
@@ -118,10 +141,10 @@ export default function Home() {
 
       {/* confidential score — image left, text right */}
       <div className="home-block split media-left">
-        <div className="split-media">
+        <div className="split-media reveal">
           <img src="/confidential.jpg" alt="" loading="lazy" />
         </div>
-        <div className="split-text">
+        <div className="split-text reveal">
           <h2>A credit score that never sees your history</h2>
           <p className="lead">
             A lender needs the judgement, not the ledger. So a <b>TEE</b> reads your full
@@ -132,7 +155,7 @@ export default function Home() {
       </div>
 
       {/* footer cta */}
-      <footer className="home-cta">
+      <footer className="home-cta reveal">
         <h2>Every invoice ends in a quittance or a mark.</h2>
         <div className="cta-row">
           <Link to="/create" className="btn primary">Create an invoice</Link>
