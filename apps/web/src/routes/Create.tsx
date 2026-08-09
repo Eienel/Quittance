@@ -62,7 +62,7 @@ export default function Create() {
           onChange={(e) => setBearer(e.target.checked)}
           style={{ width: "auto", marginRight: ".4rem" }}
         />
-        Bearer invoice — anyone may settle it
+        Bearer invoice · anyone may settle it
       </label>
       {bearer ? (
         <p className="dim">

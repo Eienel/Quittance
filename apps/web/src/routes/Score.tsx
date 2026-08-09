@@ -55,7 +55,7 @@ export default function Score() {
       <h2>Confidential score</h2>
       <p className="dim">
         A creditworthiness score computed inside a TEE. The enclave reads this
-        account&apos;s entire payment history — every invoice, amount and date — and
+        account&apos;s entire payment history (every invoice, amount and date), and
         only the score comes out.
       </p>
 
@@ -81,8 +81,8 @@ export default function Score() {
           way to make the privacy claim legible rather than asserted.
         </p>
         <p className="dim">
-          Fixture states to build against: {Object.keys(fixtures.scores).join(", ")} —
-          see <code>src/lib/fixtures.ts</code>.
+          Fixture states to build against: {Object.keys(fixtures.scores).join(", ")}.
+          See <code>src/lib/fixtures.ts</code>.
         </p>
       </div>
     </section>
