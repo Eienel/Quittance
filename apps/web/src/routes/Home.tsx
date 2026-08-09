@@ -14,7 +14,22 @@ export default function Home() {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
-    v.play().catch(() => {});
+    const tryPlay = () => { v.play().catch(() => {}); };
+    // Low Power Mode / blocked autoplay: start it on the first user gesture,
+    // and retry when the tab becomes visible again.
+    const events = ["pointerdown", "touchstart", "keydown", "scroll"] as const;
+    const onInteract = () => {
+      tryPlay();
+      if (!v.paused) events.forEach((e) => window.removeEventListener(e, onInteract));
+    };
+    const onVisible = () => { if (document.visibilityState === "visible") tryPlay(); };
+    tryPlay();
+    events.forEach((e) => window.addEventListener(e, onInteract, { passive: true }));
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, onInteract));
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   // Scroll-reveal: fade + rise elements in as they enter the viewport.
