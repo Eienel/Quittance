@@ -443,18 +443,14 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 
 /* how-it-works steps */
 .hiw h2 { text-align: center; justify-content: center; }
-.steps { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
-.steps li {
-  display: flex; gap: 1rem; align-items: flex-start;
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 1.9rem 2rem; box-shadow: var(--shadow);
+.steps {
+  list-style: none; padding: 0; margin: 2.6rem 0 0; display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(2.2rem, 5vw, 3.6rem) clamp(2rem, 6vw, 5rem);
 }
-.step-n {
-  flex: 0 0 auto; width: 40px; padding-top: 0.1rem;
-  font: 600 1.05rem/1 var(--sans); color: var(--faint); letter-spacing: 0.05em;
-}
-.steps li b { font-size: 1.08rem; letter-spacing: -0.02em; }
-.steps li p { margin: 0.3rem 0 0; color: var(--dim); }
+.steps li { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.step-n { font: 300 2.1rem/1 var(--sans); color: var(--faint); letter-spacing: 0.05em; margin-bottom: 0.95rem; }
+.steps li b { font-size: 1.15rem; letter-spacing: -0.02em; }
+.steps li p { margin: 0.45rem auto 0; color: var(--dim); max-width: 34ch; }
 
 .home-cta { text-align: center; padding: var(--gap) 0 1rem; border-top: 1px solid var(--line); }
 .home-cta h2 { justify-content: center; font-size: clamp(1.7rem, 4vw, 2.6rem); letter-spacing: -0.04em; margin: 1rem auto 1.6rem; max-width: 18ch; }
