@@ -1,0 +1,205 @@
+import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+
+/**
+ * Landing page — says what Quittance is before dropping anyone into the app.
+ * Hero → the core insight (proof of absence) → the two outcomes at equal
+ * weight → how it works → the confidential score → CTA.
+ */
+export default function Home() {
+  // React can drop the `muted` attribute, which makes the browser block
+  // muted-autoplay and show a play button — force muted + play() via the ref.
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    // Low Power Mode / blocked autoplay: start on the first user gesture. On
+    // desktop only a real activation gesture (click/keypress) is allowed to
+    // start playback — scroll and mousemove don't count — so listen for both
+    // those and the mobile-friendly touch/scroll ones. Detach once it plays.
+    const events = ["pointerdown", "mousedown", "click", "keydown", "touchstart", "scroll", "wheel"] as const;
+    const detach = () => events.forEach((e) => window.removeEventListener(e, onInteract));
+    const tryPlay = () => v.play().then(detach).catch(() => {});
+    const onInteract = () => { tryPlay(); };
+    const onVisible = () => { if (document.visibilityState === "visible") tryPlay(); };
+    tryPlay();
+    events.forEach((e) => window.addEventListener(e, onInteract, { passive: true }));
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      detach();
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, []);
+
+  // Scroll-reveal: fade + rise elements in as they enter the viewport.
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !("IntersectionObserver" in window)) {
+      els.forEach((el) => el.classList.add("in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // Parallax: images sit slightly zoomed and drift vertically as they scroll.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const imgs = Array.from(document.querySelectorAll<HTMLElement>(".parallax"));
+    if (!imgs.length) return;
+    let raf = 0;
+    const update = () => {
+      const vh = window.innerHeight;
+      for (const img of imgs) {
+        const r = img.getBoundingClientRect();
+        const pct = (r.top + r.height / 2 - vh / 2) / vh; // ~ -1..1 across the viewport
+        const shift = Math.max(-1, Math.min(1, pct)) * 26;
+        img.style.transform = `scale(1.12) translateY(${shift.toFixed(1)}px)`;
+      }
+      raf = 0;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <div className="home">
+      {/* hero */}
+      <header className="hero">
+        <video
+          ref={videoRef}
+          className="hero-video"
+          src="/hero-loop.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
+        <div className="hero-scrim" />
+        <div className="hero-inner">
+          <h1>
+            Every invoice ends in a<br />
+            <span className="q">quittance</span>, or a <span className="m">mark</span>.
+          </h1>
+          <p className="hero-sub">
+            Invoices in XRP that settle themselves. Proven paid, or proven unpaid.
+          </p>
+          <div className="cta-row">
+            <Link to="/create" className="btn primary">Create an invoice</Link>
+            <Link to="/invoices" className="btn">See it in action →</Link>
+          </div>
+        </div>
+        <span className="scroll-cue">Scroll ↓</span>
+      </header>
+
+      {/* the core insight — image left, text right */}
+      <div className="home-block split">
+        <div className="split-media reveal">
+          <img className="parallax" src="/insight.jpg" alt="" loading="lazy" />
+        </div>
+        <div className="split-text reveal">
+          <h2>Proof nobody else can give</h2>
+          <p className="lead">
+            Anyone can prove a payment <em>happened</em>. Almost nothing can prove one
+            <em> didn&apos;t</em>. Flare can, so a missed payment becomes a fact anyone can verify,
+            not just your word against theirs.
+          </p>
+        </div>
+      </div>
+
+      {/* two outcomes, equal weight */}
+      <div className="two-up">
+        <div className="outcome-card settled reveal">
+          <div className="headline">Paid, on time <span className="k">Quittance</span></div>
+          <p className="sub">
+            The XRPL payment landed before the deadline. Settled with an FDC
+            <span className="mono"> XRPPayment</span> proof. A permanent receipt.
+          </p>
+        </div>
+        <div className="outcome-card delinquent reveal">
+          <div className="headline">Proven unpaid <span className="k">Mark</span></div>
+          <p className="sub">
+            No payment exists anywhere in the window. Marked with an FDC
+            <span className="mono"> XRPPaymentNonexistence</span> proof. A permanent mark.
+          </p>
+        </div>
+      </div>
+
+      {/* how it works */}
+      <div className="home-block hiw">
+        <h2 className="reveal">How it works</h2>
+        <ol className="steps">
+          <li className="reveal">
+            <div>
+              <b>Issue</b>
+              <p>Create an invoice payable in XRP with a deadline. The registry mints a unique destination tag.</p>
+            </div>
+          </li>
+          <li className="reveal">
+            <div>
+              <b>Pay</b>
+              <p>The payer sends ordinary XRP from any wallet or exchange, tagged with that number. Nothing to install, no bridging, no custody.</p>
+            </div>
+          </li>
+          <li className="reveal">
+            <div>
+              <b>Prove</b>
+              <p>Flare&apos;s Data Connector votes on the outcome and returns an on-chain proof in about two minutes, visible the whole way.</p>
+            </div>
+          </li>
+          <li className="reveal">
+            <div>
+              <b>Settle or mark</b>
+              <p>The invoice locks to exactly one outcome, forever. It accumulates into a permanent, per-account payment record.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      {/* confidential score — image left, text right */}
+      <div className="home-block split media-left">
+        <div className="split-media reveal">
+          <img className="parallax" src="/confidential.jpg" alt="" loading="lazy" />
+        </div>
+        <div className="split-text reveal">
+          <h2>A credit score that never sees your history</h2>
+          <p className="lead">
+            A lender needs the judgement, not the ledger. So a <b>TEE</b> reads your full
+            history and returns only the score. The raw data never leaves the enclave.
+          </p>
+          <Link to="/score" className="btn" style={{ marginTop: "0.5rem" }}>Try the score →</Link>
+        </div>
+      </div>
+
+      {/* footer cta */}
+      <footer className="home-cta reveal">
+        <h2>Every invoice ends in a quittance or a mark.</h2>
+        <div className="cta-row">
+          <Link to="/create" className="btn primary">Create an invoice</Link>
+          <Link to="/record" className="btn">Look up a record</Link>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -20,18 +20,18 @@ export default function Pipeline({ pipeline }: { pipeline: PipelineType }) {
   const stages = pipeline.stage === "delinquent" ? ["awaiting_payment", "proving", "delinquent"] : ORDER;
   const currentIndex = stages.indexOf(pipeline.stage);
 
+  const badTerminal = pipeline.stage === "delinquent";
+
   return (
-    <div className="stub">
-      <ol style={{ display: "flex", gap: "1rem", listStyle: "none", padding: 0, flexWrap: "wrap" }}>
+    <div className="pipeline">
+      <ol>
         {stages.map((stage, i) => {
           const done = i < currentIndex || (terminal && i === currentIndex);
           const active = i === currentIndex && !terminal;
+          const cls = done ? (badTerminal && i === currentIndex ? "bad" : "done") : active ? "active" : "";
           return (
-            <li
-              key={stage}
-              className={done ? "status-settled" : active ? "status-open" : "dim"}
-              style={{ borderBottom: "2px solid currentColor", paddingBottom: ".25rem" }}
-            >
+            <li key={stage} className={cls}>
+              <span className="node" />
               {STAGE_LABELS[stage as PipelineType["stage"]].label}
             </li>
           );
@@ -39,14 +39,17 @@ export default function Pipeline({ pipeline }: { pipeline: PipelineType }) {
       </ol>
 
       {pipeline.stage === "proving" && (
-        <p className="dim">
+        <p className="dim small" style={{ marginTop: "0.9rem" }}>
           The Flare Data Connector is voting on this outcome. Rounds take about{" "}
-          {TIMING.fdcRound}s, occasionally up to {TIMING.fdcRoundWorstCase}s.
+          {TIMING.fdcRound}s, occasionally up to {TIMING.fdcRoundWorstCase}s. The wait is
+          in the protocol, not the page.
         </p>
       )}
 
       {pipeline.xrplTxHash && (
-        <p className="dim mono">XRPL tx {pipeline.xrplTxHash.slice(0, 16)}…</p>
+        <p className="dim small mono" style={{ marginTop: "0.5rem" }}>
+          XRPL tx {pipeline.xrplTxHash.slice(0, 16)}…
+        </p>
       )}
     </div>
   );

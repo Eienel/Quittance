@@ -70,7 +70,7 @@ export default function InvoiceDetail() {
             <th>Payer</th>
             <td className="mono">
               {isBearer(invoice)
-                ? "bearer — anyone may settle"
+                ? "bearer · anyone may settle"
                 : resolve(invoice.payerAddressHash) ?? truncate(invoice.payerAddressHash, 10, 6)}
             </td>
           </tr>

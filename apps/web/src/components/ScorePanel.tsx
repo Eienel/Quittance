@@ -15,27 +15,40 @@ import type { Score } from "@/lib/types";
 export default function ScorePanel({ score }: { score: Score }) {
   if (score.score === 0) {
     return (
-      <div className="stub">
-        <p><b>No record</b></p>
-        <p className="dim">
-          This account has no attested outcomes. That is not the same as a clean
-          record — say so plainly.
+      <div style={{ marginTop: "1rem" }}>
+        <p style={{ margin: 0, fontWeight: 600, color: "var(--ink)" }}>No record</p>
+        <p className="dim" style={{ marginTop: "0.3rem" }}>
+          This account has no attested outcomes. <b>Not</b> the same as a clean record,
+          and not a score of zero. There is simply nothing yet to score.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="stub">
-      <p style={{ fontSize: "3rem", margin: 0 }}>{score.score}</p>
-      <p className="badge status-open">{score.band}</p>
-      <p className="dim">
-        Based on {score.basis} attested outcome{score.basis === 1 ? "" : "s"} · model {score.version}
-      </p>
-      <p className="dim">
-        Computed inside a TEE. The payment history behind this number never left
-        the enclave.
-      </p>
+    <div style={{ marginTop: "1rem" }}>
+      <div className="score-wrap">
+        <div className="score-num">{score.score}</div>
+        <div>
+          <span className={`score-band band-${score.band}`}>{score.band}</span>
+          <p className="dim small" style={{ margin: "0.5rem 0 0" }}>
+            Backed by <b>{score.basis}</b> attested outcome{score.basis === 1 ? "" : "s"} ·
+            model {score.version}
+          </p>
+        </div>
+      </div>
+
+      <div className="enclave">
+        <div className="side private">
+          <div className="tagline">Never exposed</div>
+          Every invoice, amount, date and counterparty. The full history stays inside the enclave.
+        </div>
+        <div className="arrow">→</div>
+        <div className="side">
+          <div className="tagline">Crosses the boundary</div>
+          Only <b>{"{ score, band, basis }"}</b> leaves the TEE. The judgement, never the ledger.
+        </div>
+      </div>
     </div>
   );
 }

@@ -89,7 +89,7 @@ export default function OutcomeAction({
 
       {txHash && <p className="status-settled mono">Recorded in {txHash.slice(0, 18)}…</p>}
       {error && <p className="error">{error}</p>}
-      {!signer && <p className="dim">Connect a wallet to do this — it costs a little C2FLR in gas.</p>}
+      {!signer && <p className="dim">Connect a wallet to do this. It costs a little C2FLR in gas.</p>}
     </div>
   );
 }
