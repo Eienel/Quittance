@@ -12,19 +12,27 @@
  * the invoice before the UI shows it. A tampered value simply fails to match.
  */
 import { addressHash } from "./format";
-import type { Invoice } from "./types";
+import type { Invoice, ObligationKind } from "./types";
 
 export interface InvoiceMeta {
   /** XRPL classic address to be paid. */
   payee?: string;
   /** Free-form human description. */
   memo?: string;
+  /**
+   * What kind of obligation this is. The registry neither stores nor cares about
+   * this — every kind is the same three contract calls (issue, prove-met,
+   * prove-missed) — but declaring it lets the UI frame the same primitive as the
+   * thing each user actually recognizes. Absent means "invoice".
+   */
+  kind?: ObligationKind;
 }
 
 export function encodeMeta(meta: InvoiceMeta): string {
   const clean: InvoiceMeta = {};
   if (meta.payee) clean.payee = meta.payee.trim();
   if (meta.memo) clean.memo = meta.memo.trim();
+  if (meta.kind && meta.kind !== "invoice") clean.kind = meta.kind;
   return Object.keys(clean).length ? JSON.stringify(clean) : "";
 }
 
@@ -37,6 +45,7 @@ export function decodeMeta(metadataURI: string): InvoiceMeta {
       return {
         payee: typeof parsed.payee === "string" ? parsed.payee : undefined,
         memo: typeof parsed.memo === "string" ? parsed.memo : undefined,
+        kind: typeof parsed.kind === "string" ? (parsed.kind as ObligationKind) : undefined,
       };
     }
   } catch {

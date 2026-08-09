@@ -79,21 +79,42 @@ async function protocolContract(name: string, abi: string[], runner: ethers.Cont
   return new ethers.Contract(addr, abi, runner);
 }
 
-async function prepareRequest(attestationName: string, requestBody: unknown): Promise<string> {
-  const res = await fetch(`${VERIFIER_BASE}/verifier/xrp/${attestationName}/prepareRequest`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "X-API-KEY": VERIFIER_KEY },
-    body: JSON.stringify({
-      attestationType: toBytes32(attestationName),
-      sourceId: SOURCE_TESTXRP,
-      requestBody,
-    }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok || body.status !== "VALID") {
-    throw new Error(`Verifier rejected the ${attestationName} request: ${JSON.stringify(body)}`);
+/**
+ * Ask the verifier to encode and integrity-check an attestation request.
+ *
+ * A payment seen on the XRPL seconds ago is not attestable yet: the verifier waits for
+ * finality (3 confirmations, ~12 s) and answers `TRANSACTION DOES NOT EXIST` until then.
+ * The UI notices payments almost immediately, so a user who clicks straight away lands
+ * in exactly that window — it is a race to wait out, not a rejection to surface.
+ */
+async function prepareRequest(
+  attestationName: string,
+  requestBody: unknown,
+  onProgress?: FdcProgress
+): Promise<string> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(`${VERIFIER_BASE}/verifier/xrp/${attestationName}/prepareRequest`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "X-API-KEY": VERIFIER_KEY },
+      body: JSON.stringify({
+        attestationType: toBytes32(attestationName),
+        sourceId: SOURCE_TESTXRP,
+        requestBody,
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+
+    if (res.ok && body.status === "VALID") return body.abiEncodedRequest;
+
+    const notYetFinal =
+      typeof body.status === "string" && body.status.includes("DOES NOT EXIST");
+    if (!notYetFinal || attempt >= 10) {
+      throw new Error(`Verifier rejected the ${attestationName} request: ${JSON.stringify(body)}`);
+    }
+
+    onProgress?.("preparing", "waiting for XRPL finality");
+    await new Promise((r) => setTimeout(r, 6_000));
   }
-  return body.abiEncodedRequest;
 }
 
 async function submitRequest(signer: ethers.Signer, encoded: string): Promise<number> {
@@ -175,10 +196,14 @@ export async function acknowledge(
   onProgress?: FdcProgress
 ): Promise<string> {
   onProgress?.("preparing");
-  const encoded = await prepareRequest("XRPPayment", {
-    transactionId: "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
-    proofOwner: ethers.ZeroAddress,
-  });
+  const encoded = await prepareRequest(
+    "XRPPayment",
+    {
+      transactionId: "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
+      proofOwner: ethers.ZeroAddress,
+    },
+    onProgress
+  );
 
   const proof = await obtainProof(signer, encoded, XRP_PAYMENT_RESPONSE, onProgress);
 
@@ -199,10 +224,14 @@ export async function settleWithPayment(
   onProgress?: FdcProgress
 ): Promise<string> {
   onProgress?.("preparing");
-  const encoded = await prepareRequest("XRPPayment", {
-    transactionId: "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
-    proofOwner: ethers.ZeroAddress,
-  });
+  const encoded = await prepareRequest(
+    "XRPPayment",
+    {
+      transactionId: "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
+      proofOwner: ethers.ZeroAddress,
+    },
+    onProgress
+  );
 
   const proof = await obtainProof(signer, encoded, XRP_PAYMENT_RESPONSE, onProgress);
 
@@ -225,18 +254,22 @@ export async function markDelinquent(
   onProgress?: FdcProgress
 ): Promise<string> {
   onProgress?.("preparing");
-  const encoded = await prepareRequest("XRPPaymentNonexistence", {
-    minimalBlockNumber: invoice.minimalBlockNumber.toString(),
-    deadlineBlockNumber: invoice.deadlineBlockNumber.toString(),
-    deadlineTimestamp: invoice.deadlineTimestamp.toString(),
-    destinationAddressHash: invoice.payeeAddressHash,
-    amount: invoice.amountDrops.toString(),
-    checkFirstMemoData: false,
-    firstMemoDataHash: ethers.ZeroHash,
-    checkDestinationTag: true,
-    destinationTag: invoice.destinationTag.toString(),
-    proofOwner: ethers.ZeroAddress,
-  });
+  const encoded = await prepareRequest(
+    "XRPPaymentNonexistence",
+    {
+      minimalBlockNumber: invoice.minimalBlockNumber.toString(),
+      deadlineBlockNumber: invoice.deadlineBlockNumber.toString(),
+      deadlineTimestamp: invoice.deadlineTimestamp.toString(),
+      destinationAddressHash: invoice.payeeAddressHash,
+      amount: invoice.amountDrops.toString(),
+      checkFirstMemoData: false,
+      firstMemoDataHash: ethers.ZeroHash,
+      checkDestinationTag: true,
+      destinationTag: invoice.destinationTag.toString(),
+      proofOwner: ethers.ZeroAddress,
+    },
+    onProgress
+  );
 
   const proof = await obtainProof(signer, encoded, XRP_NONEXISTENCE_RESPONSE, onProgress);
 

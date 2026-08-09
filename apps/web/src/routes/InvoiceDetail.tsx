@@ -7,7 +7,9 @@ import StatusBadge from "@/components/StatusBadge";
 import PayInstructions from "@/components/PayInstructions";
 import Pipeline from "@/components/Pipeline";
 import OutcomeAction from "@/components/OutcomeAction";
+import BondPanel from "@/components/BondPanel";
 import { verifyPayee, decodeMeta } from "@/lib/metadata";
+import { framingFor } from "@/lib/obligations";
 import type { useWallet } from "@/hooks/useWallet";
 
 type Wallet = ReturnType<typeof useWallet>;
@@ -50,6 +52,8 @@ export default function InvoiceDetail() {
         </p>
       )}
 
+      <BondPanel invoice={invoice} signer={wallet.signer} onDone={refresh} />
+
       <OutcomeAction
         invoice={invoice}
         pipeline={pipeline}
@@ -76,6 +80,7 @@ export default function InvoiceDetail() {
               {invoice.minimalBlockNumber.toString()} – {invoice.deadlineBlockNumber.toString()}
             </td>
           </tr>
+          <tr><th>Kind</th><td>{framingFor(decodeMeta(invoice.metadataURI).kind).label}</td></tr>
           {decodeMeta(invoice.metadataURI).memo && (
             <tr><th>Description</th><td>{decodeMeta(invoice.metadataURI).memo}</td></tr>
           )}

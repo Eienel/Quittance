@@ -69,7 +69,8 @@ async function getInvoice(invoiceId) {
  */
 async function acknowledge(invoiceId, xrplTxHash, log = console.error) {
   const encoded = await fdc.prepareXrpPaymentRequest(
-    "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase()
+    "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
+    log
   );
   const proof = await fdc.obtainProof(encoded, fdc.XRP_PAYMENT_RESPONSE, log);
   const tx = await registry().acknowledge(invoiceId, proof);
@@ -80,7 +81,10 @@ async function acknowledge(invoiceId, xrplTxHash, log = console.error) {
 
 /** Paid path: prove the XRPL transaction and settle the invoice. */
 async function settleWithPayment(invoiceId, xrplTxHash, log = console.error) {
-  const encoded = await fdc.prepareXrpPaymentRequest("0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase());
+  const encoded = await fdc.prepareXrpPaymentRequest(
+    "0x" + xrplTxHash.replace(/^0x/i, "").toUpperCase(),
+    log
+  );
   const proof = await fdc.obtainProof(encoded, fdc.XRP_PAYMENT_RESPONSE, log);
   const tx = await registry().settle(invoiceId, proof);
   const receipt = await tx.wait();

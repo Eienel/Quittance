@@ -11,6 +11,19 @@ describe("invoice metadata", () => {
     expect(decodeMeta(encoded)).toEqual({ payee: PAYEE, memo: "Design work" });
   });
 
+  it("round-trips a non-invoice obligation kind", () => {
+    const encoded = encodeMeta({ payee: PAYEE, kind: "coupon" });
+    expect(decodeMeta(encoded)).toEqual({ payee: PAYEE, kind: "coupon" });
+  });
+
+  it("omits the default invoice kind to keep metadata small", () => {
+    // "invoice" is the absence of a kind, so it should not be written.
+    expect(encodeMeta({ payee: PAYEE, kind: "invoice" })).toBe(
+      encodeMeta({ payee: PAYEE })
+    );
+    expect(decodeMeta(encodeMeta({ payee: PAYEE, kind: "invoice" })).kind).toBeUndefined();
+  });
+
   it("encodes nothing for an empty meta", () => {
     expect(encodeMeta({})).toBe("");
     expect(decodeMeta("")).toEqual({});

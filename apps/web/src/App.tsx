@@ -47,6 +47,8 @@ export default function App() {
           <NavLink to="/create">Create</NavLink>
           <NavLink to="/record">Record</NavLink>
           <NavLink to="/score">Score</NavLink>
+          <NavLink to="/attacks">Attacks</NavLink>
+          <NavLink to="/primitive">Primitive</NavLink>
           <button className="ghost drawer-connect" onClick={wallet.connect} disabled={wallet.connecting}>
             {walletLabel}
           </button>

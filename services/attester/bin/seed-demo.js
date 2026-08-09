@@ -6,6 +6,7 @@
  *   2. delinquent  — acknowledged, then left unpaid, proved with XRPPaymentNonexistence
  *   3. unclaimed   — a fabricated debt the named payer never admitted: marked, but
  *                    deliberately absent from their record
+ *   4. forfeited   — bonded, acknowledged, then missed: the mark hands the bond over
  *
  * The third is the point of the acknowledgement mechanism, so a judge can see both
  * that the mark is real and that it does not touch an innocent account.
@@ -22,7 +23,7 @@ const VICTIM = process.env.SEED_VICTIM ?? "rNoSuchInnocentAccountEver12345";
 
 const log = (...a) => console.error(new Date().toISOString().slice(11, 19), ...a);
 
-async function create({ xrp, minutes, payer, memo }) {
+async function create({ xrp, minutes, payer, memo, bondFlr }) {
   const { ledgerIndex, closeTimeUnix } = await xrplSide.ledgerNow();
   const created = await reg.createInvoice({
     payeeAddressHash: xrplSide.addressHash(PAYEE),
@@ -36,6 +37,16 @@ async function create({ xrp, minutes, payer, memo }) {
     metadataURI: JSON.stringify({ payee: PAYEE, memo }),
   });
   log(`invoice ${created.invoiceId} created, tag ${created.destinationTag}, ${xrp} XRP`);
+
+  if (bondFlr) {
+    const { ethers } = require("ethers");
+    const tx = await reg.registry().postBond(created.invoiceId, {
+      value: ethers.parseEther(String(bondFlr)),
+    });
+    await tx.wait();
+    log(`  bonded ${bondFlr} FLR`);
+  }
+
   return { id: Number(created.invoiceId), tag: Number(created.destinationTag) };
 }
 
@@ -65,6 +76,17 @@ async function main() {
   const ackHash = await pay(marked.tag, 0.000001);
   await reg.acknowledge(marked.id, ackHash, log);
 
+  // 4 — bonded and missed: the proof does not merely record the outcome, it moves money.
+  const forfeited = await create({
+    xrp: 12,
+    minutes: 4,
+    payer: PAYER,
+    memo: "Bonded obligation — the mark hands the bond to the creditor",
+    bondFlr: 2,
+  });
+  const forfeitAck = await pay(forfeited.tag, 0.000001);
+  await reg.acknowledge(forfeited.id, forfeitAck, log);
+
   // 3 — a fabricated debt: nobody acknowledges it, so nobody's record should move.
   const fabricated = await create({
     xrp: 1000,
@@ -89,6 +111,7 @@ async function main() {
 
   await reg.markDelinquent(marked.id, log);
   await reg.markDelinquent(fabricated.id, log);
+  await reg.markDelinquent(forfeited.id, log);
 
   const rec = await reg.registry(require("../src/fdc").provider()).record(
     xrplSide.addressHash(PAYER)
@@ -101,6 +124,11 @@ async function main() {
   const victimRec = await reg
     .registry(require("../src/fdc").provider())
     .record(xrplSide.addressHash(VICTIM));
+  const { ethers } = require("ethers");
+  const issuerAddr = new ethers.Wallet(require("../src/config").privateKey).address;
+  const owed = await reg.registry(require("../src/fdc").provider()).withdrawable(issuerAddr);
+  log(`bond forfeited to issuer: ${ethers.formatEther(owed)} FLR withdrawable`);
+
   log("victim record (must be empty):", {
     settled: Number(victimRec.settledCount),
     delinquent: Number(victimRec.delinquentCount),

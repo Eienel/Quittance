@@ -1,205 +1,226 @@
 # Quittance
 
-**Every invoice ends in a quittance or a mark.**
+**Every invoice ends in a quittance or a mark — and the mark is what almost nothing else can do.**
 
-Quittance is an invoicing protocol on Flare where any XRPL payment — from any wallet or
-exchange, matched by destination tag — produces a cryptographic outcome either way: an
-FDC-proved receipt if the invoice is paid, or a permanent Merkle-proved delinquency mark if
-the deadline passes. A planned confidential-compute extension turns that payment history
-into a private credit score inside a TEE.
+Quittance is a settlement protocol on Flare for obligations that fail by *silence*. Someone
+issues an invoice payable in XRP; the payer sends ordinary XRP from any wallet or exchange,
+tagged with a destination tag. The invoice then ends in exactly one of two cryptographic
+outcomes, never both and permanently:
 
-> *Quittance* is the historical term for a document discharging a debt — proof that the
+- a **quittance** — an FDC-proved XRPL payment that discharges the debt, or
+- a **mark** — an FDC-proved *absence* of that payment by the deadline, which can hand a
+  posted bond to the creditor in the same transaction.
+
+> *Quittance* is the historical term for a document discharging a debt — proof the
 > obligation is settled.
 
 Built for [Flare Summer Signal](https://dorahacks.io/hackathon/flaresummersignal/detail).
+Live on Coston2, seeded, with a browser that drives the whole thing and no backend.
 
-## Why this is not just an invoice app
+## The one thing this does that other systems can't
 
-Most payment tooling can prove a payment happened. Almost nothing can prove one *didn't*.
-Flare's Data Connector ships `XRPPaymentNonexistence`, an attestation that no XRPL payment
-matching a destination address, amount, and destination tag was confirmed in a given ledger
-range. That makes non-payment a first-class, network-attested fact rather than one party's
-claim — which is what a payment record needs to be worth anything to a third party.
+Most payment tooling can prove a payment *happened*. Almost nothing can prove one *didn't* —
+because you cannot produce evidence of an absence. Contracts that fail by non-action (a
+missed invoice, an unpaid coupon, a skipped SLA heartbeat) have always needed a trusted
+party to declare the failure. One party's word.
 
-The two outcomes are symmetric and mutually exclusive:
+Flare's Data Connector ships `XRPPaymentNonexistence`: an attestation, backed by ~100
+independent data providers, that **no** XRPL payment matching a destination address, amount
+and destination tag was confirmed in a given ledger range. That makes non-payment a
+network-attested fact. Quittance is the layer that makes that fact *binding*: attach it to
+one specific obligation, permit exactly one outcome, and move money on it.
+
+Ask of any hackathon submission: *could you move it to Ethereum unchanged?* An NFT
+marketplace, yes. A lending app, yes. Quittance, no — there is no proof-of-absence anywhere
+else at production scale. Move it and the product ceases to exist. That is the integration
+depth this bounty rewards.
+
+## Who is it for
+
+- **Anyone who takes a deposit, retainer, or milestone payment in XRP** and wants a missed
+  deadline to carry an automatic consequence rather than a chase-by-email. Post a bond at
+  the start; the outcome moves it, needing no audience and no trust in a servicer.
+- **Counterparties and lenders** who need to read whether an account pays on time — a
+  network-attested payment record, not a self-reported one. Fraud in receivables (bogus
+  debts, non-existent customers) is a real underwriting problem, and the record here is
+  built so a fabricated debt cannot enter it.
+- **Roadmap: tokenized-credit servicing**, where "was this coupon paid?" is worth real money
+  and is today answered by a trusted servicer. Invoices are the demo; deadline-shaped
+  obligations are the market.
+
+Honest scope: this is a hackathon build on testnet, not a company. What it proves is the
+mechanism, and that the mechanism survives being attacked (see **Attacks**, below).
+
+## The two outcomes
 
 | Outcome | Attestation type | What it establishes |
 | --- | --- | --- |
-| Quittance (paid) | `XRPPayment` | A specific XRPL transaction, with this destination tag and at least this amount, reached the payee before the deadline. |
+| Quittance (paid) | `XRPPayment` | A specific XRPL transaction, this destination tag, at least this amount, reached the payee before the deadline. |
 | Mark (unpaid) | `XRPPaymentNonexistence` | No such transaction exists anywhere in the invoice's ledger range. |
 
-An invoice accepts exactly one of them, once, permanently.
+An invoice accepts exactly one, once, forever.
 
 ## How it uses Flare
 
-- **FDC / `XRPPayment`** — settles an invoice. `InvoiceRegistry.settle()` verifies the
-  Merkle proof through `FdcVerification`, then checks the attested transaction against the
-  invoice itself: destination tag, payee address hash, amount, sender, XRPL success status,
-  and close time versus deadline.
-- **FDC / `XRPPaymentNonexistence`** — marks an invoice delinquent.
-  `InvoiceRegistry.markDelinquent()` verifies the proof and then requires the *request body*
-  to reproduce the invoice's terms exactly — search range, amount, payee, destination tag,
-  and no extra memo constraint. This is the load-bearing check: a nonexistence proof only
-  means something relative to the window it was requested over, so without it a creditor
-  could prove "no payment" over a hand-picked one-ledger window and mark a payer who
-  settled in full. See `markDelinquent` in
-  [`contracts/src/InvoiceRegistry.sol`](contracts/src/InvoiceRegistry.sol).
-- **FlareContractRegistry** — `FdcVerification` is resolved at runtime through the canonical
-  registry (`0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019`, identical on every Flare network),
-  never hardcoded, so an FDC upgrade requires no redeploy.
+- **FDC / `XRPPayment`** settles an invoice. `InvoiceRegistry.settle()` verifies the Merkle
+  proof through `FdcVerification`, then checks the attested transaction against the invoice:
+  destination tag, payee hash, amount, sender, XRPL success status, close time vs deadline.
+- **FDC / `XRPPaymentNonexistence`** marks an invoice delinquent. `markDelinquent()` verifies
+  the proof and then requires the *request body* to reproduce the invoice's own terms —
+  search range, amount, payee, destination tag, no extra memo constraint.
+- **FlareContractRegistry** resolves `FdcVerification` at runtime
+  (`0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019`, identical on every Flare network), so an FDC
+  upgrade needs no redeploy.
+- **Flare Compute Extension** (Part 2) scores the payment record inside a TEE — extension
+  `66014`, registered on Coston2.
 
-Nothing is bridged, wrapped, or custodied. The payer sends ordinary XRP from whatever they
-already use; the destination tag is the entire integration surface on the XRPL side.
+Nothing is bridged, wrapped, or custodied. The payer sends ordinary XRP; the destination tag
+is the entire integration surface on the XRPL side.
+
+## Attacks: why a true proof is not enough
+
+The idea — proof of absence for invoicing — is not hard to arrive at. What sets this build
+apart is that its security model was **attacked**, and shows its work. `Attacks`
+(`apps/web/src/routes/Attacks.tsx`) renders a live run of
+[`services/attester/bin/adversary.js`](services/attester/bin/adversary.js), which fires three
+attacks at the deployed registry. Each uses an attestation that is **genuine and
+FDC-confirmed** — and each is refused:
+
+1. **Cherry-picked window.** A real proof that no payment arrived in a five-ledger slice
+   chosen to exclude the payment that actually settled the invoice. The FDC confirms it; the
+   registry rejects it, `ProofMismatch(minimalBlockNumber)`, because a nonexistence proof
+   means nothing unless requested over the invoice's own range.
+2. **Fabricated debt.** Anyone may write an invoice naming anyone as the payer. Let it lapse
+   and the nonexistence proof is truthful — nobody paid. The invoice is marked, but the named
+   account's payment record stays untouched, because a mark only accrues once the debtor has
+   *admitted* the debt: any payment they sign carrying the invoice's destination tag. One
+   drop is enough; paying in full admits it implicitly.
+3. **Cross-chain substitution.** A mainnet nonexistence proof aimed at a testXRP invoice —
+   trivially true there, every field matching. The registry pins its source chain at
+   deployment and checks it. (Honestly labelled: not executable on Coston2 today, since its
+   FDC attests only `(XRPPaymentNonexistence, testXRP)`; this is hardening the registry does
+   not have to depend on, covered by `ProofOrigin.test.js`.)
+
+## The bond: making the proof do something
+
+A proof of non-payment, alone, only *says* something — the difference between a credit
+bureau, whose reports gate credit, and a diary nobody reads. A registry with three invoices
+is worth nothing to a lender, so a pure record only pays off at adoption scale a new protocol
+does not have.
+
+So an obligation can carry a **bond**: native FLR locked by the payer, or by a third party
+guaranteeing them. Settlement returns it; a mark hands it to the issuer, released by the very
+same attestation that records the mark. The first invoice ever issued is therefore useful to
+its two parties, with no audience — and the payment record accrues quietly in the background
+instead of being the thing that must be bootstrapped first.
+
+Proceeds are **pulled, not pushed** (`withdraw()` credits, never transfers inline): otherwise
+a creditor whose address rejects payment could make their own invoice unsettleable, and a
+debtor could block their own mark. An unresolved bond can be reclaimed by its poster 30 days
+past the deadline, so an outcome nobody proves cannot strand the money forever.
+
+## There is no backend
+
+Both Flare services the app needs — the FDC verifier and the DA layer — send
+`Access-Control-Allow-Origin: *`, so `apps/web/src/lib/fdc.ts` runs the whole attestation
+lifecycle in the browser: prepare → `FdcHub.requestAttestation` (a tiny fee) → wait for the
+voting round → fetch the Merkle proof → `settle()` / `markDelinquent()`. Whoever has the page
+open drives an invoice to its outcome for a trivial amount of gas. The whole product is a
+static site.
 
 ## Repository layout
 
 ```
 contracts/
-  src/InvoiceRegistry.sol          # create / settle / markDelinquent, one-outcome guard, payer records
-  src/test/MockFdcVerification.sol # accept/reject stand-in for FdcVerification in unit tests
-  test/InvoiceRegistry.test.js     # 34 tests, incl. the cherry-picked-window attack matrix
-  script/deploy.js
+  src/InvoiceRegistry.sol            # issuance, settle, acknowledge, markDelinquent,
+                                     #   one-outcome guard, bond escrow, source-chain binding, records
+  src/fce/ScoreInstructionSender.sol # on-chain entry point for the confidential scorer
+  src/test/MockFdcVerification.sol   # accept/reject stand-in for FdcVerification
+  src/test/RejectingRecipient.sol    # hostile bond recipient, proves outcomes can't be blocked
+  test/                              # 75 tests: registry, acknowledgement, bond, proof-origin
+  script/deploy.js  script/deploy-fce.js
 services/attester/
-  src/fdc.js                       # FDC lifecycle: verifier → FdcHub (fee) → round wait → DA proof
-  src/xrpl.js                      # faucet funding, tagged payments, ledger clock
-  src/registry.js                  # settle / markDelinquent pipelines against the registry
-  bin/quittance.js                 # CLI: fund | create | pay | settle | mark | status | record | watch
-apps/web/
-  index.html                       # static UI: issue invoices, pay instructions, outcomes, records
+  src/fdc.js  src/xrpl.js  src/registry.js   # FDC lifecycle, XRPL helpers, outcome pipelines
+  bin/quittance.js                   # CLI: fund|create|pay|acknowledge|settle|mark|status|record|watch
+  bin/seed-demo.js                   # seeds the four demo states on a fresh registry
+  bin/adversary.js                   # runs the three attacks, writes apps/web/src/lib/attacks.json
+apps/web/                            # React + Vite + TypeScript app (this is the frontend)
+apps/reference/index.html            # original single-file vanilla page, superseded, kept for reference
+fce/scorer/                          # Go TEE scorer for Confidential Space
 ```
 
-### Attester quickstart
+## Run it
 
 ```bash
-cd services/attester && npm install && cp .env.example .env  # fill PRIVATE_KEY + INVOICE_REGISTRY
-node bin/quittance.js fund                                   # fresh funded XRPL testnet account
-node bin/quittance.js create --payee rPAYEE --payer rPAYER --xrp 10 --minutes 10
-node bin/quittance.js pay --seed sSEED --to rPAYEE --tag 1 --xrp 10
-node bin/quittance.js watch --payee rPAYEE                   # drives every open invoice to its outcome
+# contracts
+cd contracts && npm install && npx hardhat compile && npx hardhat test    # 75 tests
+
+# web (fixture mode needs no wallet or network)
+cd apps/web && npm install && npm run dev        # http://localhost:5173/?fixtures=1
 ```
 
-## Data model
-
-An invoice fixes, at issuance, every parameter that either proof will later be checked
-against:
-
-| Field | Meaning |
-| --- | --- |
-| `destinationTag` | Unique `uint32` issued by the registry; the XRPL-side primary key. |
-| `payeeAddressHash` | Standard address hash of the XRPL account to be paid. |
-| `payerAddressHash` | The debtor the outcome is attributed to. Zero makes it a bearer invoice: anyone may settle it, and a lapse marks nobody. |
-| `acknowledged` | Whether that debtor has admitted the debt. Nothing reaches their record until they do — see below. |
-| `amountDrops` | Amount owed in drops (1 XRP = 1,000,000 drops). Overpayment settles; underpayment does not. |
-| `minimalBlockNumber` / `deadlineBlockNumber` / `deadlineTimestamp` | The ledger range within which payment counts — and the exact range a nonexistence proof must be requested over. |
-
-Outcomes accumulate into a `PayerRecord` per XRPL account (settled/delinquent counts and
-drop totals, plus the last outcome time). That record is the input the confidential scorer
-is designed to read.
-
-### Consent: why a truthful proof is not enough
-
-Issuance is unilateral — anyone may write an invoice naming anyone as the payer. A
-nonexistence proof over such an invoice is perfectly true and completely meaningless: it
-proves nobody paid a debt that was never owed. Left unguarded, that turns the registry into
-a way to manufacture delinquencies against any XRPL account, and a lender reading a record
-could not tell a real obligation from a fabricated one.
-
-So the payer's own signature over the debt is what admits it into their record, and the
-XRPL itself carries that signature: **any payment from the payer's account to the payee
-bearing the invoice's unique destination tag** is an act only the key-holder could perform,
-against terms only that invoice defines. One drop is enough. Paying in full acknowledges
-implicitly, so an honest payer never does this separately.
-
-An unacknowledged invoice can still be marked — the mark is true — but it touches no
-payment record. The invoice carries the outcome; the record stays trustworthy, because
-third parties lend against it.
-
-## Running it
+Deploy to Coston2 (needs `PRIVATE_KEY` funded with C2FLR from the faucet). `XRPL_SOURCE`
+pins the chain the registry accepts proofs from:
 
 ```bash
-cd contracts
-npm install
-npx hardhat compile
-npx hardhat test
+PRIVATE_KEY=0x... XRPL_SOURCE=testXRP npx hardhat run script/deploy.js --network coston2
 ```
-
-Deploy to Coston2 (needs `PRIVATE_KEY` funded with C2FLR from the faucet):
-
-```bash
-PRIVATE_KEY=0x... npx hardhat run script/deploy.js --network coston2
-```
-
-## Status
-
-| Component | State |
-| --- | --- |
-| `InvoiceRegistry` — issuance, both proof paths, one-outcome guard, payer records | Implemented, 34 passing tests |
-| FDC request/proof lifecycle (verifier → FdcHub → round wait → DA layer) | Implemented (`services/attester/src/fdc.js`); prepareRequest verified live for both attestation types on testXRP |
-| Attester service — CLI + deadline watcher driving both outcome paths | Implemented (`services/attester`); live XRPL payment with destination tag verified on testnet |
-| Web UI — invoice creation, pay instructions, status, registry | Implemented (`apps/web`, static, wallet-connected) |
-| Coston2 deployment + full E2E, both outcomes | **Done** — see below |
-| Confidential scorer (FCE) — model, in-enclave registry reader, handler, on-chain registration | **Done** — extension `65975` live on Coston2 ([`fce/`](fce/)) |
-| FCE reproducible image + TEE machine registration | Needs Docker + a Confidential Space VM |
 
 ## Deployed (Coston2)
 
 | Contract | Address |
 | --- | --- |
-| `InvoiceRegistry` | [`0x14E50b59fA00c252155E5c532580d9581933D7b9`](https://coston2-explorer.flare.network/address/0x14E50b59fA00c252155E5c532580d9581933D7b9) |
-| `ScoreInstructionSender` (FCE `65975`) | [`0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44`](https://coston2-explorer.flare.network/address/0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44) |
+| `InvoiceRegistry` | [`0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99`](https://coston2-explorer.flare.network/address/0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99) |
+| `ScoreInstructionSender` (FCE `66014`) | [`0xCf55db970F78adfD824B4B87f3b55c8901B47766`](https://coston2-explorer.flare.network/address/0xCf55db970F78adfD824B4B87f3b55c8901B47766) |
 
-Both outcomes were exercised end-to-end against the XRPL testnet on the predecessor
-deployment (`0xC07009…2d00A`, before acknowledgement was added):
+The registry is **seeded and live** with all four demo states: a settled invoice, an
+acknowledged delinquency, a bonded obligation whose 2 FLR bond was forfeited to the issuer on
+the mark, and a fabricated debt marked against an account whose record stays clean. The
+`Attacks` screen is driven by a real run of the adversary against this same registry.
 
-- **Quittance** — an invoice paid on the XRPL
-  (tx `9E6C3DDEF5E35CE1C8E91A2705B20B9DEC6875C88B77403C1587DC56BB4DDC96`) and settled with a
-  live FDC `XRPPayment` proof in Coston2 tx
-  [`0x5b7d97b740cd8d98ffed222e4e4987040a931164b2b66c9211f80ee5fb9affff`](https://coston2-explorer.flare.network/tx/0x5b7d97b740cd8d98ffed222e4e4987040a931164b2b66c9211f80ee5fb9affff).
-- **Mark** — an invoice left unpaid past its deadline and marked delinquent with a live FDC
-  `XRPPaymentNonexistence` proof in Coston2 tx
-  [`0x1798e8ee21a08b1c13c27ec4cf19d4cf5d4e44ea0d35a288676d4ff7813737b5`](https://coston2-explorer.flare.network/tx/0x1798e8ee21a08b1c13c27ec4cf19d4cf5d4e44ea0d35a288676d4ff7813737b5).
+## Status
 
-> **The current deployment is not yet seeded.** Re-seeding needs a working XRPL testnet
-> node, and both public endpoints were unreachable at the time of deployment
-> (`testnet.xrpl-labs.com` out of sync; `s.altnet.rippletest.net` unreachable from the build
-> sandbox). Run `services/attester/bin/seed-demo.js` from any normal network — about ten
-> minutes — and it produces all three demo states, including the fabricated debt that proves
-> an unacknowledged mark reaches nobody's record.
+| Component | State |
+| --- | --- |
+| `InvoiceRegistry` — both proof paths, one-outcome guard, records | Live on Coston2 |
+| Acknowledgement — consent before a mark reaches a record | Live |
+| Bond escrow — post, resolve, withdraw, grace reclaim | Live |
+| Proof-origin binding — source chain + attestation type | Live |
+| Full test suite | **75 passing** |
+| Browser-driven FDC pipeline (no backend) | Live, tested |
+| Adversarial demo — three genuine proofs, all refused | Live, on-chain |
+| Web app — data layer + hooks | Done, tested against live chain |
+| Web app — visual layer | Scaffold; the frontend build is in progress |
+| Confidential scorer (FCE) — model, in-enclave reader, registration | Done, extension `66014` |
+| FCE reproducible image + TEE machine registration | Image built & reproducible; machine needs a Confidential Space VM |
 
 ## Part 2: Quittance Confidential
 
-That record is public, which is what makes it checkable — but a payment history is
-commercially sensitive, and a lender needs the judgement, not the ledger. So the second
-half of the project is a Flare Compute Extension that scores an account **inside a TEE**:
-an account hash goes in, the enclave reads the full history from `InvoiceRegistry` itself,
-and only `{score, band, basis}` comes out. Counts, amounts, dates and counterparties never
-cross the boundary, and the machine's attested identity is what makes that checkable
-rather than merely promised.
+The payment record is public — that is what makes it checkable — but a payment history is
+commercially sensitive, and a lender needs the judgement, not the ledger. So a Flare Compute
+Extension scores an account **inside a TEE**: an account hash goes in, the enclave reads the
+full history from `InvoiceRegistry` itself, and only `{score, band, basis}` comes out. Counts,
+amounts, dates and counterparties never cross the boundary, and the machine's attested
+identity is what makes that checkable rather than promised.
 
-Registration turned out to be **permissionless on Coston2** — the same network as the
-registry, not Songbird as expected — so extension `65975` is registered and owned by us,
-with no Foundation involvement. Details, scoring model, and the live verification against
-real Coston2 data are in [`fce/README.md`](fce/README.md).
-
-Unit tests mock `FdcVerification`, because a real Merkle proof against a relayed root cannot
-be produced in-process. Everything downstream of proof validity — every term check, the
-one-outcome guard, the record accounting — is exercised for real. Proof verification itself
-is covered by the Coston2 integration path, not by these tests.
-
-Contract addresses will be listed here once deployed.
+Registration is **permissionless on Coston2** — the same network as the registry — so
+extension `66014` is registered and owned by us, no Foundation involvement. The scoring model,
+the in-enclave reader, and live verification against real Coston2 data are in
+[`fce/README.md`](fce/README.md). The one remaining step is registering a TEE machine, which
+needs a Google Cloud Confidential Space VM.
 
 ## Roadmap
 
 - Mainnet deployment.
-- BTC and DOGE invoices via `ReferencedPaymentNonexistence`.
-- Recurring invoices (dead-man switch: silence itself produces the mark).
+- BTC and DOGE obligations via `ReferencedPaymentNonexistence` — the same primitive, other chains.
+- Recurring obligations (dead-man switch: silence itself produces the mark) — subscriptions, SLAs.
 - A delinquency/score read API for lenders and counterparties.
-- Private scoring inside a Flare Compute Extension: the scorer reads the registry inside a
-  Google Cloud Confidential Space enclave, and only the score plus its attestation leave —
-  raw payment history never does. Full deployment follows FCC reaching mainnet.
+- Tokenized-credit servicing: default detection for coupons and redemptions.
+- Full private scoring once FCC reaches mainnet.
 
 ## Notes
 
-FDC voting rounds take roughly 90 seconds and XRPL finality about 12 seconds, so both
-outcome paths are asynchronous by construction; the UI is designed around that wait rather
-than trying to hide it.
+FDC voting rounds take ~90 s and XRPL finality ~12 s, so both outcome paths are asynchronous
+by construction. The verifier returns `TRANSACTION DOES NOT EXIST` until a payment reaches
+finality — a race to wait out, not a rejection, handled in both the attester and the browser.
+The UI is built around the ~2-minute wait rather than hiding it.

@@ -14,6 +14,14 @@ export enum InvoiceStatus {
 }
 
 /**
+ * The registry is generic: an obligation is a deadline, an amount, a debtor, a
+ * creditor, and a proof either way. "Invoice" is just the first thing you point it
+ * at. This label lives in metadata and is UI-only — the contract is identical for
+ * every kind, which is the whole claim that this is a primitive rather than an app.
+ */
+export type ObligationKind = "invoice" | "deposit" | "coupon" | "sla";
+
+/**
  * The UI-level status. `Lapsed` is not an on-chain state: it is an Open invoice
  * whose deadline has passed and whose delinquency proof is still being produced.
  * That window is ~2 minutes and showing it as "open" reads as a bug.
@@ -38,6 +46,15 @@ export interface Invoice {
    * payment record. Surface this: an unacknowledged mark is a claim, not a judgement.
    */
   acknowledged: boolean;
+  /**
+   * Native FLR locked against this obligation, in wei. Settlement returns it to the
+   * poster; a mark hands it to the issuer. A bonded invoice is the only kind whose
+   * outcome moves money, which is what makes it matter without anyone else reading
+   * the registry.
+   */
+  bondAmount: bigint;
+  /** Who gets it back on settlement — not necessarily the payer; guarantors are allowed. */
+  bondPoster: string;
   settledByAddressHash: string;
   outcomeTimestamp: bigint;
   metadataURI: string;

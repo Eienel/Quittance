@@ -29,6 +29,8 @@ function toInvoice(id: bigint, raw: ethers.Result | any): Invoice {
     deadlineTimestamp: raw.deadlineTimestamp,
     payerAddressHash: raw.payerAddressHash,
     acknowledged: raw.acknowledged,
+    bondAmount: raw.bondAmount,
+    bondPoster: raw.bondPoster,
     settledByAddressHash: raw.settledByAddressHash,
     outcomeTimestamp: raw.outcomeTimestamp,
     metadataURI: raw.metadataURI,
@@ -134,6 +136,26 @@ export async function createInvoice(
   };
 }
 
+/** Lock FLR against an invoice. Anyone may post; the poster gets it back on settlement. */
+export async function postBond(
+  signer: ethers.Signer,
+  invoiceId: bigint,
+  amountWei: bigint
+): Promise<string> {
+  const tx = await registryWrite(signer).postBond(invoiceId, { value: amountWei });
+  return (await tx.wait()).hash;
+}
+
+/** Collect bond proceeds owed to you. Proceeds are pulled, never pushed. */
+export async function withdraw(signer: ethers.Signer): Promise<string> {
+  const tx = await registryWrite(signer).withdraw();
+  return (await tx.wait()).hash;
+}
+
+export async function withdrawableOf(address: string): Promise<bigint> {
+  return registryRead().withdrawable(address);
+}
+
 /**
  * Ask the TEE for a confidential score. The result arrives asynchronously from
  * the enclave, so this resolves when the request is on-chain, not when the score
@@ -185,6 +207,22 @@ export function decodeRegistryError(err: unknown): string | null {
         return "This debt has already been acknowledged.";
       case "NotAcknowledgeable":
         return "A bearer invoice names no debtor, so there is nothing to acknowledge.";
+      case "WrongSourceChain":
+        return "That proof is about a different XRPL network than this registry serves.";
+      case "WrongAttestationType":
+        return "That proof is the wrong kind of attestation for this action.";
+      case "ZeroBond":
+        return "A bond has to be more than zero.";
+      case "BondPostedByAnother":
+        return "Someone else already posted the bond on this invoice.";
+      case "NoBond":
+        return "There is no bond on this invoice.";
+      case "NothingToWithdraw":
+        return "Nothing to withdraw.";
+      case "ReclaimTooEarly":
+        return "The bond cannot be reclaimed until the grace period after the deadline has passed.";
+      case "TransferFailed":
+        return "The transfer failed — your address rejected the payment.";
       case "TagSpaceExhausted":
         return "This registry has issued every destination tag.";
       default:

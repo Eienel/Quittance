@@ -32,6 +32,8 @@ const base = (overrides: Partial<Invoice> = {}): Invoice => ({
   deadlineTimestamp: BigInt(now() + 600),
   payerAddressHash: LIVE.payerHash,
   acknowledged: true,
+  bondAmount: 0n,
+  bondPoster: "0x0000000000000000000000000000000000000000",
   settledByAddressHash: ZERO_HASH,
   outcomeTimestamp: 0n,
   metadataURI: "",
@@ -84,6 +86,26 @@ export const invoices = {
   unacknowledged: () =>
     base({ id: 8n, destinationTag: 8, acknowledged: false, amountDrops: 1_000_000_000n }),
 
+  /** Bonded and open — the payer has real money riding on the deadline. */
+  bonded: () =>
+    base({
+      id: 10n,
+      destinationTag: 10,
+      bondAmount: 5_000_000_000_000_000_000n, // 5 FLR
+      bondPoster: LIVE.issuer,
+    }),
+
+  /** Bonded and missed: the mark handed the bond to the creditor. */
+  bondForfeited: () =>
+    base({
+      id: 11n,
+      destinationTag: 11,
+      status: InvoiceStatus.Delinquent,
+      bondAmount: 0n, // cleared on resolution; BondResolved carries the amount
+      bondPoster: LIVE.issuer,
+      outcomeTimestamp: BigInt(now() - 90),
+    }),
+
   /** Marked, but never acknowledged: a claim, not a judgement. */
   unacknowledgedMark: () =>
     base({
@@ -106,6 +128,8 @@ export const list = (): Invoice[] => [
   invoices.large(),
   invoices.unacknowledged(),
   invoices.unacknowledgedMark(),
+  invoices.bonded(),
+  invoices.bondForfeited(),
 ];
 
 export const records: Record<string, PayerRecord> = {

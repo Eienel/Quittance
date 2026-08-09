@@ -46,9 +46,9 @@ const CHAIN_ID   = 114;                 // 0x72
 const RPC        = "https://coston2-api.flare.network/ext/C/rpc";
 const EXPLORER   = "https://coston2-explorer.flare.network";
 
-const INVOICE_REGISTRY        = "0x14E50b59fA00c252155E5c532580d9581933D7b9";
-const SCORE_INSTRUCTION_SENDER = "0x2793D55DBe8aED3bD1396B8a29bb42A7D1902b44";
-const FCE_EXTENSION_ID        = 65975;
+const INVOICE_REGISTRY        = "0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99";
+const SCORE_INSTRUCTION_SENDER = "0xCf55db970F78adfD824B4B87f3b55c8901B47766";
+const FCE_EXTENSION_ID        = 66014;
 
 // XRPL testnet — plain JSON-RPC over POST, CORS-friendly, no key needed
 const XRPL_RPC    = "https://testnet.xrpl-labs.com";
@@ -269,7 +269,7 @@ meaningful to render on day one.
 curl -s -X POST https://coston2-api.flare.network/ext/C/rpc \
   -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"eth_call","params":[{
-        "to":"0x14E50b59fA00c252155E5c532580d9581933D7b9",
+        "to":"0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99",
         "data":"0x14d0f1ea"},"latest"]}'   # invoiceCount() → 2
 ```
 
@@ -411,7 +411,7 @@ XRPL payment visible (§6.2) + on-chain status = enough for a two-state pipeline
 | --- | --- |
 | `InvoiceRegistry` on Coston2 | Live, both outcome paths exercised end-to-end |
 | Attester CLI + watcher | Working; no HTTP API yet (§7) |
-| `ScoreInstructionSender` + FCE registration | Registered, extension `65975` |
+| `ScoreInstructionSender` + FCE registration | Registered, extension `66014` |
 | Scoring model + in-enclave registry reader | Built and tested against live Coston2 data |
 | TEE image | Built, runs, verified reproducible (5.93 MB distroless) |
 | TEE machine registration | Needs a Confidential Space VM — the score endpoint isn't live yet |
