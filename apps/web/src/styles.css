@@ -329,16 +329,30 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 /* ── landing page ───────────────────────────────────────────────────────── */
 .home { --gap: clamp(3rem, 8vw, 5.5rem); }
 
-/* scroll reveal */
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.22, 0.61, 0.36, 1); }
-.reveal.in { opacity: 1; transform: none; }
+/* scroll reveal — fade + blur-in + rise */
+.reveal {
+  opacity: 0; transform: translateY(34px); filter: blur(8px);
+  transition: opacity 0.8s ease, transform 0.95s cubic-bezier(0.2, 0.6, 0.2, 1), filter 0.8s ease;
+}
+.reveal.in { opacity: 1; transform: none; filter: none; }
+/* the two split halves slide in from their own side and converge */
+.split .split-media.reveal { transform: translateX(52px); }
+.split .split-text.reveal { transform: translateX(-44px); }
+.split.media-left .split-media.reveal { transform: translateX(-52px); }
+.split.media-left .split-text.reveal { transform: translateX(44px); }
+.split .split-media.reveal.in, .split .split-text.reveal.in,
+.split.media-left .split-media.reveal.in, .split.media-left .split-text.reveal.in { transform: none; }
+/* stagger */
 .split-text.reveal { transition-delay: 0.08s; }
 .two-up .outcome-card.reveal:nth-child(2) { transition-delay: 0.1s; }
-.steps li.reveal:nth-child(2) { transition-delay: 0.07s; }
-.steps li.reveal:nth-child(3) { transition-delay: 0.14s; }
-.steps li.reveal:nth-child(4) { transition-delay: 0.21s; }
+.steps li.reveal:nth-child(2) { transition-delay: 0.08s; }
+.steps li.reveal:nth-child(3) { transition-delay: 0.16s; }
+.steps li.reveal:nth-child(4) { transition-delay: 0.24s; }
+/* parallax: images sit slightly zoomed and drift as you scroll (transform set in JS) */
+.split-media img { transform: scale(1.12); will-change: transform; }
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal.in { opacity: 1; transform: none; transition: none; }
+  .reveal, .reveal.in { opacity: 1; transform: none; filter: none; transition: none; }
+  .split-media img { transform: none; }
 }
 
 .eyebrow {
@@ -430,6 +444,11 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   }
   .split-text { order: 0; text-align: center; }
   .split-media { order: 1; }
+  /* on mobile the split halves rise instead of sliding sideways */
+  .split .split-media.reveal, .split .split-text.reveal,
+  .split.media-left .split-media.reveal, .split.media-left .split-text.reveal { transform: translateY(30px); }
+  .split .split-media.reveal.in, .split .split-text.reveal.in,
+  .split.media-left .split-media.reveal.in, .split.media-left .split-text.reveal.in { transform: none; }
   .split-text h2 { margin-bottom: 0.6rem; justify-content: center; }
   .split-text .lead { font-size: 1.06rem; }
 }

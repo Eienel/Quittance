@@ -40,6 +40,33 @@ export default function Home() {
     return () => io.disconnect();
   }, []);
 
+  // Parallax: images sit slightly zoomed and drift vertically as they scroll.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const imgs = Array.from(document.querySelectorAll<HTMLElement>(".parallax"));
+    if (!imgs.length) return;
+    let raf = 0;
+    const update = () => {
+      const vh = window.innerHeight;
+      for (const img of imgs) {
+        const r = img.getBoundingClientRect();
+        const pct = (r.top + r.height / 2 - vh / 2) / vh; // ~ -1..1 across the viewport
+        const shift = Math.max(-1, Math.min(1, pct)) * 26;
+        img.style.transform = `scale(1.12) translateY(${shift.toFixed(1)}px)`;
+      }
+      raf = 0;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <div className="home">
       {/* hero */}
@@ -74,7 +101,7 @@ export default function Home() {
       {/* the core insight — image left, text right */}
       <div className="home-block split">
         <div className="split-media reveal">
-          <img src="/insight.jpg" alt="" loading="lazy" />
+          <img className="parallax" src="/insight.jpg" alt="" loading="lazy" />
         </div>
         <div className="split-text reveal">
           <h2>Proof nobody else can give</h2>
@@ -142,7 +169,7 @@ export default function Home() {
       {/* confidential score — image left, text right */}
       <div className="home-block split media-left">
         <div className="split-media reveal">
-          <img src="/confidential.jpg" alt="" loading="lazy" />
+          <img className="parallax" src="/confidential.jpg" alt="" loading="lazy" />
         </div>
         <div className="split-text reveal">
           <h2>A credit score that never sees your history</h2>
