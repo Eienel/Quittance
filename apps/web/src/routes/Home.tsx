@@ -14,20 +14,20 @@ export default function Home() {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
-    const tryPlay = () => { v.play().catch(() => {}); };
-    // Low Power Mode / blocked autoplay: start it on the first user gesture,
-    // and retry when the tab becomes visible again.
-    const events = ["pointerdown", "touchstart", "keydown", "scroll"] as const;
-    const onInteract = () => {
-      tryPlay();
-      if (!v.paused) events.forEach((e) => window.removeEventListener(e, onInteract));
-    };
+    // Low Power Mode / blocked autoplay: start on the first user gesture. On
+    // desktop only a real activation gesture (click/keypress) is allowed to
+    // start playback — scroll and mousemove don't count — so listen for both
+    // those and the mobile-friendly touch/scroll ones. Detach once it plays.
+    const events = ["pointerdown", "mousedown", "click", "keydown", "touchstart", "scroll", "wheel"] as const;
+    const detach = () => events.forEach((e) => window.removeEventListener(e, onInteract));
+    const tryPlay = () => v.play().then(detach).catch(() => {});
+    const onInteract = () => { tryPlay(); };
     const onVisible = () => { if (document.visibilityState === "visible") tryPlay(); };
     tryPlay();
     events.forEach((e) => window.addEventListener(e, onInteract, { passive: true }));
     document.addEventListener("visibilitychange", onVisible);
     return () => {
-      events.forEach((e) => window.removeEventListener(e, onInteract));
+      detach();
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
