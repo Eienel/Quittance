@@ -82,39 +82,39 @@ export default function Home() {
       </div>
 
       {/* how it works */}
-      <section className="home-block">
+      <div className="home-block">
         <h2>How it works</h2>
         <ol className="steps">
           <li>
-            <span className="step-n">1</span>
+            <span className="step-n">I</span>
             <div>
               <b>Issue</b>
               <p>Create an invoice payable in XRP with a deadline. The registry mints a unique destination tag.</p>
             </div>
           </li>
           <li>
-            <span className="step-n">2</span>
+            <span className="step-n">II</span>
             <div>
               <b>Pay</b>
               <p>The payer sends ordinary XRP from any wallet or exchange, tagged with that number. Nothing to install, no bridging, no custody.</p>
             </div>
           </li>
           <li>
-            <span className="step-n">3</span>
+            <span className="step-n">III</span>
             <div>
               <b>Prove</b>
               <p>Flare&apos;s Data Connector votes on the outcome and returns an on-chain proof in about two minutes, visible the whole way.</p>
             </div>
           </li>
           <li>
-            <span className="step-n">4</span>
+            <span className="step-n">IV</span>
             <div>
               <b>Settle or mark</b>
               <p>The invoice locks to exactly one outcome, forever. It accumulates into a permanent, per-account payment record.</p>
             </div>
           </li>
         </ol>
-      </section>
+      </div>
 
       {/* confidential score — image left, text right */}
       <div className="home-block split media-left">

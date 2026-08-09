@@ -445,9 +445,8 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 .steps { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 1.4rem; }
 .steps li { display: flex; gap: 1.1rem; align-items: flex-start; }
 .step-n {
-  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
-  display: grid; place-items: center; font: 600 0.95rem var(--sans);
-  color: var(--ink); background: var(--panel); border: 1px solid var(--line-2);
+  flex: 0 0 auto; width: 40px; padding-top: 0.1rem;
+  font: 600 1.05rem/1 var(--sans); color: var(--faint); letter-spacing: 0.05em;
 }
 .steps li b { font-size: 1.05rem; letter-spacing: -0.02em; }
 .steps li p { margin: 0.25rem 0 0; color: var(--dim); max-width: 60ch; }
