@@ -442,7 +442,11 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 .two-up .outcome-card .sub { font-size: 0.96rem; line-height: 1.5; color: var(--text); }
 
 /* how-it-works steps */
-.hiw h2 { text-align: center; justify-content: center; }
+.hiw h2 {
+  text-align: center; justify-content: center;
+  font-family: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+  font-weight: 600; letter-spacing: -0.02em;
+}
 .steps {
   list-style: none; padding: 0; margin: 2.6rem 0 0; display: grid; grid-template-columns: 1fr 1fr;
   gap: clamp(2.2rem, 5vw, 3.6rem) clamp(2rem, 6vw, 5rem);
