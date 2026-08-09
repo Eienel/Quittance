@@ -82,7 +82,7 @@ export default function Home() {
       </div>
 
       {/* how it works */}
-      <div className="home-block">
+      <div className="home-block hiw">
         <h2>How it works</h2>
         <ol className="steps">
           <li>
