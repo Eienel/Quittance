@@ -56,8 +56,8 @@ export default function BondPanel({
       <div className="stub">
         <p className="dim">
           {status === "settled"
-            ? "Obligation met — any bond was returned to whoever posted it."
-            : "Obligation broken — any bond went to the issuer."}
+            ? "Obligation met. Any bond was returned to whoever posted it."
+            : "Obligation broken. Any bond went to the issuer."}
         </p>
       </div>
     );
@@ -72,12 +72,12 @@ export default function BondPanel({
           </p>
           <p className="dim">
             Paid on time, it returns to {invoice.bondPoster.slice(0, 8)}…. Missed, it goes to
-            the issuer — released by the same proof that records the mark.
+            the issuer, released by the same proof that records the mark.
           </p>
         </>
       ) : (
         <p className="dim">
-          No bond posted. The outcome will be proved either way, but nothing moves — the mark
+          No bond posted. The outcome will be proved either way, but nothing moves: the mark
           would be a statement rather than a consequence.
         </p>
       )}

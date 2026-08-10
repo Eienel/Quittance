@@ -71,7 +71,7 @@ export function formatCountdown(seconds: number): string {
 }
 
 export const formatTimestamp = (unix: bigint | number): string =>
-  Number(unix) === 0 ? "—" : new Date(Number(unix) * 1000).toLocaleString();
+  Number(unix) === 0 ? "-" : new Date(Number(unix) * 1000).toLocaleString();
 
 /**
  * The XRPL payment URI most wallets understand. Amount is in XRP, `dt` is the

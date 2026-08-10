@@ -36,7 +36,7 @@ async function rpc<T = any>(method: string, params: Record<string, unknown> = {}
     }
   }
 
-  throw new Error(`XRPL ${method} failed on every endpoint — ${failures.join("; ")}`);
+  throw new Error(`XRPL ${method} failed on every endpoint: ${failures.join("; ")}`);
 }
 
 export interface LedgerNow {

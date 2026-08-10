@@ -7,7 +7,7 @@
       "name": "Cherry-picked window",
       "live": true,
       "blocked": true,
-      "claim": "A genuine, FDC-confirmed proof that no payment arrived — over a five-ledger slice chosen to exclude the payment that actually settled this invoice.",
+      "claim": "A genuine, FDC-confirmed proof that no payment arrived, over a five-ledger slice chosen to exclude the payment that actually settled this invoice.",
       "whyItFools": "A naive integration verifies the Merkle proof and marks the invoice. Every field it would check is authentic.",
       "defence": "markDelinquent requires the proof's request body to reproduce the invoice's own search range, amount, payee and destination tag.",
       "reason": "ProofMismatch(minimalBlockNumber)"
@@ -16,7 +16,7 @@
       "name": "Fabricated debt",
       "live": true,
       "blocked": true,
-      "claim": "A truthful proof that an invoice naming an innocent account went unpaid — for a debt that account never agreed to.",
+      "claim": "A truthful proof that an invoice naming an innocent account went unpaid, for a debt that account never agreed to.",
       "whyItFools": "The proof is impeccable. Nothing in an attestation can say whether the obligation was ever real.",
       "defence": "A delinquency reaches a payment record only if the named debtor admitted the debt first, by making any payment carrying the invoice's destination tag from their own XRPL account.",
       "reason": "invoice marked delinquent; payer record still 0 delinquent / 0 settled"
@@ -27,7 +27,7 @@
       "blocked": true,
       "claim": "A nonexistence proof about XRP mainnet, aimed at an invoice that lives on testXRP. Trivially true there, and every request-body field would match.",
       "whyItFools": "Verifying a Merkle proof establishes that an attestation is genuine, not that it is about the ledger your obligation lives on.",
-      "defence": "The registry pins its sourceId at deployment and checks it, alongside the attestation type — so the guarantee does not depend on how the verifier happens to be configured.",
+      "defence": "The registry pins its sourceId at deployment and checks it, alongside the attestation type, so the guarantee does not depend on how the verifier happens to be configured.",
       "reason": "Coston2's verifier declines to produce this proof at all: Attestation type and source id combination not supported: (0x5852505061796d656e744e6f6e6578697374656e6365000000000000000",
       "note": "Hardening rather than a live exploit on Coston2 today: its FDC attests only (XRPPaymentNonexistence, testXRP). Covered by ProofOrigin.test.js."
     }

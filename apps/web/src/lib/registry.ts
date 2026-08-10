@@ -186,13 +186,13 @@ export function decodeRegistryError(err: unknown): string | null {
     if (!parsed) return null;
     switch (parsed.name) {
       case "InvoiceNotOpen":
-        return "This invoice already has an outcome — it cannot change.";
+        return "This invoice already has an outcome. It cannot change.";
       case "ProofMismatch":
         return parsed.args[0] === "destinationTag"
           ? "The payment did not carry this invoice's destination tag, so it cannot be matched."
           : `The proof does not match the invoice's ${parsed.args[0]}.`;
       case "PaidAfterDeadline":
-        return "Paid, but after the deadline — the invoice still lapses.";
+        return "Paid, but after the deadline. The invoice still lapses.";
       case "PaymentFailed":
         return Number(parsed.args[0]) === 1
           ? "The XRPL payment failed (sender's fault)."
@@ -200,7 +200,7 @@ export function decodeRegistryError(err: unknown): string | null {
       case "NoSuchInvoice":
         return "No such invoice.";
       case "InvalidProof":
-        return "The Data Connector has not finalized this proof yet — try again shortly.";
+        return "The Data Connector has not finalized this proof yet. Try again shortly.";
       case "InvalidTerms":
         return `Invalid invoice terms: ${parsed.args[0]}.`;
       case "AlreadyAcknowledged":
@@ -222,7 +222,7 @@ export function decodeRegistryError(err: unknown): string | null {
       case "ReclaimTooEarly":
         return "The bond cannot be reclaimed until the grace period after the deadline has passed.";
       case "TransferFailed":
-        return "The transfer failed — your address rejected the payment.";
+        return "The transfer failed: your address rejected the payment.";
       case "TagSpaceExhausted":
         return "This registry has issued every destination tag.";
       default:

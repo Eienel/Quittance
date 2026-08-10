@@ -288,4 +288,4 @@ export const STAGE_TEXT: Record<FdcStage, string> = {
   done: "Done",
 };
 
-export const FAUCET_HINT = `Needs a little C2FLR for gas — ${CHAIN.faucet}`;
+export const FAUCET_HINT = `Needs a little C2FLR for gas: ${CHAIN.faucet}`;

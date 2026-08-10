@@ -21,7 +21,7 @@ export default function Primitive() {
         Quittance is not an invoicing app. It is one registry that turns any
         deadline-shaped obligation into a proved outcome. Every kind below is the
         same three contract calls at{" "}
-        <span className="mono">{CONTRACTS.invoiceRegistry.slice(0, 10)}…</span> — the
+        <span className="mono">{CONTRACTS.invoiceRegistry.slice(0, 10)}…</span>. The
         contract does not know a coupon from an invoice.
       </p>
 
@@ -84,7 +84,7 @@ export default function Primitive() {
         The strength of a primitive is that one mechanism serves many uses. Invoices
         are the first thing we pointed it at; FAssets already uses the same
         proof-of-absence for redemption defaults. Everything here runs on the one
-        registry — nothing above required a second contract.
+        registry; nothing above required a second contract.
       </p>
     </section>
   );

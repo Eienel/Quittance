@@ -91,7 +91,7 @@ async function cherryPickedWindow(invoiceId) {
       name: "Cherry-picked window",
       live: true,
       blocked: false,
-      detail: "THE REGISTRY ACCEPTED IT — a paid invoice was marked delinquent.",
+      detail: "THE REGISTRY ACCEPTED IT: a paid invoice was marked delinquent.",
     };
   } catch (err) {
     const reason = errorName(err) ?? err.shortMessage ?? err.message;
@@ -101,7 +101,7 @@ async function cherryPickedWindow(invoiceId) {
       live: true,
       blocked: true,
       claim:
-        "A genuine, FDC-confirmed proof that no payment arrived — over a five-ledger slice chosen to exclude the payment that actually settled this invoice.",
+        "A genuine, FDC-confirmed proof that no payment arrived, over a five-ledger slice chosen to exclude the payment that actually settled this invoice.",
       whyItFools:
         "A naive integration verifies the Merkle proof and marks the invoice. Every field it would check is authentic.",
       defence:
@@ -132,7 +132,7 @@ async function fabricatedDebt(invoiceId) {
     live: true,
     blocked: marked && untouched,
     claim:
-      "A truthful proof that an invoice naming an innocent account went unpaid — for a debt that account never agreed to.",
+      "A truthful proof that an invoice naming an innocent account went unpaid, for a debt that account never agreed to.",
     whyItFools:
       "The proof is impeccable. Nothing in an attestation can say whether the obligation was ever real.",
     defence:
@@ -193,7 +193,7 @@ async function crossChainSubstitution() {
     whyItFools:
       "Verifying a Merkle proof establishes that an attestation is genuine, not that it is about the ledger your obligation lives on.",
     defence:
-      "The registry pins its sourceId at deployment and checks it, alongside the attestation type — so the guarantee does not depend on how the verifier happens to be configured.",
+      "The registry pins its sourceId at deployment and checks it, alongside the attestation type, so the guarantee does not depend on how the verifier happens to be configured.",
     reason: `Coston2's verifier declines to produce this proof at all: ${
       (body.error ?? "").slice(0, 120) || `HTTP ${res.status}`
     }`,

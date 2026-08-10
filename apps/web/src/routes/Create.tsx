@@ -80,7 +80,7 @@ export default function Create() {
       <p className="dim">
         {framing.summary} Obligor: {framing.obligor}; obligee: {framing.obligee}. Same{" "}
         <span className="mono">createInvoice</span> / <span className="mono">settle</span> /{" "}
-        <span className="mono">markDelinquent</span> underneath — see the{" "}
+        <span className="mono">markDelinquent</span> underneath. See the{" "}
         <a href="/primitive">primitive</a> page.
       </p>
 

@@ -27,7 +27,7 @@ export default function Attacks() {
       <h2>Attacks</h2>
       <p className="dim">
         Every proof below is real and every statement it makes is true. Each would still be
-        false about the invoice it targets — and a naive integration would accept all of
+        false about the invoice it targets, and a naive integration would accept all of
         them.
       </p>
 
