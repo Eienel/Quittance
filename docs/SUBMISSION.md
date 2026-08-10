@@ -1,171 +1,248 @@
 # DoraHacks submission — Quittance
 
-Flare Summer Signal. Submission deadline **14 Aug 2026**. Entered for two bounties:
-**Interoperable Asset Products** and **Confidential Compute Apps**.
-
-Everything below is copy-paste-ready. Fields map to the DoraHacks BUIDL form.
+Flare Summer Signal. Submissions close **14 Aug 2026, 19:59**. Structured against the
+official Submission Requirements; every heading below is one of their bullets, in their
+order. Copy-paste-ready.
 
 ---
 
-## Name
+## 1. Project name
 
-Quittance
+**Quittance**
 
-## Tagline (one line)
+## 2. Selected bounties
 
-Every invoice ends in a quittance or a mark — the mark is an FDC-proved *absence* of
-payment, and it can move money.
+Both:
 
-## Short description (~50 words)
+- **Bounty 1 — Interoperable Asset Products**
+- **Bounty 2 — Confidential Compute Apps**
 
-Quittance is a settlement protocol on Flare for obligations that fail by silence. An invoice
-is payable in ordinary XRP, matched by destination tag. It then ends in exactly one
-cryptographic outcome, permanently: an FDC-proved payment, or an FDC-proved *non-payment*
-that hands a posted FLR bond to the creditor in the same transaction.
+## 3. Short product description
 
-## Full description
+Quittance is a settlement protocol on Flare for obligations that fail by *silence*. An
+invoice is issued payable in ordinary XRP and matched by destination tag. It then ends in
+exactly one cryptographic outcome, permanently: an FDC-proved payment (a **quittance**), or
+an FDC-proved *non-payment* (a **mark**) that hands a posted FLR bond to the creditor in the
+same transaction.
 
 Most payment tooling can prove a payment happened. Almost nothing can prove one didn't —
-you cannot produce evidence of an absence. So every obligation that fails by non-action (a
-missed invoice, an unpaid coupon, a skipped SLA heartbeat) has needed a trusted party to
-declare the failure. One party's word.
+you cannot produce evidence of an absence. Flare's `XRPPaymentNonexistence` attestation, backed
+by ~100 independent data providers, makes non-payment a network-attested fact. Quittance is
+the layer that makes that fact binding: it attaches the attestation to one specific
+obligation, permits exactly one outcome ever, and settles value on it.
 
-Flare's Data Connector ships `XRPPaymentNonexistence`: an attestation, backed by ~100
-independent data providers, that **no** XRPL payment matching a destination address, amount
-and destination tag was confirmed in a given ledger range. That makes non-payment a
-network-attested fact. Quittance is the layer that makes the fact *binding* — it attaches
-the attestation to one specific obligation, permits exactly one outcome ever, and settles
-value on it.
+## 4. Target user
 
-**Why it can only exist on Flare.** Ask of any submission: could you move it to Ethereum
-unchanged? An NFT marketplace, yes. A lending app, yes. Quittance, no — there is no
-proof-of-absence anywhere else at production scale. Move it and the product ceases to exist.
-Flare's own flagship, FAssets, uses the sibling attestation
-(`ReferencedPaymentNonexistence`) to prove redemption defaults and seize agent collateral.
-Same mechanism, different obligation — which is the validation that this is a primitive
-rather than a demo.
+Three concrete users, in order of how ready they are today:
 
-**The bond is what makes the first invoice worth issuing.** Without it a mark is only a
-*statement*, consequential only if some stranger later reads the registry — and on day one
-nobody does. A payer or a third-party guarantor locks FLR against the invoice. Settlement
-returns it; a mark hands it to the issuer, released by the very same attestation that
-records the mark. Proceeds are pulled, never pushed, so a hostile recipient can never block
-an outcome.
+1. **Anyone taking a deposit, retainer or milestone payment in XRP** — freelancers, agencies,
+   OTC desks — who wants a missed payment to be a fact a third party can check, not a claim
+   they have to argue. They post or require a bond; a mark pays it out automatically.
+2. **A guarantor or counterparty who needs the failure to be machine-readable.** This is the
+   real wedge. A contract on Flare cannot see the XRP Ledger, so it cannot know a payment
+   never came. Quittance is the piece that lets *any* Flare contract condition itself on an
+   XRPL non-payment.
+3. **Lenders underwriting XRPL counterparties.** They read the accumulated payment record —
+   through the confidential scorer, so they get the judgement without seeing the history.
 
-**It is a primitive, not an invoicing app.** One registry, the same three calls
-(`createInvoice` / `settle` / `markDelinquent`), four obligation kinds: invoice, bonded
-deposit, coupon, SLA heartbeat. The kind rides in on-chain invoice metadata, so a real
-non-invoice obligation is issued through the identical contract path.
+Who it is *not* for: anyone whose counterparty risk is already covered by escrow or an
+existing legal relationship. Quittance matters where the parties don't trust each other and
+no third party is willing to arbitrate.
 
-**There is no backend.** Both Flare services the app needs — the FDC verifier and the DA
-layer — send `Access-Control-Allow-Origin: *`, so the browser runs the entire attestation
-lifecycle itself: `prepareRequest` → `FdcHub.requestAttestation` → wait out the voting round
-→ fetch the Merkle proof from the DA layer → `settle()` or `markDelinquent()`. Whoever has
-the page open can drive an invoice to its outcome for a trivial amount of gas. The whole
-product is a static site.
-
-**Confidential Compute.** Outcomes accumulate into a permanent per-account payment record.
-Quittance Confidential scores that record inside a TEE (Flare Compute Extension `66014`,
-Google Confidential Space, AMD SEV-SNP), so a lender receives the judgement without ever
-seeing the history. `score: 0` means *no record*, never a score of zero, and the `basis`
-(how many attested outcomes back the number) is always displayed — a 700 from two invoices
-is a different claim from a 700 from forty.
-
-## The part no other team can copy: we attacked it
-
-The **Attacks** screen is generated by a real adversary run against the live registry
-(`services/attester/bin/adversary.js` → `apps/web/src/lib/attacks.json`). Three genuine,
-FDC-confirmed proofs, each of which would do something false, and the contract refusing all
-three:
-
-1. **Cherry-picked window** — a real proof that no payment arrived, over a five-ledger slice
-   chosen to exclude the payment that actually settled the invoice. Every field is
-   authentic; a naive integration verifies the Merkle proof and marks it.
-   *Rejected:* `ProofMismatch(minimalBlockNumber)` — the proof's request body must reproduce
-   the invoice's own search range, amount, payee and destination tag.
-
-2. **Fabricated debt** — a truthful proof that an invoice naming an innocent account went
-   unpaid, for a debt that account never agreed to. Nothing in an attestation can say
-   whether the obligation was ever real.
-   *Rejected in effect:* the invoice is marked, but the delinquency reaches no payment
-   record. A mark counts only if the named debtor first admitted the debt by sending any
-   payment carrying the invoice's destination tag from their own XRPL account. Live result:
-   payer record still 0 delinquent / 0 settled.
-
-3. **Cross-chain substitution** — a nonexistence proof about XRP *mainnet* aimed at an
-   invoice living on testXRP. Trivially true there, and every request-body field matches.
-   *Rejected:* the registry pins its `sourceId` at deployment and checks it alongside the
-   attestation type. Honest framing: on Coston2 today this is **hardening, not a live
-   exploit** — its FDC attests only `(XRPPaymentNonexistence, testXRP)` and the verifier
-   declines the request upstream. Covered by `contracts/test/ProofOrigin.test.js`.
-
-## Links
+## 5. Demo link, video, or working app link
 
 | | |
 | --- | --- |
-| Live app | https://quittance-azure.vercel.app |
-| Repo | https://github.com/Eienel/Quittance |
-| `InvoiceRegistry` (Coston2) | `0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99` |
-| `ScoreInstructionSender` (Coston2) | `0xCf55db970F78adfD824B4B87f3b55c8901B47766` |
+| **Working app (live, seeded)** | https://quittance-azure.vercel.app |
+| **No-wallet demo** | https://quittance-azure.vercel.app/?fixtures=1 |
+| **Video** | _(fill in)_ |
+
+The app is live on Coston2 with a seeded registry — judges can inspect real outcomes without
+issuing anything. To interact, a Coston2 wallet with a little C2FLR from
+https://faucet.flare.network/coston2.
+
+**Suggested 60-second path for a judge:**
+
+1. Open the app. **Invoice #2** is settled (FDC `XRPPayment`). **#3** is marked delinquent
+   (FDC `XRPPaymentNonexistence`). **#4** is a bonded obligation whose 2 FLR bond was
+   forfeited to the creditor on the mark. **#5** is a fabricated debt: marked, yet the named
+   account's payment record stays clean.
+2. Open **Attacks** — every entry is a real adversarial run against this same registry.
+3. Open **Primitive** — the same three contract calls across four obligation kinds.
+4. `?fixtures=1` renders every screen with no wallet at all, including states that are
+   otherwise slow to reach (an invoice past its deadline with the proof still in flight).
+
+## 6. GitHub repo / technical materials
+
+- **Repo:** https://github.com/Eienel/Quittance
+- `contracts/` — `InvoiceRegistry`, `ScoreInstructionSender` (Solidity, 75 tests)
+- `apps/web/` — the React app; runs the whole FDC lifecycle in the browser
+- `fce/` — the Go TEE scorer for Confidential Space
+- `services/attester/` — CLI for seeding and the adversary script
+- `docs/FRONTEND_SPEC.md`, `docs/BUILD_PLAN.md`
+
+## 7. How the project uses Flare
+
+Flare is not a deployment target here; it is the only reason the product exists.
+
+**Flare Data Connector — both directions of the same question.**
+`XRPPayment` proves a specific XRPL transaction settled an invoice. `XRPPaymentNonexistence`
+proves that **no** payment matching a destination address, amount and destination tag was
+confirmed in a given ledger range. The registry consumes both through `FdcVerification`,
+resolved at runtime from `FlareContractRegistry`.
+
+**Why it cannot be ported.** Ask of any submission: could you move it to Ethereum unchanged?
+An NFT marketplace, yes. A lending app, yes. Quittance, no — there is no proof-of-absence
+anywhere else at production scale. Move it and the product ceases to exist.
+
+**Precedent inside Flare itself.** FAssets uses the sibling attestation
+(`ReferencedPaymentNonexistence`) to prove redemption defaults and seize agent collateral.
+Same mechanism, different obligation — which is the evidence that this is a primitive rather
+than a one-off.
+
+**Flare Compute Extensions.** Extension `66014`, registered on Coston2 against
+`FlareTeeManager`. The scorer reads the on-chain payment record inside a TEE and returns a
+score without exposing the history.
+
+**No backend.** Both Flare services the app needs — the FDC verifier and the DA layer — send
+`Access-Control-Allow-Origin: *`, so the browser runs the entire lifecycle itself:
+`prepareRequest` → `FdcHub.requestAttestation` → wait out the voting round → fetch the Merkle
+proof from the DA layer → `settle()` or `markDelinquent()`. Whoever has the page open can
+drive an invoice to its outcome for a trivial amount of gas. The whole product is a static
+site.
+
+## 8. What was newly built during the program
+
+Everything. Quittance did not exist before Flare Summer Signal — nothing was ported in.
+
+**Built from scratch:**
+
+- `InvoiceRegistry` — invoice lifecycle, both proof paths, permanent per-account payment
+  record. One outcome ever, enforced.
+- **Bond escrow** — post, resolve, withdraw, and a 30-day grace reclaim. Proceeds are
+  *pulled*, never pushed, so a hostile recipient can never block an outcome. 17 tests.
+- **The acknowledgement mechanism** — closes a hole we found in our own design (below).
+- **Proof-origin binding** — the registry pins its `sourceId` and attestation type. 8 tests.
+- **Browser-side FDC pipeline** — the whole attestation lifecycle client-side, including a
+  retry for the ~12 s XRPL finality race before the verifier will attest.
+- **The adversary script** — three real attacks run against the live registry, generating the
+  Attacks page.
+- **Quittance Confidential** — Go scorer for Confidential Space, extension `66014` registered.
+- **The web app** — every screen, plus a full fixture mode so it demos with no wallet.
+
+**Improved during the program, by attacking our own work.** Two genuine holes we found and
+closed, both now regression-tested:
+
+1. **Unilateral delinquency.** Anyone can write an invoice naming anyone as payer, and the
+   nonexistence proof for it would be perfectly true. We added acknowledgement: a mark
+   reaches an account's payment record only if that account first admitted the debt by
+   sending any payment carrying the invoice's destination tag from their own XRPL account.
+   The invoice can still be marked — the proof is true — but an unacknowledged mark touches
+   no record.
+2. **Cross-chain proof substitution.** A nonexistence proof about XRP mainnet would satisfy
+   every request-body field of a testnet invoice. The registry now pins `sourceId` at
+   deployment. Stated honestly: on Coston2 today this is **hardening, not a live exploit** —
+   its FDC attests only `(XRPPaymentNonexistence, testXRP)` and the verifier declines the
+   request upstream.
+
+## 9. Contract addresses and deployment details
+
+| | |
+| --- | --- |
+| Network | **Flare Coston2 testnet**, chainId **114** |
+| `InvoiceRegistry` | `0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99` |
+| `ScoreInstructionSender` | `0xCf55db970F78adfD824B4B87f3b55c8901B47766` |
 | Flare Compute Extension ID | `66014` |
 | Explorer | https://coston2-explorer.flare.network |
-| Demo video | _(fill in)_ |
 
-Chain: Flare Coston2 testnet, chainId **114**.
+Deployed on **Coston2**, not Songbird or Flare Mainnet. The registry is seeded and live: a
+settled invoice, a delinquent one, a bonded obligation whose bond was forfeited on the mark,
+and a fabricated debt marked against an account whose record stays clean.
 
-## How to try it in 60 seconds
-
-1. Open https://quittance-azure.vercel.app — the registry is seeded and live.
-2. **Invoice #2** is settled (FDC `XRPPayment`). **#3** is marked delinquent (FDC
-   `XRPPaymentNonexistence`). **#4** is a bonded obligation whose 2 FLR bond was forfeited
-   to the creditor on the mark. **#5** is a fabricated debt: marked, yet the named account's
-   record stays clean.
-3. Open **Attacks** — every entry there is a real run against this same registry.
-4. Open **Primitive** — the same three calls across four obligation kinds.
-5. No wallet? Append `?fixtures=1` and every screen renders offline, including states that
-   are otherwise slow to reach (an invoice past its deadline with the proof still in
-   flight — the UI calls that `lapsed`).
-6. To issue your own: a Coston2 wallet with a little C2FLR from
-   https://faucet.flare.network/coston2.
-
-## What is live vs. what is not
-
-Stated plainly, because a judge will poke at exactly this.
+**What is live vs. what is not** — stated plainly, because a judge should not have to find it:
 
 | Component | State |
 | --- | --- |
 | `InvoiceRegistry`, both proof paths | Live on Coston2, exercised end-to-end |
-| Bond escrow — post, resolve, withdraw, grace reclaim | Live, 17 tests |
-| Proof origin binding (source chain + attestation type) | Live, 8 tests |
-| Browser-side FDC pipeline (no backend) | Live, tested |
+| Bond escrow | Live, 17 tests |
+| Proof-origin binding | Live, 8 tests |
+| Browser-side FDC pipeline | Live, tested |
 | XRPL payment detection | Live, client-side |
-| Adversary run behind the Attacks screen | Real, against the live registry |
-| Confidential scorer | Model + enclave reader built and tested, extension `66014` registered; **no TEE machine provisioned yet**, so the score screen runs on fixtures |
+| Adversary run behind the Attacks page | Real, against the live registry |
+| Confidential scorer | Model and enclave reader built and tested, extension `66014` registered; **TEE machine status: see note** |
+
+> **TEE note — update before submitting.** If the Confidential Space VM is running by
+> submission time, replace this with the live proxy URL and the measured code hash. If it is
+> not, say so here plainly: the scorer is built and tested but runs on fixtures, with no live
+> enclave. Do not leave this ambiguous.
 
 75 contract tests, 18 web data-layer tests, strict TypeScript, clean build.
+
+## 10. Short roadmap / next steps
+
+**Immediately after the hackathon:**
+
+- Bring the Confidential Space TEE fully live and register the measured code hash on-chain,
+  so scores are produced in an enclave rather than from fixtures.
+- Deploy to **Songbird**, then Flare Mainnet against XRPL mainnet. The registry pins its
+  source chain at deployment, so this is a new deployment, not a migration.
+
+**Next:**
+
+- **Make the mark portable.** Today the payment record lives in one registry. The value
+  compounds when any Flare contract can condition on it — lending protocols reading the
+  record, escrow releasing on a mark, an FAssets-style agent posting a bond against delivery.
+- **Third-party guarantors.** Bonds can already be posted by someone other than the payer.
+  The next step is a market for that: underwriters pricing an account's record and selling
+  the guarantee.
+- **Beyond XRPL.** `ReferencedPaymentNonexistence` covers BTC, DOGE and others. The same
+  registry generalizes to any chain the FDC attests, which turns four illustrative obligation
+  kinds into live ones.
+- Multi-vantage attestation for SLA-style obligations, where a heartbeat payment proves the
+  heartbeat but not the service.
+
+## 11. Distribution, testing and traction — the honest answer
+
+**We have no users, no pilot, and no partner conversations.** Quittance was built during the
+program and has not been put in front of anyone outside the team. Claiming otherwise would be
+easy and worthless.
+
+What we *do* have, in place of traction:
+
+- **A live, seeded, publicly reachable deployment** anyone can inspect without asking us for
+  anything.
+- **Adversarial testing against ourselves.** Three attacks constructed and run against the
+  live registry, two of which found real holes that are now closed and regression-tested.
+  This is the honest substitute for users: we could not test it with strangers, so we tested
+  it as an attacker.
+- **93 tests** across contracts and the data layer, run against the live chain and live Flare
+  services, not mocks.
+- **A design constraint aimed squarely at distribution:** no backend. The whole product is a
+  static site, and any holder of the page can drive an invoice to its outcome for gas. There
+  is no server for us to keep running and no operator for a user to trust, which is what
+  makes it plausible that this outlives the hackathon.
+
+---
 
 ## Demo video outline (target 3 minutes)
 
 - **0:00–0:20** — The problem in one sentence: you can prove you were paid; you cannot prove
   you weren't. Show a marked invoice.
-- **0:20–1:00** — Issue an invoice. The destination tag dominates the pay screen (a payment
-  without it cannot be matched — this is the single most likely way a live demo fails, and
-  the UI says so).
-- **1:00–1:45** — Miss the deadline with a bond posted. Show both futures *before* the
-  deadline, then the FLR actually moving to the creditor on the mark. This is the whole
-  pitch in one shot.
+- **0:20–1:00** — Issue an invoice. The destination tag dominates the pay screen; a payment
+  without it cannot be matched, and the UI says so loudly.
+- **1:00–1:45** — Miss a deadline with a bond posted. Show both futures *before* the deadline,
+  then the FLR actually moving to the creditor on the mark. The whole pitch in one shot.
 - **1:45–2:00** — The ~2 minute wait is real (XRPL finality ~12 s, an FDC voting round
-  90–180 s) and is shown as a named pipeline, not a spinner. Do not hide it — a named
-  pipeline reads as rigor.
+  90–180 s) and is shown as a named pipeline, not a spinner. A named pipeline reads as rigor.
 - **2:00–2:40** — The Attacks screen: three true proofs, three refusals.
-- **2:40–3:00** — Primitive grid and the confidential score, stating the TEE caveat out loud.
+- **2:40–3:00** — Primitive grid, then the confidential score with its status stated out loud.
 
 ## Pre-submission checklist
 
-- [ ] Demo video recorded and linked
-- [ ] Repo public, `main` up to date
-- [ ] Live app reachable, all seeded invoices rendering correct statuses
+- [ ] Demo video recorded and linked in §5
+- [ ] TEE status resolved in §9 — live URL and code hash, or the plain caveat
+- [ ] Custom domain live (avoids the wallet "malicious site" flag on `*.vercel.app`)
 - [ ] `attacks.json` regenerated close to submission (`services/attester/bin/adversary.js`)
 - [ ] Both bounty tracks selected on the BUIDL form
-- [ ] Contract addresses in this file match what is deployed
-- [ ] TEE caveat stated in the submission text, not only in the repo
+- [ ] Contract addresses here match what is deployed
+- [ ] Repo public and `main` up to date
