@@ -2,7 +2,7 @@
 
 The scoring half of Plime: a Flare Compute Extension that turns an account's
 attested payment history into a creditworthiness score **without anyone seeing the
-history** — including the machine operator and the caller.
+history** - including the machine operator and the caller.
 
 ## Why a TEE is load-bearing here
 
@@ -15,11 +15,11 @@ So the asymmetry across the enclave boundary is the entire product:
 | | Crosses the boundary |
 | --- | --- |
 | **In** | one XRPL account hash, one registry address |
-| **Out** | `{score, band, basis, version}` — a number in 300–850 |
+| **Out** | `{score, band, basis, version}` - a number in 300–850 |
 | **Never out** | invoice counts, amounts, dates, counterparties, any per-invoice detail |
 
 The enclave reads the full record from `InvoiceRegistry.record()` itself, summarizes it,
-and drops it. `GET /state` exposes aggregate counters only — a per-account counter would
+and drops it. `GET /state` exposes aggregate counters only - a per-account counter would
 leak exactly what this exists to protect. The score is deliberately lossy: distinct
 histories map to the same number, so the output is not a re-encoding of the input.
 
@@ -33,7 +33,7 @@ their score.
 scorer/internal/score/       # the scoring model (pure, unit-tested)
 scorer/internal/registry/    # in-enclave reader for InvoiceRegistry.record()
 scorer/internal/extension/   # FCE handler: SCORING / SCORE_PAYER routing
-scorer/pkg/types/            # wire types — note what the response omits
+scorer/pkg/types/            # wire types - note what the response omits
 ```
 
 The on-chain entry point lives with the other Solidity, at
@@ -44,7 +44,7 @@ so one `hardhat compile` covers the whole project.
 
 Range 300–850, or 0 for an account with no attested history.
 
-- **Quality** blends the settled ratio by count (0.4) and by value (0.6) — a large missed
+- **Quality** blends the settled ratio by count (0.4) and by value (0.6) - a large missed
   invoice says more than a small one, but a habit of missing small ones is still a signal.
 - **Confidence** ramps over the first ~6 outcomes, so a thin file cannot read as an
   excellent one; sparse records sit near the 500 baseline.
@@ -62,7 +62,7 @@ Registered and live on Coston2:
 | Registration tx | `0xd8cfaabeb085a710e352f7962f81070180339aac5f338fcf27718f46ca7aa798` |
 | `FlareTeeManager` (Coston2) | `0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE` |
 
-Registration was **permissionless** — `register()` returns an extension id owned by the
+Registration was **permissionless** - `register()` returns an extension id owned by the
 caller, who then allowlists their own machine owners. No Foundation approval was involved.
 
 Verified against live data: the reader pulls the real Coston2 record for the payer from the
@@ -93,7 +93,7 @@ go run ./cmd                               # extension server on :8080
 
 The image is built for reproducibility: a digest-pinned base, `SOURCE_DATE_EPOCH`-clamped
 timestamps, apt pinned to a Debian snapshot, and a static `CGO_ENABLED=0` binary on
-distroless. Two builds of the same commit must produce the same image digest — that digest
+distroless. Two builds of the same commit must produce the same image digest - that digest
 is what the TEE attests to, so a reader can check that the score came from *this* code.
 
 ```bash
@@ -106,7 +106,7 @@ DOCKER_BUILDKIT=1 docker build --provenance=false \
 
 `--provenance=false` is **required**, not cosmetic. BuildKit otherwise attaches a
 provenance attestation containing the wall-clock build time, which changes the manifest
-list digest on every build even when the image itself is identical — exactly the digest a
+list digest on every build even when the image itself is identical - exactly the digest a
 verifier would be comparing.
 
 ### Verified reproducible
@@ -120,7 +120,7 @@ Built twice from the same commit, the second time with `--no-cache`:
 | Image manifest | `sha256:07c6db11a292344ff4ba96e56ff7ee5b5faef90563cecb572d069a7cc002fb9b` |
 
 So the digest a TEE attests to is a function of the source, not of when or where it was
-built — which is what makes "this score came from this code" checkable by a third party.
+built - which is what makes "this score came from this code" checkable by a third party.
 
 > One caveat on the numbers above: they were produced in a sandbox whose egress proxy
 > required an extra CA in the builder stage, added in a throwaway copy of the build context
@@ -129,5 +129,5 @@ built — which is what makes "this score came from this code" checkable by a th
 > re-established once, then pinned.
 
 `MODE` in the Dockerfile is `1` (simulated attestation) so a bare `docker run` works
-locally. **A real Confidential Space deploy must set `MODE=0`** — the Flare TEE data
+locally. **A real Confidential Space deploy must set `MODE=0`** - the Flare TEE data
 committee rejects simulated attestation.

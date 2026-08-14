@@ -51,7 +51,7 @@ contract InvoiceRegistry {
         /// @dev Native FLR locked against this obligation. A mark moves it to the creditor,
         ///      which is what turns the proof from a statement into a consequence.
         uint256 bondAmount;
-        /// @dev Who gets it back on settlement. Not necessarily the payer — a third party
+        /// @dev Who gets it back on settlement. Not necessarily the payer - a third party
         ///      may guarantee an obligation on someone else's behalf.
         address bondPoster;
         // --- outcome ---
@@ -61,7 +61,7 @@ contract InvoiceRegistry {
     }
 
     /// @notice The permanent record accumulated against one XRPL account.
-    /// @dev Only acknowledged invoices are counted here — see `markDelinquent`.
+    /// @dev Only acknowledged invoices are counted here - see `markDelinquent`.
     struct PayerRecord {
         uint64 settledCount;
         uint64 delinquentCount;
@@ -86,7 +86,7 @@ contract InvoiceRegistry {
     /**
      * @dev Bond proceeds, held for withdrawal rather than pushed.
      *
-     * An outcome must never fail because a recipient's address reverts on receive —
+     * An outcome must never fail because a recipient's address reverts on receive -
      * that would let a hostile creditor make their own invoice unsettleable, and let a
      * hostile debtor block their own mark. Credit here, transfer on demand.
      */
@@ -96,7 +96,7 @@ contract InvoiceRegistry {
      * @dev How long after the deadline a bond stays hostage to an outcome nobody proves.
      *
      * Once the deadline passes the outcome is already determined and anyone can submit
-     * the proof for a trivial fee — but if the FDC could not produce one at all, the
+     * the proof for a trivial fee - but if the FDC could not produce one at all, the
      * money must not be locked forever. After this window the poster can take it back.
      */
     uint64 public constant BOND_RECLAIM_GRACE = 30 days;
@@ -111,7 +111,7 @@ contract InvoiceRegistry {
      *
      * @dev The FDC confirms attestations against whichever chain the request named, and a
      *      proof carries that chain in `sourceId`. Verifying the Merkle proof therefore
-     *      establishes that the attestation is genuine — not that it is about the ledger
+     *      establishes that the attestation is genuine - not that it is about the ledger
      *      this invoice lives on.
      *
      *      Left unchecked that is a fund-loss bug rather than a nicety: against an invoice
@@ -120,7 +120,7 @@ contract InvoiceRegistry {
      *      No such payment exists there, so the attestation is legitimately confirmed, its
      *      leaf is in the root, and every request-body field we compare matches. The
      *      invoice would be marked, the payer's record damaged, and the bond handed to the
-     *      issuer — on a proof that is perfectly true about the wrong chain.
+     *      issuer - on a proof that is perfectly true about the wrong chain.
      *
      *      Immutable, and set per deployment, so the same code serves testnet and mainnet.
      */
@@ -218,7 +218,7 @@ contract InvoiceRegistry {
     /**
      * @param _fdcVerificationOverride Zero to resolve FdcVerification through
      *        FlareContractRegistry, which is the production path.
-     * @param _sourceId The XRPL network this registry accepts proofs from — `testXRP` or
+     * @param _sourceId The XRPL network this registry accepts proofs from - `testXRP` or
      *        `XRP`, right-padded utf8. Immutable: a registry that could be pointed at a
      *        second ledger mid-life would accept proofs about the wrong one.
      */
@@ -325,7 +325,7 @@ contract InvoiceRegistry {
      *
      * @dev A proof of non-payment, on its own, only *says* something. Nobody has to read
      *      it and nothing follows from it, which is the difference between a credit bureau
-     *      — whose reports gate access to credit — and a diary. The bond is what gives the
+     *      - whose reports gate access to credit - and a diary. The bond is what gives the
      *      proof teeth: the same attestation that records the mark also moves money, so
      *      the outcome matters to the two parties on the very first invoice, without
      *      waiting for anyone else to adopt the registry.
@@ -333,7 +333,7 @@ contract InvoiceRegistry {
      *      Anyone may post. Usually it is the debtor putting up earnest money, but a third
      *      party guaranteeing someone else's obligation is a legitimate and useful case, so
      *      the poster is recorded rather than assumed. One poster per invoice, who may top
-     *      up — splitting a bond between parties would make refunds ambiguous.
+     *      up - splitting a bond between parties would make refunds ambiguous.
      */
     function postBond(uint256 invoiceId) external payable {
         Invoice storage inv = _open(invoiceId);
@@ -370,7 +370,7 @@ contract InvoiceRegistry {
     /**
      * @notice Take back a bond on an obligation that was never resolved.
      *
-     * @dev Once the deadline passes the outcome is settled in fact — anyone can buy the
+     * @dev Once the deadline passes the outcome is settled in fact - anyone can buy the
      *      proof for a trivial fee and close it. But if no proof can be obtained at all
      *      (the FDC drops the attestation type, the data source disappears), the money
      *      must not be stranded. This is the escape hatch, deliberately far enough out
@@ -416,7 +416,7 @@ contract InvoiceRegistry {
      *
      * @dev Issuance is unilateral: anyone may write an invoice naming anyone as the payer.
      *      A nonexistence proof over such an invoice is perfectly true and completely
-     *      meaningless — it proves nobody paid a debt that was never owed. Left unguarded,
+     *      meaningless - it proves nobody paid a debt that was never owed. Left unguarded,
      *      that would let anyone manufacture delinquencies against any XRPL account, and a
      *      lender reading a record could not tell a real obligation from a fabricated one.
      *
@@ -427,7 +427,7 @@ contract InvoiceRegistry {
      *      enough. Paying in full acknowledges implicitly, so an honest payer never does
      *      this separately.
      *
-     *      Anyone may submit the proof — the attestation, not the sender, is the authority.
+     *      Anyone may submit the proof - the attestation, not the sender, is the authority.
      */
     function acknowledge(uint256 invoiceId, IXRPPayment.Proof calldata proof) external {
         Invoice storage inv = _open(invoiceId);
@@ -471,7 +471,7 @@ contract InvoiceRegistry {
     /**
      * @notice Discharge an invoice with an FDC-proved XRPL payment.
      * @dev The proof carries the whole transaction, so every term is checked against the
-     *      invoice here rather than trusted from the caller. Anyone may submit it — the
+     *      invoice here rather than trusted from the caller. Anyone may submit it - the
      *      proof, not the sender, is the authority.
      */
     function settle(uint256 invoiceId, IXRPPayment.Proof calldata proof) external {
@@ -632,7 +632,7 @@ contract InvoiceRegistry {
 
     /**
      * @notice Whether the invoice's deadline has passed in XRPL terms, i.e. whether it is
-     *         worth requesting a nonexistence attestation yet. Advisory only — the FDC
+     *         worth requesting a nonexistence attestation yet. Advisory only - the FDC
      *         decides, using the ledger's own close times.
      */
     function isPastDeadline(uint256 invoiceId, uint64 xrplTimeNow) external view returns (bool) {

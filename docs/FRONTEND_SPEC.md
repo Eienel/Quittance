@@ -1,17 +1,17 @@
-# Plime — Frontend Handoff Spec
+# Plime - Frontend Handoff Spec
 
 Everything the UI needs, and how to test each piece without waiting on the backend.
 
 **You do not need to run any backend service.** All state lives on Coston2 and the XRPL
 testnet, both of which are public. The UI reads them directly over HTTPS/RPC. The one thing
-the UI cannot do alone is *produce* an FDC proof — that's the attester's job (§7).
+the UI cannot do alone is *produce* an FDC proof - that's the attester's job (§7).
 
 **There is now a scaffolded React/Vite/TypeScript app at `apps/web`** with the whole data
-layer built and tested against the live chain — read [`apps/web/README.md`](../apps/web/README.md)
+layer built and tested against the live chain - read [`apps/web/README.md`](../apps/web/README.md)
 first, then come back here for product detail. Run it with `?fixtures=1` to see every state
 without a wallet or a network.
 
-The original single-file vanilla page is kept at `apps/reference/index.html` — superseded,
+The original single-file vanilla page is kept at `apps/reference/index.html` - superseded,
 but it proves the wiring in one file with no build step.
 
 ---
@@ -31,7 +31,7 @@ turns a missed invoice into a permanent, third-party-checkable fact rather than 
 word. **The UI's job is to make that asymmetry legible.**
 
 Payers use any XRPL wallet or exchange. There is nothing to install, no bridging, no
-custody. The entire integration surface on the payer's side is a **destination tag** — a
+custody. The entire integration surface on the payer's side is a **destination tag** - a
 number they type into a normal XRP send.
 
 Tagline: *One primitive for every payment-shaped obligation.*
@@ -50,7 +50,7 @@ const INVOICE_REGISTRY        = "0x6e88110e4d9dA843Fd3d87F6f5985201d7b28F99";
 const SCORE_INSTRUCTION_SENDER = "0xCf55db970F78adfD824B4B87f3b55c8901B47766";
 const FCE_EXTENSION_ID        = 66014;
 
-// XRPL testnet — plain JSON-RPC over POST, CORS-friendly, no key needed
+// XRPL testnet - plain JSON-RPC over POST, CORS-friendly, no key needed
 const XRPL_RPC    = "https://testnet.xrpl-labs.com";
 const XRPL_FAUCET = "https://faucet.altnet.rippletest.net/accounts";
 const XRPL_EXPLORER = "https://testnet.xrpl.org";
@@ -63,7 +63,7 @@ signatures.
 Wallet needs **C2FLR** for gas: https://faucet.flare.network/coston2
 
 > ⚠️ Nothing above is a secret, but the deployer key in `services/attester/.env` is
-> gitignored and must stay that way. The UI never needs a private key — users sign with
+> gitignored and must stay that way. The UI never needs a private key - users sign with
 > their own wallet.
 
 ---
@@ -79,7 +79,7 @@ Wallet needs **C2FLR** for gas: https://faucet.flare.network/coston2
 | `issuer` | `address` | Flare address that created it |
 | `destinationTag` | `uint32` | **The hero number.** What the payer types into their wallet |
 | `status` | `uint8` | `0` None · `1` Open · `2` Settled · `3` Delinquent |
-| `payeeAddressHash` | `bytes32` | keccak256 of the payee's XRPL address — *not reversible*, see §3.1 |
+| `payeeAddressHash` | `bytes32` | keccak256 of the payee's XRPL address - *not reversible*, see §3.1 |
 | `amountDrops` | `uint256` | Divide by 1e6 for XRP |
 | `minimalBlockNumber` | `uint64` | Start of the XRPL ledger window |
 | `deadlineBlockNumber` | `uint64` | Last ledger that counts as on time |
@@ -90,10 +90,10 @@ Wallet needs **C2FLR** for gas: https://faucet.flare.network/coston2
 | `metadataURI` | `string` | Free-form; may be empty |
 
 `invoiceCount()` returns the highest id. **IDs start at 1**, not 0. There is no
-"get all invoices" call — loop `id` from `invoiceCount()` downward, or read
-`InvoiceCreated` events (cheaper for long lists — see §8).
+"get all invoices" call - loop `id` from `invoiceCount()` downward, or read
+`InvoiceCreated` events (cheaper for long lists - see §8).
 
-### 3.1 Address hashes — important UX constraint
+### 3.1 Address hashes - important UX constraint
 
 The chain stores `keccak256(utf8(xrplClassicAddress))`, **not** the address. You cannot
 turn a hash back into an `r...` address. So:
@@ -121,7 +121,7 @@ const addrHash = (r) => ethers.keccak256(ethers.toUtf8Bytes(r.trim()));
 | `delinquentDrops` | `uint256` |
 | `lastOutcomeTimestamp` | `uint64` |
 
-All zeros = no attested history. Display that as "no record", **not** "clean record" —
+All zeros = no attested history. Display that as "no record", **not** "clean record" -
 they're different claims and the distinction matters to a lender.
 
 ---
@@ -157,21 +157,21 @@ Call:
 ```js
 createInvoice(payeeHash, payerHash, amountDrops, ledgerIndex, deadlineLedger, deadlineTs, metadataURI)
 ```
-Read the assigned tag from the `InvoiceCreated` event in the receipt — **the return value
+Read the assigned tag from the `InvoiceCreated` event in the receipt - **the return value
 is not accessible from a transaction**, only from the event.
 
 **Empty payer = bearer invoice.** Make this a deliberate toggle with an explanation, not a
 blank field. It changes the semantics: anyone may settle it, and if it lapses, nobody's
 record is marked. That's a real product decision the issuer is making.
 
-### 4.2 Pay instructions — the most important screen
+### 4.2 Pay instructions - the most important screen
 
 This is what a judge will actually use. It must be copy-paste-proof and work on a phone
 next to a desktop.
 
 Show, unmistakably:
-1. **Destination address** (`r...`) — copy button
-2. **Destination tag** — copy button, biggest element on screen
+1. **Destination address** (`r...`) - copy button
+2. **Destination tag** - copy button, biggest element on screen
 3. **Exact amount** in XRP
 4. **Live countdown** to the deadline
 
@@ -190,8 +190,8 @@ ripple:rPAYEE?amount=10&dt=42
 Status badge per invoice: `open` (blue) / `settled ✓` (green) / `delinquent ✗` (red).
 
 For open invoices show the countdown. **When the deadline passes, an open invoice does not
-instantly become delinquent** — it enters a pending window while the FDC round runs
-(~90–180 s). Show that as a distinct third state, e.g. "lapsed — proving…". Silence there
+instantly become delinquent** - it enters a pending window while the FDC round runs
+(~90–180 s). Show that as a distinct third state, e.g. "lapsed - proving…". Silence there
 reads as a bug.
 
 ### 4.4 Payment record / lender view
@@ -199,15 +199,15 @@ reads as a bug.
 Input an XRPL address → show `settledCount` / `delinquentCount` and the drop totals.
 
 This is the "why does this exist" screen. Frame it as what a counterparty sees before
-extending credit. A delinquency here is permanent and network-attested — no one can
+extending credit. A delinquency here is permanent and network-attested - no one can
 retract it, including the issuer.
 
-### 4.5 Confidential score (Part 2) — the differentiator
+### 4.5 Confidential score (Part 2) - the differentiator
 
 Same input (an XRPL address), but the number comes from a TEE, not from the chain.
 
-**The story the UI must tell:** the enclave reads the account's *entire* payment history —
-every invoice, every amount, every date — and returns only a score. The history never
+**The story the UI must tell:** the enclave reads the account's *entire* payment history -
+every invoice, every amount, every date - and returns only a score. The history never
 leaves. Show this as a visible boundary: raw history on one side marked "never exposed",
 the score crossing over.
 
@@ -215,12 +215,12 @@ Response shape:
 ```json
 { "score": 516, "band": "poor", "basis": 2, "version": "plime-score-1" }
 ```
-- `score` — 300–850, or **0 meaning no history** (render as "no record", not a zero score)
-- `band` — `none` | `poor` | `fair` | `good` | `excellent`
-- `basis` — how many attested outcomes back the score. **Show this.** A 700 on 2 outcomes
+- `score` - 300–850, or **0 meaning no history** (render as "no record", not a zero score)
+- `band` - `none` | `poor` | `fair` | `good` | `excellent`
+- `basis` - how many attested outcomes back the score. **Show this.** A 700 on 2 outcomes
   is a different claim from a 700 on 40, and hiding it would be the dishonest version of
   this screen.
-- `version` — the model version, so a score is reproducible
+- `version` - the model version, so a score is reproducible
 
 Trigger: `ScoreInstructionSender.requestScore(bytes32 payerAddressHash)`, payable. The
 result arrives asynchronously from the TEE, so this screen needs the same
@@ -253,7 +253,7 @@ payment seen on XRPL  →  attestation requested  →  round finalizing  →  pr
 
 The first stage is checkable directly (§6.2). The last is checkable directly (invoice
 status flips). The middle stages are the attester's; if you want them live, it needs to
-expose them (§7) — otherwise show the first and last and mark the middle as "proving".
+expose them (§7) - otherwise show the first and last and mark the middle as "proving".
 
 ---
 
@@ -261,7 +261,7 @@ expose them (§7) — otherwise show the first and last and mark the middle as "
 
 ### 6.1 Read live state right now
 
-The registry already has two invoices with **both** outcomes on it — one settled, one
+The registry already has two invoices with **both** outcomes on it - one settled, one
 delinquent. This is real data from a real end-to-end run, so the UI has something
 meaningful to render on day one.
 
@@ -310,7 +310,7 @@ const match = result.transactions.find(t => {
 
 ### 6.3 Fixtures for states you can't produce on demand
 
-Build every screen against these first — they cover states that are slow or impossible to
+Build every screen against these first - they cover states that are slow or impossible to
 trigger by hand.
 
 ```js
@@ -360,16 +360,16 @@ watch the delinquency path.
 
 ### 6.5 Error states the UI must handle
 
-These are real reverts from the contract, not hypotheticals — each has a custom error:
+These are real reverts from the contract, not hypotheticals - each has a custom error:
 
 | Error | When | Suggested copy |
 | --- | --- | --- |
 | `InvoiceNotOpen` | Settle/mark an already-decided invoice | "This invoice already has an outcome." |
-| `ProofMismatch(field)` | Proof doesn't match invoice terms | Name the field — usually `destinationTag` (payer forgot the tag) |
-| `PaidAfterDeadline` | Payment landed late | "Paid, but after the deadline — the invoice still lapses." |
+| `ProofMismatch(field)` | Proof doesn't match invoice terms | Name the field - usually `destinationTag` (payer forgot the tag) |
+| `PaidAfterDeadline` | Payment landed late | "Paid, but after the deadline - the invoice still lapses." |
 | `PaymentFailed(status)` | XRPL tx failed | `1` = sender's fault, `2` = receiver's fault |
 | `NoSuchInvoice` | Bad id or tag | 404 state |
-| `InvalidProof` | FDC rejected it | Transient — usually means the round isn't finalized yet |
+| `InvalidProof` | FDC rejected it | Transient - usually means the round isn't finalized yet |
 
 Decode with `contract.interface.parseError(err.data)`.
 
@@ -377,7 +377,7 @@ Decode with `contract.interface.parseError(err.data)`.
 
 ## 7. If you want live pipeline stages
 
-The attester (`services/attester`) currently has no HTTP surface — it's a CLI plus a
+The attester (`services/attester`) currently has no HTTP surface - it's a CLI plus a
 `watch` daemon that logs to stderr. If the UI wants live "requested / finalizing / proof
 fetched" stages rather than inferring them, tell me and I'll add a small read-only
 endpoint:
@@ -400,7 +400,7 @@ XRPL payment visible (§6.2) + on-chain status = enough for a two-state pipeline
   `payerAddressHash`, which makes a per-account history view cheap.
 - Poll the chain every ~15–20 s. Coston2 blocks are ~2 s but nothing here changes faster
   than the FDC round.
-- `apps/web/vendor/ethers.umd.min.js` is vendored so the reference page works offline —
+- `apps/web/vendor/ethers.umd.min.js` is vendored so the reference page works offline -
   use your own bundler, ignore that file.
 
 ---
@@ -414,7 +414,7 @@ XRPL payment visible (§6.2) + on-chain status = enough for a two-state pipeline
 | `ScoreInstructionSender` + FCE registration | Registered, extension `66014` |
 | Scoring model + in-enclave registry reader | Built and tested against live Coston2 data |
 | TEE image | Built, runs, verified reproducible (5.93 MB distroless) |
-| TEE machine registration | Needs a Confidential Space VM — the score endpoint isn't live yet |
+| TEE machine registration | Needs a Confidential Space VM - the score endpoint isn't live yet |
 
 **Build the score screen against fixtures.** Everything else is live now.
 
@@ -422,7 +422,7 @@ XRPL payment visible (§6.2) + on-chain status = enough for a two-state pipeline
 
 ## 10. Design steers
 
-- **Two outcomes, equal weight.** Don't treat delinquency as an error state — it's half the
+- **Two outcomes, equal weight.** Don't treat delinquency as an error state - it's half the
   product and the half nobody else can do. It deserves the same visual investment as the
   receipt.
 - **The destination tag is the product surface.** If a payer misses it, everything fails.

@@ -15,7 +15,7 @@ interface Async<T> {
  * Polled chain reads.
  *
  * Nothing on-chain here changes faster than an FDC round, so a 15 s poll is
- * plenty — don't tighten it hoping for snappier updates, the latency is in the
+ * plenty - don't tighten it hoping for snappier updates, the latency is in the
  * protocol, not the polling.
  */
 function usePolled<T>(fetcher: () => Promise<T>, deps: unknown[], enabled = true): Async<T> {

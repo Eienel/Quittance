@@ -7,10 +7,10 @@ import type { Pipeline as PipelineType } from "@/lib/types";
  *
  * From the payer hitting send to a receipt on screen is roughly two minutes,
  * almost all of it one FDC voting round. That latency is in the protocol and
- * cannot be engineered away — so the UI's job is to show real progress across
+ * cannot be engineered away - so the UI's job is to show real progress across
  * it. A named pipeline reads as rigor; a two-minute spinner reads as broken.
  *
- * TODO(design): this is the strongest candidate for real motion — a progress
+ * TODO(design): this is the strongest candidate for real motion - a progress
  * arc keyed to TIMING.fdcRound, stage transitions, the XRPL tx link appearing.
  */
 const ORDER: PipelineType["stage"][] = ["awaiting_payment", "proving", "settled"];

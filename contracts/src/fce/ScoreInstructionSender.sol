@@ -11,7 +11,7 @@ import { ITeeMachineRegistry } from "./interfaces/ITeeMachineRegistry.sol";
 ///         The privacy claim rests on what crosses this boundary. The instruction carries
 ///         only the account hash; the enclave reads the account's full outcome history from
 ///         the registry itself and returns a single score. The history is never an argument,
-///         never a return value, and never leaves the TEE — the caller learns the score and
+///         never a return value, and never leaves the TEE - the caller learns the score and
 ///         nothing else, and the enclave's attestation is what makes that claim checkable
 ///         rather than merely asserted.
 ///
@@ -39,7 +39,7 @@ contract ScoreInstructionSender {
     uint256 private _extensionId;
 
     /// @notice Payload for a SCORE_PAYER instruction.
-    /// @param invoiceRegistry Registry to read from — pinned so a caller cannot point the
+    /// @param invoiceRegistry Registry to read from - pinned so a caller cannot point the
     ///        enclave at a registry of their own with fabricated history.
     /// @param payerAddressHash Standard address hash of the XRPL account to score.
     struct ScorePayerMessage {

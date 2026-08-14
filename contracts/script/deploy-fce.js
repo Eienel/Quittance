@@ -36,7 +36,7 @@ async function main() {
 
   const diamond = new ethers.Contract(FLARE_TEE_MANAGER, DIAMOND_ABI, deployer);
 
-  // The state verifier is optional for this extension — the score is derived
+  // The state verifier is optional for this extension - the score is derived
   // from on-chain state the enclave reads itself, so there is no external state
   // commitment to verify.
   const tx = await diamond.register(ethers.ZeroAddress, senderAddress);

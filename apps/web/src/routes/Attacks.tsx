@@ -4,7 +4,7 @@ import { CHAIN } from "@/lib/config";
 /**
  * The adversarial demo.
  *
- * Every attestation behind this page is genuine — confirmed by the Flare Data Connector,
+ * Every attestation behind this page is genuine - confirmed by the Flare Data Connector,
  * asserting something true. Each one would nonetheless be false *about the invoice it is
  * aimed at*, and an integration that verifies the Merkle proof and then acts would accept
  * all of them.
@@ -14,7 +14,7 @@ import { CHAIN } from "@/lib/config";
  * obligation in front of you.
  *
  * The JSON is written by `services/attester/bin/adversary.js`, which runs these against
- * the live registry — so what is on screen is the output of a run, not a claim.
+ * the live registry - so what is on screen is the output of a run, not a claim.
  *
  * TODO(design): this is the most quotable screen in the app. Consider leading with the
  * three claims in the attacker's voice, and revealing the contract's refusal underneath.

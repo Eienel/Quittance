@@ -9,7 +9,7 @@ const { ethers } = require("hardhat");
  * real; only checking the origin shows it is about the ledger this registry serves.
  *
  * These tests pin the cross-chain substitution that would otherwise let anyone mark a
- * genuinely-paid invoice delinquent, damage the payer's record, and take the bond — using
+ * genuinely-paid invoice delinquent, damage the payer's record, and take the bond - using
  * a proof that is perfectly true about a different XRPL network.
  */
 

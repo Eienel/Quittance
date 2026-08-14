@@ -86,7 +86,7 @@ const nonexistenceProof = (destinationTag = 1n) => ({
   },
 });
 
-/** Advance to at least `target`, never backwards — the chain persists across tests. */
+/** Advance to at least `target`, never backwards - the chain persists across tests. */
 async function warpTo(target) {
   const latest = await ethers.provider.getBlock("latest");
   const next = Math.max(Number(target), latest.timestamp + 1);

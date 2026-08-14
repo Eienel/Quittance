@@ -65,7 +65,7 @@ async function getInvoice(invoiceId) {
 
 /**
  * Consent path: prove a payment from the debtor carrying the invoice's tag.
- * One drop is enough — it is the debtor's signature over the debt, not payment.
+ * One drop is enough - it is the debtor's signature over the debt, not payment.
  */
 async function acknowledge(invoiceId, xrplTxHash, log = console.error) {
   const encoded = await fdc.prepareXrpPaymentRequest(

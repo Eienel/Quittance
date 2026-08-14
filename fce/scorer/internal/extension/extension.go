@@ -4,8 +4,8 @@
 // The whole point of running this in a TEE is the asymmetry between what goes
 // in and what comes out: the instruction names an account, the enclave reads
 // that account's entire attested payment history from the InvoiceRegistry, and
-// only a score comes back. Nobody — not the caller, not the machine operator,
-// not the Foundation — sees the history, and the enclave's attestation is what
+// only a score comes back. Nobody - not the caller, not the machine operator,
+// not the Foundation - sees the history, and the enclave's attestation is what
 // makes that a checkable claim rather than a promise.
 package extension
 

@@ -11,14 +11,14 @@ import type { ethers } from "ethers";
  *
  * Both Flare services involved allow cross-origin requests, so the whole
  * attestation lifecycle runs client-side. Nobody has to be running a server for
- * an invoice to settle — whoever is looking at the page can push it through,
+ * an invoice to settle - whoever is looking at the page can push it through,
  * paying a trivial amount of gas. That is what lets this deploy as a static site
  * and still work end to end.
  *
  * The wait is ~2 minutes, essentially all of it one FDC voting round, so the
  * stage text below is the whole UX. Don't replace it with a spinner.
  *
- * TODO(design): this is a prime candidate for real motion — a progress arc keyed
+ * TODO(design): this is a prime candidate for real motion - a progress arc keyed
  * to TIMING.fdcRound, with the stage text beneath it.
  */
 export default function OutcomeAction({

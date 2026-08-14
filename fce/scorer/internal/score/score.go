@@ -8,7 +8,7 @@ package score
 
 import "math"
 
-// Record mirrors InvoiceRegistry.PayerRecord — the account's full attested history.
+// Record mirrors InvoiceRegistry.PayerRecord - the account's full attested history.
 type Record struct {
 	SettledCount     uint64
 	DelinquentCount  uint64

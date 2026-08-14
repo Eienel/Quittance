@@ -6,7 +6,7 @@ import type { Invoice } from "@/lib/types";
 import type { ethers as Ethers } from "ethers";
 
 /**
- * The bond — the thing that makes an outcome matter.
+ * The bond - the thing that makes an outcome matter.
  *
  * Without it, a delinquency mark is a statement: true, permanent, and consequential
  * only if some third party ever reads the registry. With it, the same attestation
@@ -15,8 +15,8 @@ import type { ethers as Ethers } from "ethers";
  *
  * TODO(design): this is the most demo-critical screen after the pay instructions.
  * A judge watching FLR actually move on a missed deadline is the whole pitch in one
- * shot. Consider showing the two futures side by side — "paid: returned to you" vs
- * "missed: goes to the issuer" — so the stake is legible before the deadline, not
+ * shot. Consider showing the two futures side by side - "paid: returned to you" vs
+ * "missed: goes to the issuer" - so the stake is legible before the deadline, not
  * only after.
  */
 export default function BondPanel({

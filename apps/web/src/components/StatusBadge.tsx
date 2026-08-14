@@ -1,7 +1,7 @@
 import type { DisplayStatus } from "@/lib/types";
 
 /**
- * The four states must stay visually distinct — especially `lapsed`, which is
+ * The four states must stay visually distinct - especially `lapsed`, which is
  * an invoice whose deadline has passed but whose proof is still in flight.
  * Collapsing it into `open` makes a working system look stuck.
  */

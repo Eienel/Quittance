@@ -1,7 +1,7 @@
 /**
  * The XRPL half, over plain JSON-RPC.
  *
- * The UI can do all of this itself — no backend needed — which is what makes the
+ * The UI can do all of this itself - no backend needed - which is what makes the
  * "payment seen" pipeline stage real rather than simulated.
  */
 import { XRPL } from "./config";
@@ -10,7 +10,7 @@ import type { Invoice } from "./types";
 /**
  * Calls the first XRPL endpoint that answers.
  *
- * Public testnet nodes are unreliable — they go offline, and they report
+ * Public testnet nodes are unreliable - they go offline, and they report
  * `notSynced` / `noNetwork` while catching up, which is a successful HTTP
  * response carrying a useless answer. Both count as failure here, so the next
  * endpoint gets a turn rather than the whole page breaking.

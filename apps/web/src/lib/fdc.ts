@@ -7,7 +7,7 @@
  *   →  submit it to InvoiceRegistry
  *
  * Both Flare services send `Access-Control-Allow-Origin: *`, so no backend and no
- * proxy is needed — whoever is looking at the page can drive an invoice to its
+ * proxy is needed - whoever is looking at the page can drive an invoice to its
  * outcome themselves, paying the (negligible) gas. That is what lets the whole
  * product deploy as a static site.
  *
@@ -85,7 +85,7 @@ async function protocolContract(name: string, abi: string[], runner: ethers.Cont
  * A payment seen on the XRPL seconds ago is not attestable yet: the verifier waits for
  * finality (3 confirmations, ~12 s) and answers `TRANSACTION DOES NOT EXIST` until then.
  * The UI notices payments almost immediately, so a user who clicks straight away lands
- * in exactly that window — it is a race to wait out, not a rejection to surface.
+ * in exactly that window - it is a race to wait out, not a rejection to surface.
  */
 async function prepareRequest(
   attestationName: string,
@@ -186,7 +186,7 @@ async function obtainProof(
 
 /**
  * The consent path: prove a payment from the debtor carrying this invoice's tag,
- * which admits the debt. One drop is enough — it is the debtor's signature over
+ * which admits the debt. One drop is enough - it is the debtor's signature over
  * the terms, not payment. Without it a later mark reaches no payment record.
  */
 export async function acknowledge(
@@ -245,7 +245,7 @@ export async function settleWithPayment(
  * The mark path: prove no payment exists over the invoice's exact window.
  *
  * Every parameter below is read from the invoice itself. The registry enforces
- * the same equality on-chain — a nonexistence proof over any other window would
+ * the same equality on-chain - a nonexistence proof over any other window would
  * be a proof about a different question.
  */
 export async function markDelinquent(

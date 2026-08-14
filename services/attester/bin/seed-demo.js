@@ -2,11 +2,11 @@
 /**
  * Seeds a fresh registry with the three states a demo needs to tell the story:
  *
- *   1. settled     — paid on time, proved with XRPPayment
- *   2. delinquent  — acknowledged, then left unpaid, proved with XRPPaymentNonexistence
- *   3. unclaimed   — a fabricated debt the named payer never admitted: marked, but
+ *   1. settled     - paid on time, proved with XRPPayment
+ *   2. delinquent  - acknowledged, then left unpaid, proved with XRPPaymentNonexistence
+ *   3. unclaimed   - a fabricated debt the named payer never admitted: marked, but
  *                    deliberately absent from their record
- *   4. forfeited   — bonded, acknowledged, then missed: the mark hands the bond over
+ *   4. forfeited   - bonded, acknowledged, then missed: the mark hands the bond over
  *
  * The third is the point of the acknowledgement mechanism, so a judge can see both
  * that the mark is real and that it does not touch an innocent account.
@@ -66,33 +66,33 @@ async function main() {
     throw new Error("set SEED_PAYEE, SEED_PAYER and SEED_PAYER_SEED");
   }
 
-  // 1 — the receipt.
+  // 1 - the receipt.
   const settled = await create({ xrp: 5, minutes: 30, payer: PAYER, memo: "Design work, March" });
   const payHash = await pay(settled.tag, 5);
   await reg.settleWithPayment(settled.id, payHash, log);
 
-  // 2 — the mark, against a debt the payer admitted. A single drop is the admission.
+  // 2 - the mark, against a debt the payer admitted. A single drop is the admission.
   const marked = await create({ xrp: 7, minutes: 4, payer: PAYER, memo: "Consulting, April" });
   const ackHash = await pay(marked.tag, 0.000001);
   await reg.acknowledge(marked.id, ackHash, log);
 
-  // 4 — bonded and missed: the proof does not merely record the outcome, it moves money.
+  // 4 - bonded and missed: the proof does not merely record the outcome, it moves money.
   const forfeited = await create({
     xrp: 12,
     minutes: 4,
     payer: PAYER,
-    memo: "Bonded obligation — the mark hands the bond to the creditor",
+    memo: "Bonded obligation - the mark hands the bond to the creditor",
     bondFlr: 2,
   });
   const forfeitAck = await pay(forfeited.tag, 0.000001);
   await reg.acknowledge(forfeited.id, forfeitAck, log);
 
-  // 3 — a fabricated debt: nobody acknowledges it, so nobody's record should move.
+  // 3 - a fabricated debt: nobody acknowledges it, so nobody's record should move.
   const fabricated = await create({
     xrp: 1000,
     minutes: 4,
     payer: VICTIM,
-    memo: "Fabricated debt — demonstrates that an unacknowledged mark reaches no record",
+    memo: "Fabricated debt - demonstrates that an unacknowledged mark reaches no record",
   });
 
   // Wait out both 4-minute deadlines plus a finality margin before proving absence.

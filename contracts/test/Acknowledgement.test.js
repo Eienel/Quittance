@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 /**
- * Issuance is unilateral — anyone may write an invoice naming anyone as the payer.
+ * Issuance is unilateral - anyone may write an invoice naming anyone as the payer.
  * These tests cover the mechanism that stops that from becoming a way to manufacture
  * delinquencies against innocent accounts.
  */
@@ -119,7 +119,7 @@ describe("acknowledgement", function () {
     it("cannot mark an innocent account for a debt it never admitted", async function () {
       await createInvoice(VICTIM); // anyone may name anyone
 
-      // The nonexistence proof is entirely truthful — nobody paid.
+      // The nonexistence proof is entirely truthful - nobody paid.
       await expect(registry.markDelinquent(1, nonexistenceProof()))
         .to.emit(registry, "InvoiceMarkedDelinquent")
         .withArgs(
@@ -183,7 +183,7 @@ describe("acknowledgement", function () {
       expect((await registry.getInvoice(1)).acknowledged).to.equal(true);
     });
 
-    it("leaves the invoice open — consent is not payment", async function () {
+    it("leaves the invoice open - consent is not payment", async function () {
       await registry.acknowledge(1, paymentProof());
       expect((await registry.getInvoice(1)).status).to.equal(Status.Open);
     });

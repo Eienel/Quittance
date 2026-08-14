@@ -1,7 +1,7 @@
 // Package registry reads payment history out of an InvoiceRegistry on Flare.
 //
 // This read happens inside the enclave. The full history is fetched here,
-// summarized by the score package, and then discarded — it exists only in
+// summarized by the score package, and then discarded - it exists only in
 // enclave memory and is never written to the response, to disk, or to a log.
 package registry
 
@@ -18,7 +18,7 @@ import (
 	"github.com/eienel/plime/fce/scorer/internal/score"
 )
 
-// Only the one view the scorer needs — a narrow ABI is a narrow blast radius.
+// Only the one view the scorer needs - a narrow ABI is a narrow blast radius.
 const recordABI = `[{
   "inputs":[{"internalType":"bytes32","name":"payerAddressHash","type":"bytes32"}],
   "name":"record",
@@ -76,7 +76,7 @@ func (c *Client) Record(ctx context.Context, invoiceRegistry common.Address, pay
 	}
 
 	// The single output is a tuple, so unpack yields one element holding the
-	// whole struct — UnpackIntoInterface would try to flatten it into fields.
+	// whole struct - UnpackIntoInterface would try to flatten it into fields.
 	values, err := c.abi.Unpack("record", out)
 	if err != nil {
 		return score.Record{}, err

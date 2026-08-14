@@ -1,6 +1,6 @@
 # Default node build: self-contained and reproducible. Build context is this extension dir.
 # The extension module pins github.com/flare-foundation/tee-node to a released version in go.mod
-# and fetches it from the network (verified against go.sum) — no on-disk sibling repo or replace
+# and fetches it from the network (verified against go.sum) - no on-disk sibling repo or replace
 # directive is needed, so only the module's own sources are copied into the build.
 
 # To build against an on-disk sibling tee-node instead (while developing it), use
@@ -81,12 +81,12 @@ COPY --chmod=755 --chown=65532:65532 --from=builder /app/extension-tee /app/exte
 # Set to 1 here so a bare `docker run` works against the local devnet; compose
 # overrides it via MODE=${MODE:-1}.
 
-# For a real Confidential Space deploy this MUST be 0 — FTDC rejects simulated
+# For a real Confidential Space deploy this MUST be 0 - FTDC rejects simulated
 # attestation. See docs/deployment-steps.md §5. Keep this value identical across
 # go/, python/ and typescript/ Dockerfiles.
 ENV MODE=1 CONFIG_PORT=5501 SIGN_PORT=7701 EXTENSION_PORT=7702
 
-# match tee-node: run as root (USER 0:0) — the TEE workload itself is the isolation boundary
+# match tee-node: run as root (USER 0:0) - the TEE workload itself is the isolation boundary
 USER 0:0
 
 # confidential space launch policy label: allow the operator to override these env vars at workload launch

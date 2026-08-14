@@ -9,8 +9,8 @@ import {IXRPPaymentNonexistenceVerification} from "@flarenetwork/flare-periphery
 /**
  * @notice Stands in for the on-chain FdcVerification contract in unit tests.
  * @dev Real verification is a Merkle proof against the relayed root, which unit tests
- *      cannot produce. Everything downstream of "the proof is valid" — the term checks,
- *      the one-outcome guard, the record accounting — is what these tests exercise, so
+ *      cannot produce. Everything downstream of "the proof is valid" - the term checks,
+ *      the one-outcome guard, the record accounting - is what these tests exercise, so
  *      this mock only controls the accept/reject bit.
  */
 contract MockFdcVerification is IXRPPaymentVerification, IXRPPaymentNonexistenceVerification {

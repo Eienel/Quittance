@@ -9,11 +9,11 @@ over long-lived branches.
 | Area | Path | Owner |
 | --- | --- | --- |
 | Contracts, attester, TEE scorer | `contracts/`, `services/`, `fce/` | backend |
-| Web app — visual layer | `apps/web/src/components/`, `src/routes/`, `src/styles.css` | frontend |
-| Web app — data layer | `apps/web/src/lib/`, `src/hooks/` | backend (coordinate before changing) |
+| Web app - visual layer | `apps/web/src/components/`, `src/routes/`, `src/styles.css` | frontend |
+| Web app - data layer | `apps/web/src/lib/`, `src/hooks/` | backend (coordinate before changing) |
 
 The data layer is tested against the live chain. If you need it to expose something it
-doesn't, open an issue or ping rather than reworking the fetching — it's usually a
+doesn't, open an issue or ping rather than reworking the fetching - it's usually a
 five-minute addition on our side.
 
 ## Workflow
@@ -43,13 +43,13 @@ waiting on anyone:
 
 1. Vercel → **Add New → Project** → import **your fork**.
 2. Accept every default. `vercel.json` at the repo root already sets the build command,
-   output directory and SPA rewrites — **do not override them in the dashboard.** Vercel's
+   output directory and SPA rewrites - **do not override them in the dashboard.** Vercel's
    auto-detection guesses wrong here because the app is in `apps/web`, not the root.
 3. No environment variables. Nothing this app uses is secret.
 
 Every push to a branch on your fork gets its own preview URL. Put that URL in the PR.
 
-If you see a 404 on anything except `/`, the SPA rewrites aren't being applied — that's the
+If you see a 404 on anything except `/`, the SPA rewrites aren't being applied - that's the
 dashboard overriding `vercel.json`, not a bug in your code.
 
 ## Before you open a PR
@@ -61,7 +61,7 @@ npm test             # hermetic unit tests
 npm run build        # must succeed
 ```
 
-If you touched anything under `src/lib/`, also run `LIVE=1 npm test` — it reads the real
+If you touched anything under `src/lib/`, also run `LIVE=1 npm test` - it reads the real
 Coston2 registry and will catch a broken decode that typechecks fine.
 
 Screenshots in the PR body for anything visual, please. Before/after if you're changing
@@ -75,9 +75,9 @@ something that already existed.
 - **Comments explain why, not what.** The repo leans on this; match it.
 - **No new dependencies without a note in the PR.** The app currently runs on React, Vite,
   ethers and react-router, and a small dependency tree is worth protecting. A QR library is
-  pre-approved — the pay screen needs one.
+  pre-approved - the pay screen needs one.
 - **Never commit a private key or `.env`.** `.env` is gitignored; keep it that way. The app
-  never needs a key — users sign with their own wallet.
+  never needs a key - users sign with their own wallet.
 
 ## Testing against real state
 
@@ -99,8 +99,8 @@ You'll need C2FLR for gas: https://faucet.flare.network/coston2
 
 ## Reference
 
-- [`docs/FRONTEND_SPEC.md`](docs/FRONTEND_SPEC.md) — full product/data spec
-- [`apps/web/README.md`](apps/web/README.md) — app-specific guide, fixtures, gotchas
-- [`apps/reference/index.html`](apps/reference/index.html) — the original vanilla-JS page.
+- [`docs/FRONTEND_SPEC.md`](docs/FRONTEND_SPEC.md) - full product/data spec
+- [`apps/web/README.md`](apps/web/README.md) - app-specific guide, fixtures, gotchas
+- [`apps/reference/index.html`](apps/reference/index.html) - the original vanilla-JS page.
   Superseded by `apps/web`, kept because it's a single file that proves the wiring with no
   build step.

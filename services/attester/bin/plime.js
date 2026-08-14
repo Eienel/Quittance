@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * plime — drive an invoice from issuance to its outcome.
+ * plime - drive an invoice from issuance to its outcome.
  *
  *   fund                                     create + fund a fresh XRPL testnet account
  *   create --payee r.. [--payer r..] --xrp N --minutes M [--memo URI]
@@ -70,8 +70,8 @@ async function createInvoice(opts) {
 
 /**
  * The daemon: for every open invoice addressed to `payee`, either find the
- * matching XRPL payment and settle, or — once the ledger is safely past the
- * deadline — request the nonexistence proof and mark.
+ * matching XRPL payment and settle, or - once the ledger is safely past the
+ * deadline - request the nonexistence proof and mark.
  */
 async function watch(opts) {
   const payee = opts.payee;
@@ -151,7 +151,7 @@ async function watch(opts) {
         if (settling) {
           run("payment seen, settling", () => reg.settleWithPayment(id, settling.hash));
         } else if (admitting && !inv.acknowledged && inv.payerAddressHash !== ethers.ZeroHash) {
-          // Not enough to settle, but enough to admit the debt — which is what lets a
+          // Not enough to settle, but enough to admit the debt - which is what lets a
           // later mark count against the payer's record.
           run("partial payment seen, acknowledging", () => reg.acknowledge(id, admitting.hash));
         } else if (

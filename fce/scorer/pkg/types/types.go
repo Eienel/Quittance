@@ -37,7 +37,7 @@ func init() {
 
 // State is the extension's observable state, returned by GET /state.
 //
-// Aggregate counters only — per-account results would leak exactly what the
+// Aggregate counters only - per-account results would leak exactly what the
 // enclave exists to protect.
 type State struct {
 	ScoresComputed int    `json:"scoresComputed"`
