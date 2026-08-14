@@ -67,7 +67,7 @@ export default function OutcomeAction({
   }
 
   return (
-    <div className="stub">
+    <div className="detail-card">
       <p>
         {canSettle
           ? "A matching payment is visible on the XRPL. Prove it and settle this invoice."

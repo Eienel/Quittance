@@ -66,7 +66,7 @@ async function main() {
     throw new Error("set SEED_PAYEE, SEED_PAYER and SEED_PAYER_SEED");
   }
 
-  // 1 — the quittance.
+  // 1 — the receipt.
   const settled = await create({ xrp: 5, minutes: 30, payer: PAYER, memo: "Design work, March" });
   const payHash = await pay(settled.tag, 5);
   await reg.settleWithPayment(settled.id, payHash, log);

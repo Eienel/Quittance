@@ -1,11 +1,11 @@
 /*
- * Quittance — design system.
+ * Plime — design system.
  *
  * Clean, Apple-ish signature: near-white grounds, SF Pro / system sans
  * throughout, tight negative-tracking headings, flat cards with hairline
  * borders and soft shadows, generous whitespace. Colour is reserved almost
  * entirely for the two outcomes, so they carry equal weight:
- *   green = Quittance (settled) · red = Mark (delinquent).
+ *   green = Plime (settled) · red = Mark (delinquent).
  *
  * Semantic status classes (.status-open / .status-lapsed / .status-settled /
  * .status-delinquent) are load-bearing — the four states must stay distinct.
@@ -330,7 +330,17 @@ tbody th { color: var(--dim); font-weight: 500; white-space: nowrap; width: 1%; 
 .enclave .side .tagline { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--faint); margin-bottom: 0.4rem; font-weight: 600; }
 .enclave .arrow { color: var(--faint); font-size: 1.4rem; }
 
-.stub { border: 1px dashed var(--line-2); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin: 0.9rem 0; background: var(--panel-2); }
+.detail-card { border: 1px dashed var(--line-2); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin: 0.9rem 0; background: var(--panel-2); }
+
+.payment-footer {
+  display: flex; justify-content: space-between; gap: 1.25rem; align-items: center;
+  flex-wrap: wrap; margin-top: 1rem;
+}
+.payment-qr {
+  display: flex; flex-direction: column; gap: 0.45rem; align-items: center;
+  color: var(--dim); font-size: 0.78rem; font-weight: 500;
+}
+.payment-qr svg { display: block; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 
 /* ── landing page ───────────────────────────────────────────────────────── */

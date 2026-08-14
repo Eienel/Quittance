@@ -214,7 +214,7 @@ export async function acknowledge(
 }
 
 /**
- * The quittance path: prove the XRPL payment and settle the invoice.
+ * The receipt path: prove the XRPL payment and settle the invoice.
  * Takes about two minutes, almost all of it one FDC voting round.
  */
 export async function settleWithPayment(

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/eienel/quittance/fce/scorer/internal/score"
+	"github.com/eienel/plime/fce/scorer/internal/score"
 )
 
 // Reads the real deployed InvoiceRegistry on Coston2. Skipped unless LIVE=1,

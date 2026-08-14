@@ -55,7 +55,7 @@ export default function Record() {
           <div className="outcomes">
             <div className="outcome-card settled">
               <div className="n">{data.settledCount.toString()}</div>
-              <div className="k">Quittances · settled</div>
+              <div className="k">Plimes · settled</div>
               <div className="sub">{formatXrp(data.settledDrops)} XRP paid on time</div>
             </div>
             <div className="outcome-card delinquent">

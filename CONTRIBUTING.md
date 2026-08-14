@@ -1,4 +1,4 @@
-# Contributing to Quittance
+# Contributing to Plime
 
 Built for [Flare Summer Signal](https://dorahacks.io/hackathon/flaresummersignal/detail).
 Submission deadline **14 August 2026**, so the bias is toward small, frequent, mergeable PRs
@@ -20,9 +20,9 @@ five-minute addition on our side.
 
 ```bash
 # one-time
-gh repo fork Eienel/Quittance --clone   # or fork in the UI and clone your fork
-cd Quittance
-git remote add upstream https://github.com/Eienel/Quittance.git
+gh repo fork Eienel/Plime --clone   # or fork in the UI and clone your fork
+cd Plime
+git remote add upstream https://github.com/Eienel/Plime.git
 
 # per change
 git fetch upstream
@@ -30,7 +30,7 @@ git checkout -b feat/pay-screen upstream/main
 # …work…
 npm --prefix apps/web run typecheck && npm --prefix apps/web test
 git push -u origin feat/pay-screen
-gh pr create --repo Eienel/Quittance
+gh pr create --repo Eienel/Plime
 ```
 
 Keep PRs to one concern. A redesign of the pay screen is one PR; a design-system pass is

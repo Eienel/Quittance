@@ -2,7 +2,7 @@ package extension
 
 import (
 	"encoding/json"
-	"github.com/eienel/quittance/fce/scorer/internal/config"
+	"github.com/eienel/plime/fce/scorer/internal/config"
 	"fmt"
 	"net/http"
 

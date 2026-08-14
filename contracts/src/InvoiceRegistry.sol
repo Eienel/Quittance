@@ -10,7 +10,7 @@ import {IXRPPaymentNonexistenceVerification} from "@flarenetwork/flare-periphery
 /**
  * @title InvoiceRegistry
  * @notice An invoice ends in exactly one of two cryptographic outcomes, and never both:
- *         a *quittance* (an FDC-proved XRPL payment discharging the debt) or a *mark*
+ *         a *receipt* (an FDC-proved XRPL payment discharging the debt) or a *mark*
  *         (an FDC-proved absence of that payment by the deadline). Both outcomes are
  *         permanent and both are proved against the same Flare Data Connector Merkle
  *         root, so neither party can assert one without the network having attested it.
@@ -465,7 +465,7 @@ contract InvoiceRegistry {
     }
 
     // -------------------------------------------------------------------------
-    // Outcome: the quittance
+    // Outcome: the receipt
     // -------------------------------------------------------------------------
 
     /**

@@ -1,4 +1,4 @@
-# DoraHacks submission: Quittance
+# DoraHacks submission: Plime
 
 Flare Summer Signal. Submissions close **14 Aug 2026, 19:59**. Structured against the
 official Submission Requirements; every heading below is one of their bullets, in their
@@ -8,7 +8,7 @@ order. Copy-paste-ready.
 
 ## 1. Project name
 
-**Quittance**
+**Plime**
 
 ## 2. Selected bounties
 
@@ -19,17 +19,25 @@ Both:
 
 ## 3. Short product description
 
-Quittance is a settlement protocol on Flare for obligations that fail by *silence*. An
-invoice is issued payable in ordinary XRP and matched by destination tag. It then ends in
-exactly one cryptographic outcome, permanently: an FDC-proved payment (a **quittance**), or
-an FDC-proved *non-payment* (a **mark**) that hands a posted FLR bond to the creditor in the
-same transaction.
+Plime is an obligation and reputation primitive on Flare for products that depend on
+whether an external payment happened before a deadline. It can power bonded deposits,
+guarantees, tokenized-credit coupons, service commitments, and invoices. The working
+reference product issues invoices payable in ordinary XRP and matched by destination tag.
+Each obligation ends in exactly one permanent outcome: an FDC-proved payment receipt, or
+an FDC-proved *non-payment* mark that can hand a posted FLR bond to the creditor in the same
+transaction.
 
 Most payment tooling can prove a payment happened. Almost nothing can prove one didn't,
 because you cannot produce evidence of an absence. Flare's `XRPPaymentNonexistence` attestation, backed
-by ~100 independent data providers, makes non-payment a network-attested fact. Quittance is
+by ~100 independent data providers, makes non-payment a network-attested fact. Plime is
 the layer that makes that fact binding: it attaches the attestation to one specific
 obligation, permits exactly one outcome ever, and settles value on it.
+
+FDC supplies the fact; Plime supplies the consequence. The protocol binds either a
+payment or non-payment proof to an acknowledged obligation, rejects proofs about the wrong
+window or source chain, resolves an optional bond, and accumulates the permanent outcomes
+into a reusable payment record. Invoices are the first interface for that mechanism, not
+its limit.
 
 ## 4. Target user
 
@@ -40,13 +48,13 @@ Three concrete users, in order of how ready they are today:
    they have to argue. They post or require a bond; a mark pays it out automatically.
 2. **A guarantor or counterparty who needs the failure to be machine-readable.** This is the
    real wedge. A contract on Flare cannot see the XRP Ledger, so it cannot know a payment
-   never came. Quittance is the piece that lets *any* Flare contract condition itself on an
+   never came. Plime is the piece that lets *any* Flare contract condition itself on an
    XRPL non-payment.
 3. **Lenders underwriting XRPL counterparties.** They read the accumulated payment record
    through the confidential scorer, so they get the judgement without seeing the history.
 
 Who it is *not* for: anyone whose counterparty risk is already covered by escrow or an
-existing legal relationship. Quittance matters where the parties don't trust each other and
+existing legal relationship. Plime matters where the parties don't trust each other and
 no third party is willing to arbitrate.
 
 ## 5. Demo link, video, or working app link
@@ -74,7 +82,7 @@ https://faucet.flare.network/coston2.
 
 ## 6. GitHub repo / technical materials
 
-- **Repo:** https://github.com/Eienel/Quittance
+- **Repo:** https://github.com/Eienel/Plime
 - `contracts/`: `InvoiceRegistry`, `ScoreInstructionSender` (Solidity, 75 tests)
 - `apps/web/`: the React app; runs the whole FDC lifecycle in the browser
 - `fce/`: the Go TEE scorer for Confidential Space
@@ -92,7 +100,7 @@ confirmed in a given ledger range. The registry consumes both through `FdcVerifi
 resolved at runtime from `FlareContractRegistry`.
 
 **Why it cannot be ported.** Ask of any submission: could you move it to Ethereum unchanged?
-An NFT marketplace, yes. A lending app, yes. Quittance, no: there is no proof-of-absence
+An NFT marketplace, yes. A lending app, yes. Plime, no: there is no proof-of-absence
 anywhere else at production scale. Move it and the product ceases to exist.
 
 **Precedent inside Flare itself.** FAssets uses the sibling attestation
@@ -113,7 +121,7 @@ site.
 
 ## 8. What was newly built during the program
 
-Everything. Quittance did not exist before Flare Summer Signal: nothing was ported in.
+Everything. Plime did not exist before Flare Summer Signal: nothing was ported in.
 
 **Built from scratch:**
 
@@ -127,7 +135,7 @@ Everything. Quittance did not exist before Flare Summer Signal: nothing was port
   retry for the ~12 s XRPL finality race before the verifier will attest.
 - **The adversary script**: three real attacks run against the live registry, generating the
   Attacks page.
-- **Quittance Confidential**: Go scorer for Confidential Space, extension `66014` registered.
+- **Plime Confidential**: Go scorer for Confidential Space, extension `66014` registered.
 - **The web app**: every screen, plus a full fixture mode so it demos with no wallet.
 
 **Improved during the program, by attacking our own work.** Two genuine holes we found and
@@ -169,14 +177,12 @@ and a fabricated debt marked against an account whose record stays clean.
 | Browser-side FDC pipeline | Live, tested |
 | XRPL payment detection | Live, client-side |
 | Adversary run behind the Attacks page | Real, against the live registry |
-| Confidential scorer | Model and enclave reader built and tested, extension `66014` registered; **TEE machine status: see note** |
+| Confidential scorer | Model and enclave reader built and tested; sender and extension `66014` are live on Coston2. No TEE machine or result proxy is live, so the web app labels its score as a fixture preview. |
 
-> **TEE note: update before submitting.** If the Confidential Space VM is running by
-> submission time, replace this with the live proxy URL and the measured code hash. If it is
-> not, say so here plainly: the scorer is built and tested but runs on fixtures, with no live
-> enclave. Do not leave this ambiguous.
-
-75 contract tests, 18 web data-layer tests, strict TypeScript, clean build.
+The confidential scorer is an implemented prototype, not a live confidential-compute
+service. The remaining infrastructure is a registered TEE machine, public result proxy,
+and end-to-end instruction delivery. The submission does not claim that fixture scores
+were produced inside an enclave.
 
 ## 10. Short roadmap / next steps
 
@@ -203,7 +209,7 @@ and a fabricated debt marked against an account whose record stays clean.
 
 ## 11. Distribution, testing and traction: the honest answer
 
-**We have no users, no pilot, and no partner conversations.** Quittance was built during the
+**We have no users, no pilot, and no partner conversations.** Plime was built during the
 program and has not been put in front of anyone outside the team. Claiming otherwise would be
 easy and worthless.
 
@@ -215,8 +221,9 @@ What we *do* have, in place of traction:
   live registry, two of which found real holes that are now closed and regression-tested.
   This is the honest substitute for users: we could not test it with strangers, so we tested
   it as an attacker.
-- **93 tests** across contracts and the data layer, run against the live chain and live Flare
-  services, not mocks.
+- **96 automated checks**: 75 Solidity contract tests and 21 web tests. The web suite includes
+  11 `LIVE=1` checks against the Coston2 registry and live Flare services, alongside 10
+  hermetic metadata tests.
 - **A design constraint aimed squarely at distribution:** no backend. The whole product is a
   static site, and any holder of the page can drive an invoice to its outcome for gas. There
   is no server for us to keep running and no operator for a user to trust, which is what

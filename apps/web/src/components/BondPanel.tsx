@@ -53,7 +53,7 @@ export default function BondPanel({
   if (decided) {
     // After resolution bondAmount is zeroed; the BondResolved event carries where it went.
     return hasBond ? null : (
-      <div className="stub">
+      <div className="detail-card">
         <p className="dim">
           {status === "settled"
             ? "Obligation met. Any bond was returned to whoever posted it."
@@ -64,7 +64,7 @@ export default function BondPanel({
   }
 
   return (
-    <div className="stub">
+    <div className="detail-card">
       {hasBond ? (
         <>
           <p>

@@ -5,7 +5,7 @@ import { ITeeExtensionRegistry } from "./interfaces/ITeeExtensionRegistry.sol";
 import { ITeeMachineRegistry } from "./interfaces/ITeeMachineRegistry.sol";
 
 /// @title ScoreInstructionSender
-/// @notice On-chain entry point for Quittance Confidential: asks a TEE to compute a
+/// @notice On-chain entry point for Plime Confidential: asks a TEE to compute a
 ///         creditworthiness score for one XRPL account from its InvoiceRegistry record.
 ///
 ///         The privacy claim rests on what crosses this boundary. The instruction carries

@@ -1,5 +1,5 @@
 /**
- * The XRPL half: the payer's side of a Quittance invoice is just an ordinary
+ * The XRPL half: the payer's side of a Plime invoice is just an ordinary
  * XRP payment carrying the invoice's destination tag.
  */
 const { ethers } = require("ethers");

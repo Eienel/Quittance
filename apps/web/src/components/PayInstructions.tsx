@@ -1,3 +1,4 @@
+import { QRCodeSVG } from "qrcode.react";
 import { dropsToXrp, xrplPaymentUri } from "@/lib/format";
 import type { Invoice } from "@/lib/types";
 import Countdown from "./Countdown";
@@ -68,12 +69,24 @@ export default function PayInstructions({
       </div>
 
       {/* 4 — countdown + wallet URI */}
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", marginTop: "0.6rem" }}>
-        <span className="dim">
-          Time remaining · <Countdown deadlineTimestamp={invoice.deadlineTimestamp} />
-        </span>
-        {/* TODO(design): render `uri` as a QR code (library pre-approved). */}
-        <a className="dim mono small" href={uri} style={{ wordBreak: "break-all", borderBottom: "none" }}>{uri}</a>
+      <div className="payment-footer">
+        <div>
+          <p className="dim" style={{ marginTop: 0 }}>
+            Time remaining · <Countdown deadlineTimestamp={invoice.deadlineTimestamp} />
+          </p>
+          <a className="btn" href={uri}>Open in XRPL wallet</a>
+          <p className="dim small">The wallet link includes the amount and destination tag.</p>
+        </div>
+        <a className="payment-qr" href={uri} aria-label="Open this payment in an XRPL wallet">
+          <QRCodeSVG
+            value={uri}
+            size={144}
+            level="M"
+            marginSize={2}
+            title="XRPL payment QR code"
+          />
+          <span>Scan with an XRPL wallet</span>
+        </a>
       </div>
     </div>
   );

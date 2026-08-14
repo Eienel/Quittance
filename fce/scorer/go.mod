@@ -1,4 +1,4 @@
-module github.com/eienel/quittance/fce/scorer
+module github.com/eienel/plime/fce/scorer
 
 go 1.25.1
 

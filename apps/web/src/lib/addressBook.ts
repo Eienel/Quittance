@@ -8,7 +8,7 @@
  */
 import { addressHash } from "./format";
 
-const KEY = "quittance.addressBook.v1";
+const KEY = "plime.addressBook.v1";
 
 type Book = Record<string, string>; // hash → address
 

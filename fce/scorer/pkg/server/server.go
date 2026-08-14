@@ -1,7 +1,7 @@
 // Package server starts the scorer extension's HTTP server.
 package server
 
-import "github.com/eienel/quittance/fce/scorer/internal/extension"
+import "github.com/eienel/plime/fce/scorer/internal/extension"
 
 // StartExtension creates and starts the scorer extension in a goroutine.
 // Returns an error channel that receives any ListenAndServe failure.

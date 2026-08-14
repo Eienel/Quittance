@@ -38,7 +38,7 @@ export default function App() {
   return (
     <>
       <nav className={`${over ? "over" : ""}${menuOpen ? " menu-open" : ""}`.trim()}>
-        <Link to="/" className="brand">Quittance</Link>
+        <Link to="/" className="brand">Plime</Link>
         <div className={`nav-links${menuOpen ? " open" : ""}`}>
           <button className="drawer-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
             <span className="xicon"><i /><i /></span>

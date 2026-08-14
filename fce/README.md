@@ -1,6 +1,6 @@
-# Quittance Confidential
+# Plime Confidential
 
-The scoring half of Quittance: a Flare Compute Extension that turns an account's
+The scoring half of Plime: a Flare Compute Extension that turns an account's
 attested payment history into a creditworthiness score **without anyone seeing the
 history** — including the machine operator and the caller.
 
@@ -40,7 +40,7 @@ The on-chain entry point lives with the other Solidity, at
 [`contracts/src/fce/ScoreInstructionSender.sol`](../contracts/src/fce/ScoreInstructionSender.sol),
 so one `hardhat compile` covers the whole project.
 
-## Scoring model (`quittance-score-1`)
+## Scoring model (`plime-score-1`)
 
 Range 300–850, or 0 for an account with no attested history.
 
@@ -73,7 +73,7 @@ The image builds and runs: the Flare tee-node boots, the scorer binds, and `GET 
 answers with aggregate counters only.
 
 ```
-{"stateVersion":"0x302e312e30…","state":{"scoresComputed":0,"modelVersion":"quittance-score-1"}}
+{"stateVersion":"0x302e312e30…","state":{"scoresComputed":0,"modelVersion":"plime-score-1"}}
 ```
 
 **Remaining:** registering the TEE machine, which needs a Google Cloud Confidential Space
