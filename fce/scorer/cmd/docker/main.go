@@ -1,5 +1,5 @@
 // Package main is the Confidential Space entry point: it runs the Flare tee-node
-// and the Quittance scorer extension in one process.
+// and the Plime scorer extension in one process.
 //
 // Docker sets PROXY_URL as an env var which tee-node reads directly via
 // settings.init(), so nothing here needs the e2e harness.
@@ -15,8 +15,8 @@ import (
 	"github.com/flare-foundation/go-flare-common/pkg/logger"
 	teeServer "github.com/flare-foundation/tee-node/pkg/server"
 
-	"github.com/eienel/quittance/fce/scorer/internal/config"
-	extserver "github.com/eienel/quittance/fce/scorer/pkg/server"
+	"github.com/eienel/plime/fce/scorer/internal/config"
+	extserver "github.com/eienel/plime/fce/scorer/pkg/server"
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 	default:
 	}
 
-	logger.Infof("quittance scorer TEE running (config=%d, sign=%d, ext=%d)", configPort, signPort, extensionPort)
+	logger.Infof("plime scorer TEE running (config=%d, sign=%d, ext=%d)", configPort, signPort, extensionPort)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)

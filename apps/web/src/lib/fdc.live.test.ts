@@ -103,7 +103,7 @@ describe.skipIf(!live)("FDC pipeline", () => {
       const res = await fetch(url, {
         method: "OPTIONS",
         headers: {
-          Origin: "https://quittance.vercel.app",
+          Origin: "https://plime.vercel.app",
           "Access-Control-Request-Method": "POST",
           "Access-Control-Request-Headers": "content-type",
         },

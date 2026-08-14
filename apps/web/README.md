@@ -1,4 +1,4 @@
-# Quittance — web app
+# Plime — web app
 
 React + Vite + TypeScript. **The chain wiring is done and tested; the visual layer is
 deliberately unfinished.** Everything inside a dashed `.stub` box is yours to replace.

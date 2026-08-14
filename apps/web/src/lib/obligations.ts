@@ -20,7 +20,7 @@ export interface ObligationFraming {
   obligor: string;
   /** Who is owed. */
   obligee: string;
-  /** What a quittance (settle) means here. */
+  /** What a receipt (settle) means here. */
   met: string;
   /** What a mark (markDelinquent) means here. */
   missed: string;

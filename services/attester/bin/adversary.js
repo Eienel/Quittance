@@ -13,7 +13,7 @@
  * Writes a JSON artifact the web app renders, so the claims on screen are the output of
  * a run rather than prose.
  *
- *   node bin/adversary.js --settled 1 --victim 3
+ *   node bin/adversary.js --settled 2 --victim 5
  */
 const fs = require("fs");
 const path = require("path");
@@ -204,16 +204,18 @@ async function crossChainSubstitution() {
 
 async function main() {
   const opts = args();
-  const settledId = Number(opts.settled ?? 1);
-  const victimId = Number(opts.victim ?? 3);
+  const settledId = Number(opts.settled ?? 2);
+  const victimId = Number(opts.victim ?? 5);
 
   const results = [];
   results.push(await cherryPickedWindow(settledId));
   results.push(await fabricatedDebt(victimId));
   results.push(await crossChainSubstitution());
 
+  const generatedAt = new Date().toISOString();
   const artifact = {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
+    verifiedAt: generatedAt,
     registry: cfg.registryAddress,
     network: "coston2",
     results,

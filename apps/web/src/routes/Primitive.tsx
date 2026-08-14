@@ -18,14 +18,14 @@ export default function Primitive() {
     <section>
       <h2>One primitive, many obligations</h2>
       <p className="dim">
-        Quittance is not an invoicing app. It is one registry that turns any
+        Plime is not an invoicing app. It is one registry that turns any
         deadline-shaped obligation into a proved outcome. Every kind below is the
         same three contract calls at{" "}
         <span className="mono">{CONTRACTS.invoiceRegistry.slice(0, 10)}…</span>. The
         contract does not know a coupon from an invoice.
       </p>
 
-      <div className="stub">
+      <div className="detail-card">
         <table>
           <thead>
             <tr>
@@ -59,7 +59,7 @@ export default function Primitive() {
       </div>
 
       {OBLIGATIONS.map((o) => (
-        <div className="stub" key={o.kind}>
+        <div className="detail-card" key={o.kind}>
           <p>
             <b>{o.label}</b>{" "}
             <span className={`badge ${o.status === "live" ? "status-settled" : "status-lapsed"}`}>
@@ -71,7 +71,7 @@ export default function Primitive() {
             <tbody>
               <tr><th>Obligor</th><td>{o.obligor}</td></tr>
               <tr><th>Obligee</th><td>{o.obligee}</td></tr>
-              <tr><th>Quittance means</th><td className="status-settled">{o.met}</td></tr>
+              <tr><th>Plime means</th><td className="status-settled">{o.met}</td></tr>
               <tr><th>Mark means</th><td className="status-delinquent">{o.missed}</td></tr>
               <tr><th>Bond</th><td>{o.bond}</td></tr>
             </tbody>

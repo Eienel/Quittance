@@ -1,4 +1,4 @@
-# Quittance — project brief
+# Plime — project brief
 
 Read this before touching anything. It is written for an agent joining the frontend work.
 
@@ -12,7 +12,7 @@ then ends in exactly one of two outcomes, **never both, and permanently**:
 
 | Outcome | Meaning | Proof |
 | --- | --- | --- |
-| **Quittance** | Paid, on time | Flare Data Connector `XRPPayment` attestation |
+| **Plime** | Paid, on time | Flare Data Connector `XRPPayment` attestation |
 | **Mark** | No such payment exists in the window | FDC `XRPPaymentNonexistence` attestation |
 
 The second one is the whole point. Plenty of systems can prove a payment *happened*. Almost
@@ -27,10 +27,10 @@ mark is only a *statement*, consequential just if some stranger later reads the 
 which nobody does on day one. The bond makes the first invoice ever issued worth using.
 
 Outcomes also accumulate into a permanent per-account payment record. A second component
-(**Quittance Confidential**) scores that record inside a TEE, so a lender gets the judgement
+(**Plime Confidential**) scores that record inside a TEE, so a lender gets the judgement
 without ever seeing the history.
 
-Tagline: *Every invoice ends in a quittance or a mark.*
+Tagline: *One primitive for every payment-shaped obligation.*
 
 Built for the Flare Summer Signal hackathon (DoraHacks), submission **14 Aug 2026**, entered
 for two bounties: Interoperable Asset Products, and Confidential Compute Apps.
@@ -112,7 +112,7 @@ are exactly the things to replace. In rough order of how much they matter:
    in the attacker's voice and revealing the rejection underneath.
 2. **`Primitive`** (`routes/Primitive.tsx`) — the conceptual centerpiece: one registry,
    the same three contract calls, four obligation kinds (invoice, bonded deposit, coupon,
-   SLA). This is the argument that Quittance is a *primitive*, not an invoicing app. The
+   SLA). This is the argument that Plime is a *primitive*, not an invoicing app. The
    framing catalog is `src/lib/obligations.ts`; the kind rides in invoice metadata
    (`metadata.ts`, `ObligationKind`) so a real non-invoice obligation can be issued on-chain
    and renders with its own framing. Consider a grid: operations across the top, kinds down
@@ -213,7 +213,7 @@ version of that screen, and a judge will poke at exactly it.
 | Proof origin binding (source chain + attestation type) | Live, 8 tests |
 | Browser-side FDC pipeline | Live, tested |
 | XRPL payment detection | Live, client-side |
-| Web app data layer | Done, 18 tests |
+| Web app data layer | Done, 21 tests: 10 hermetic and 11 live Coston2/FDC checks |
 | Web app visual layer | **Scaffold only — this is the work** |
 | Confidential scorer | Model + enclave reader built and tested; extension registered; **no TEE machine yet**, so no live score. Build against `fixtures.scores` |
 
@@ -221,7 +221,7 @@ version of that screen, and a judge will poke at exactly it.
 
 ## Contributing
 
-Fork → branch → PR to `Eienel/Quittance`, base `main`. Deploy your own fork to your own
+Fork → branch → PR to `Eienel/Plime`, base `main`. Deploy your own fork to your own
 Vercel project for previews: import the fork, accept every default (`vercel.json` at the repo
 root sets build command, output dir and SPA rewrites), no environment variables. **Do not
 override the build settings in the Vercel dashboard** — auto-detection guesses wrong because

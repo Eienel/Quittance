@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quittance — every invoice ends in a quittance or a mark</title>
+<title>Plime — payment outcomes become consequences</title>
 <script src="./vendor/ethers.umd.min.js"></script>
 <style>
   :root {
@@ -55,8 +55,8 @@
 </head>
 <body>
 <main>
-  <h1><span class="q">Quittance</span></h1>
-  <p class="tagline">Every invoice ends in a quittance or a mark — an FDC-proved XRPL receipt,
+  <h1><span class="q">Plime</span></h1>
+  <p class="tagline">Every invoice ends in a receipt or a mark — an FDC-proved XRPL receipt,
   or a permanent Merkle-proved delinquency. Nothing in between.</p>
 
   <section>
@@ -141,9 +141,9 @@ const status = (m) => { $("status").textContent = m; };
 function registryAddress() { return $("registryAddr").value.trim(); }
 function readRegistry() { return new ethers.Contract(registryAddress(), ABI, provider); }
 
-$("registryAddr").value = localStorage.getItem("quittance.registry") || "";
+$("registryAddr").value = localStorage.getItem("plime.registry") || "";
 $("registryAddr").addEventListener("change", () => {
-  localStorage.setItem("quittance.registry", registryAddress());
+  localStorage.setItem("plime.registry", registryAddress());
   loadInvoices();
 });
 

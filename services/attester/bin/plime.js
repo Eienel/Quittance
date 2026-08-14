@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * quittance — drive an invoice from issuance to its outcome.
+ * plime — drive an invoice from issuance to its outcome.
  *
  *   fund                                     create + fund a fresh XRPL testnet account
  *   create --payee r.. [--payer r..] --xrp N --minutes M [--memo URI]
@@ -218,7 +218,7 @@ async function main() {
       break;
     default:
       console.error(
-        "usage: quittance <fund|create|pay|acknowledge|settle|mark|status|record|watch> [--flag value ...]"
+        "usage: plime <fund|create|pay|acknowledge|settle|mark|status|record|watch> [--flag value ...]"
       );
       process.exit(1);
   }

@@ -15,7 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/eienel/quittance/fce/scorer/internal/score"
+	"github.com/eienel/plime/fce/scorer/internal/score"
 )
 
 // Only the one view the scorer needs — a narrow ABI is a narrow blast radius.

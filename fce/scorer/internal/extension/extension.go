@@ -1,4 +1,4 @@
-// Package extension implements the Quittance Confidential scorer as a Flare
+// Package extension implements the Plime Confidential scorer as a Flare
 // Compute Extension.
 //
 // The whole point of running this in a TEE is the asymmetry between what goes
@@ -17,10 +17,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/eienel/quittance/fce/scorer/internal/config"
-	"github.com/eienel/quittance/fce/scorer/internal/registry"
-	"github.com/eienel/quittance/fce/scorer/internal/score"
-	"github.com/eienel/quittance/fce/scorer/pkg/types"
+	"github.com/eienel/plime/fce/scorer/internal/config"
+	"github.com/eienel/plime/fce/scorer/internal/registry"
+	"github.com/eienel/plime/fce/scorer/internal/score"
+	"github.com/eienel/plime/fce/scorer/pkg/types"
 
 	"github.com/flare-foundation/go-flare-common/pkg/tee/instruction"
 	"github.com/flare-foundation/go-flare-common/pkg/tee/structs"

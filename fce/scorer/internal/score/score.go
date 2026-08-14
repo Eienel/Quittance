@@ -39,7 +39,7 @@ const (
 	// decays toward baseline rather than resting on old good behaviour.
 	stalenessSeconds = 365 * 24 * 3600.0
 
-	ModelVersion = "quittance-score-1"
+	ModelVersion = "plime-score-1"
 )
 
 // Compute scores a record as of `nowUnix`.

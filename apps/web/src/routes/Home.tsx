@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
- * Landing page — says what Quittance is before dropping anyone into the app.
+ * Landing page — says what Plime is before dropping anyone into the app.
  * Hero → the core insight (proof of absence) → the two outcomes at equal
  * weight → how it works → the confidential score → CTA.
  */
@@ -99,11 +99,12 @@ export default function Home() {
         <div className="hero-scrim" />
         <div className="hero-inner">
           <h1>
-            Every invoice ends in a<br />
-            <span className="q">quittance</span>, or a <span className="m">mark</span>.
+            One primitive for every<br />
+            payment-shaped obligation.
           </h1>
           <p className="hero-sub">
-            Invoices in XRP that settle themselves. Proven paid, or proven unpaid.
+            Bind payment outcomes to consequences and turn them into reusable reputation.
+            Invoices are the working reference product, not the limit.
           </p>
           <div className="cta-row">
             <Link to="/create" className="btn primary">Create an invoice</Link>
@@ -131,7 +132,7 @@ export default function Home() {
       {/* two outcomes, equal weight */}
       <div className="two-up">
         <div className="outcome-card settled reveal">
-          <div className="headline">Paid, on time <span className="k">Quittance</span></div>
+          <div className="headline">Paid, on time <span className="k">Receipt</span></div>
           <p className="sub">
             The XRPL payment landed before the deadline. Settled with an FDC
             <span className="mono"> XRPPayment</span> proof. A permanent receipt.
@@ -194,7 +195,7 @@ export default function Home() {
 
       {/* footer cta */}
       <footer className="home-cta reveal">
-        <h2>Every invoice ends in a quittance or a mark.</h2>
+        <h2>From one proved outcome to many financial products.</h2>
         <div className="cta-row">
           <Link to="/create" className="btn primary">Create an invoice</Link>
           <Link to="/record" className="btn">Look up a record</Link>

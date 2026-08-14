@@ -1,4 +1,4 @@
-# Quittance — Frontend Handoff Spec
+# Plime — Frontend Handoff Spec
 
 Everything the UI needs, and how to test each piece without waiting on the backend.
 
@@ -18,11 +18,11 @@ but it proves the wiring in one file with no build step.
 
 ## 1. What this product is (so the UI can argue for it)
 
-An invoice on Quittance ends in exactly one of two outcomes, and **never both**:
+An invoice on Plime ends in exactly one of two outcomes, and **never both**:
 
 | Outcome | What it means | How it's proved |
 | --- | --- | --- |
-| **Quittance** (settled) | The XRPL payment happened, on time | FDC `XRPPayment` attestation |
+| **Plime** (settled) | The XRPL payment happened, on time | FDC `XRPPayment` attestation |
 | **Mark** (delinquent) | No such payment exists, anywhere in the window | FDC `XRPPaymentNonexistence` attestation |
 
 The second one is the unusual part and should be visually prominent. Most systems can prove
@@ -34,7 +34,7 @@ Payers use any XRPL wallet or exchange. There is nothing to install, no bridging
 custody. The entire integration surface on the payer's side is a **destination tag** — a
 number they type into a normal XRP send.
 
-Tagline: *Every invoice ends in a quittance or a mark.*
+Tagline: *One primitive for every payment-shaped obligation.*
 
 ---
 
@@ -213,7 +213,7 @@ the score crossing over.
 
 Response shape:
 ```json
-{ "score": 516, "band": "poor", "basis": 2, "version": "quittance-score-1" }
+{ "score": 516, "band": "poor", "basis": 2, "version": "plime-score-1" }
 ```
 - `score` — 300–850, or **0 meaning no history** (render as "no record", not a zero score)
 - `band` — `none` | `poor` | `fair` | `good` | `excellent`
@@ -336,10 +336,10 @@ export const FIXTURES = {
   },
 
   scores: {
-    none:      { score: 0,   band: "none",      basis: 0,  version: "quittance-score-1" },
-    thin:      { score: 546, band: "poor",      basis: 1,  version: "quittance-score-1" },
-    live:      { score: 516, band: "poor",      basis: 2,  version: "quittance-score-1" },
-    excellent: { score: 828, band: "excellent", basis: 14, version: "quittance-score-1" }
+    none:      { score: 0,   band: "none",      basis: 0,  version: "plime-score-1" },
+    thin:      { score: 546, band: "poor",      basis: 1,  version: "plime-score-1" },
+    live:      { score: 516, band: "poor",      basis: 2,  version: "plime-score-1" },
+    excellent: { score: 828, band: "excellent", basis: 14, version: "plime-score-1" }
   }
 };
 ```
@@ -350,10 +350,10 @@ If you want to watch the whole thing happen live:
 
 ```bash
 cd services/attester && npm install && cp .env.example .env   # fill PRIVATE_KEY, INVOICE_REGISTRY
-node bin/quittance.js fund                                    # funded XRPL testnet account
-node bin/quittance.js create --payee rPAYEE --payer rPAYER --xrp 5 --minutes 10
-node bin/quittance.js pay --seed sSEED --to rPAYEE --tag N --xrp 5
-node bin/quittance.js settle --invoice N --tx HASH            # ~2 min, prints each stage
+node bin/plime.js fund                                    # funded XRPL testnet account
+node bin/plime.js create --payee rPAYEE --payer rPAYER --xrp 5 --minutes 10
+node bin/plime.js pay --seed sSEED --to rPAYEE --tag N --xrp 5
+node bin/plime.js settle --invoice N --tx HASH            # ~2 min, prints each stage
 ```
 Swap the last two for "do nothing, wait past the deadline, then `mark --invoice N`" to
 watch the delinquency path.

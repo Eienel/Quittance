@@ -167,13 +167,13 @@ export const records: Record<string, PayerRecord> = {
 
 export const scores: Record<string, Score> = {
   /** score 0 means no history — render as "no record", not a zero score. */
-  none: { score: 0, band: "none", basis: 0, version: "quittance-score-1" },
+  none: { score: 0, band: "none", basis: 0, version: "plime-score-1" },
   /** One outcome. The `basis` is what stops this reading as a real judgement. */
-  thin: { score: 546, band: "poor", basis: 1, version: "quittance-score-1" },
+  thin: { score: 546, band: "poor", basis: 1, version: "plime-score-1" },
   /** Computed by the real enclave from the live Coston2 record. */
-  live: { score: 516, band: "poor", basis: 2, version: "quittance-score-1" },
-  good: { score: 702, band: "good", basis: 8, version: "quittance-score-1" },
-  excellent: { score: 828, band: "excellent", basis: 14, version: "quittance-score-1" },
+  live: { score: 516, band: "poor", basis: 2, version: "plime-score-1" },
+  good: { score: 702, band: "good", basis: 8, version: "plime-score-1" },
+  excellent: { score: 828, band: "excellent", basis: 14, version: "plime-score-1" },
 };
 
 /** Flip the whole app onto fixtures with `?fixtures=1`. */

@@ -1,13 +1,13 @@
-# Quittance — Build Plan (v2, dual-bounty)
+# Plime — Build Plan (v2, dual-bounty)
 
 ## One-sentence definition
-Quittance is an invoicing protocol on Flare where any XRPL payment (from any wallet or exchange, matched by destination tag) produces a cryptographic outcome either way — an FDC-proved receipt if paid, or a permanent Merkle-proved delinquency mark if the deadline passes — plus a confidential compute extension that turns that payment history into a private credit score inside a TEE.
+Plime is an invoicing protocol on Flare where any XRPL payment (from any wallet or exchange, matched by destination tag) produces a cryptographic outcome either way — an FDC-proved receipt if paid, or a permanent Merkle-proved delinquency mark if the deadline passes — plus a confidential compute extension that turns that payment history into a private credit score inside a TEE.
 
-Name note: "quittance" is the historical term for a document discharging a debt — a receipt that the obligation is settled. Product tagline: "Every invoice ends in a quittance or a mark."
+Product positioning: Plime is an obligation and reputation primitive. Invoices are the working reference product, not the limit. Tagline: "One primitive for every payment-shaped obligation."
 
 ## Two-part product = two bounty entries
-1. **Quittance Registry** (Bounty 1: Interoperable Asset Products) — invoice + proof-of-payment/proof-of-non-payment registry. PRIORITY. Must be end-to-end by Day 6.
-2. **Quittance Confidential** (Bounty 2: Confidential Compute Apps) — a Flare Compute Extension (FCE) in Google Cloud Confidential Space that reads the registry and computes a private credit score; raw history never leaves the enclave, only score + attestation exit. BUILT ONLY IF part 1 is E2E by Day 6; otherwise it ships as a roadmap section.
+1. **Plime Registry** (Bounty 1: Interoperable Asset Products) — invoice + proof-of-payment/proof-of-non-payment registry. PRIORITY. Must be end-to-end by Day 6.
+2. **Plime Confidential** (Bounty 2: Confidential Compute Apps) — a Flare Compute Extension (FCE) in Google Cloud Confidential Space that reads the registry and computes a private credit score; raw history never leaves the enclave, only score + attestation exit. BUILT ONLY IF part 1 is E2E by Day 6; otherwise it ships as a roadmap section.
 
 ## Hackathon facts (verified)
 - Flare Summer Signal, DoraHacks: https://dorahacks.io/hackathon/flaresummersignal/detail
@@ -90,7 +90,7 @@ Core rules: invoice issues unique uint32 destinationTag; paid → settle() with 
 4. (Part 2) Score page: score served from the FCE with TEE attestation; raw history shown as NOT exposed.
 
 ## Submission checklist
-- [ ] Name: Quittance · bounties: both (or Bounty 1 only if gate failed)
+- [ ] Name: Plime · bounties: both (or Bounty 1 only if gate failed)
 - [ ] Target user: merchants/freelancers invoicing in XRP; lenders/counterparties reading the record
 - [ ] Demo link + 3–5 min video · GitHub repo
 - [ ] How it uses Flare: XRPPayment + XRPPaymentNonexistence via FDC on Coston2; FCE on Confidential Space registered via TeeExtensionRegistry (Part 2)

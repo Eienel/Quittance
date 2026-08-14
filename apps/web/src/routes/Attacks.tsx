@@ -20,7 +20,7 @@ import { CHAIN } from "@/lib/config";
  * three claims in the attacker's voice, and revealing the contract's refusal underneath.
  */
 export default function Attacks() {
-  const { results, generatedAt, registry } = attacks;
+  const { results, generatedAt, verifiedAt, registry } = attacks;
 
   return (
     <section>
@@ -32,7 +32,7 @@ export default function Attacks() {
       </p>
 
       {results.map((a) => (
-        <div className="stub" key={a.name}>
+        <div className="detail-card" key={a.name}>
           <p>
             <b>{a.name}</b>{" "}
             <span className={`badge ${a.blocked ? "status-settled" : "status-delinquent"}`}>
@@ -69,7 +69,9 @@ export default function Attacks() {
         <a href={`${CHAIN.explorer}/address/${registry}`} className="mono">
           {registry.slice(0, 10)}…
         </a>
-        . Re-run with <code>node bin/adversary.js</code>.
+        . Live registry state and FDC endpoints re-verified{" "}
+        {new Date(verifiedAt).toLocaleString()}. Re-run the full adversary with{" "}
+        <code>node bin/adversary.js</code> from a funded Coston2 account.
       </p>
     </section>
   );

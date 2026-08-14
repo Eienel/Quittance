@@ -1,14 +1,14 @@
 {
-  "name": "@quittance/attester",
+  "name": "@plime/attester",
   "version": "0.1.0",
   "private": true,
-  "description": "Drives Quittance invoices to their outcome: XRPL payment watcher, FDC request/proof lifecycle, on-chain settlement and delinquency marking.",
+  "description": "Drives Plime invoices to their outcome: XRPL payment watcher, FDC request/proof lifecycle, on-chain settlement and delinquency marking.",
   "main": "src/index.js",
   "bin": {
-    "quittance": "bin/quittance.js"
+    "plime": "bin/plime.js"
   },
   "scripts": {
-    "watch": "node bin/quittance.js watch"
+    "watch": "node bin/plime.js watch"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

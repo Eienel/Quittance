@@ -1,18 +1,16 @@
-# Quittance
+# Plime
 
-**Every invoice ends in a quittance or a mark — and the mark is what almost nothing else can do.**
+**An obligation primitive for products built on payment outcomes and reputation.**
 
-Quittance is a settlement protocol on Flare for obligations that fail by *silence*. Someone
-issues an invoice payable in XRP; the payer sends ordinary XRP from any wallet or exchange,
-tagged with a destination tag. The invoice then ends in exactly one of two cryptographic
-outcomes, never both and permanently:
+Plime is a settlement and reputation protocol on Flare for obligations that depend on
+whether an external payment happened before a deadline. Products can use it for bonded
+deposits, guarantees, tokenized-credit coupons, service commitments, or invoices. The
+working reference product issues invoices payable in XRP, matched by destination tag.
+Every obligation ends in exactly one cryptographic outcome, never both and permanently:
 
-- a **quittance** — an FDC-proved XRPL payment that discharges the debt, or
+- a **receipt** — an FDC-proved XRPL payment that discharges the obligation, or
 - a **mark** — an FDC-proved *absence* of that payment by the deadline, which can hand a
   posted bond to the creditor in the same transaction.
-
-> *Quittance* is the historical term for a document discharging a debt — proof the
-> obligation is settled.
 
 Built for [Flare Summer Signal](https://dorahacks.io/hackathon/flaresummersignal/detail).
 Live on Coston2, seeded, with a browser that drives the whole thing and no backend.
@@ -27,11 +25,16 @@ party to declare the failure. One party's word.
 Flare's Data Connector ships `XRPPaymentNonexistence`: an attestation, backed by ~100
 independent data providers, that **no** XRPL payment matching a destination address, amount
 and destination tag was confirmed in a given ledger range. That makes non-payment a
-network-attested fact. Quittance is the layer that makes that fact *binding*: attach it to
+network-attested fact. Plime is the layer that makes that fact *binding*: attach it to
 one specific obligation, permit exactly one outcome, and move money on it.
 
+FDC supplies the fact; Plime supplies the consequence. It binds either a payment or
+non-payment proof to an acknowledged obligation, rejects proofs about the wrong window or
+chain, resolves an optional bond, and accumulates the permanent outcomes into a payment
+record. Invoices are the first interface for that mechanism, not its limit.
+
 Ask of any hackathon submission: *could you move it to Ethereum unchanged?* An NFT
-marketplace, yes. A lending app, yes. Quittance, no — there is no proof-of-absence anywhere
+marketplace, yes. A lending app, yes. Plime, no — there is no proof-of-absence anywhere
 else at production scale. Move it and the product ceases to exist. That is the integration
 depth this bounty rewards.
 
@@ -55,7 +58,7 @@ mechanism, and that the mechanism survives being attacked (see **Attacks**, belo
 
 | Outcome | Attestation type | What it establishes |
 | --- | --- | --- |
-| Quittance (paid) | `XRPPayment` | A specific XRPL transaction, this destination tag, at least this amount, reached the payee before the deadline. |
+| Receipt (paid) | `XRPPayment` | A specific XRPL transaction, this destination tag, at least this amount, reached the payee before the deadline. |
 | Mark (unpaid) | `XRPPaymentNonexistence` | No such transaction exists anywhere in the invoice's ledger range. |
 
 An invoice accepts exactly one, once, forever.
@@ -141,7 +144,7 @@ contracts/
   script/deploy.js  script/deploy-fce.js
 services/attester/
   src/fdc.js  src/xrpl.js  src/registry.js   # FDC lifecycle, XRPL helpers, outcome pipelines
-  bin/quittance.js                   # CLI: fund|create|pay|acknowledge|settle|mark|status|record|watch
+  bin/plime.js                   # CLI: fund|create|pay|acknowledge|settle|mark|status|record|watch
   bin/seed-demo.js                   # seeds the four demo states on a fresh registry
   bin/adversary.js                   # runs the three attacks, writes apps/web/src/lib/attacks.json
 apps/web/                            # React + Vite + TypeScript app (this is the frontend)
@@ -186,7 +189,8 @@ the mark, and a fabricated debt marked against an account whose record stays cle
 | Acknowledgement — consent before a mark reaches a record | Live |
 | Bond escrow — post, resolve, withdraw, grace reclaim | Live |
 | Proof-origin binding — source chain + attestation type | Live |
-| Full test suite | **75 passing** |
+| Solidity contract suite | **75 tests**; verified on every pull request |
+| Web suite | **21 passing with `LIVE=1`**: 10 hermetic and 11 Coston2/FDC checks |
 | Browser-driven FDC pipeline (no backend) | Live, tested |
 | Adversarial demo — three genuine proofs, all refused | Live, on-chain |
 | Web app — data layer + hooks | Done, tested against live chain |
@@ -194,7 +198,7 @@ the mark, and a fabricated debt marked against an account whose record stays cle
 | Confidential scorer (FCE) — model, in-enclave reader, registration | Done, extension `66014` |
 | FCE reproducible image + TEE machine registration | Image built & reproducible; machine needs a Confidential Space VM |
 
-## Part 2: Quittance Confidential
+## Part 2: Plime Confidential
 
 The payment record is public — that is what makes it checkable — but a payment history is
 commercially sensitive, and a lender needs the judgement, not the ledger. So a Flare Compute
