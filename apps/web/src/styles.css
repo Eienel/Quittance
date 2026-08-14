@@ -1,5 +1,5 @@
 /*
- * Plime — design system.
+ * Plime - design system.
  *
  * Clean, Apple-ish signature: near-white grounds, SF Pro / system sans
  * throughout, tight negative-tracking headings, flat cards with hairline
@@ -8,7 +8,7 @@
  *   green = Plime (settled) · red = Mark (delinquent).
  *
  * Semantic status classes (.status-open / .status-lapsed / .status-settled /
- * .status-delinquent) are load-bearing — the four states must stay distinct.
+ * .status-delinquent) are load-bearing - the four states must stay distinct.
  */
 
 @font-face {
@@ -30,7 +30,7 @@
   --dim: #6e6e73;
   --faint: #a1a1a6;
 
-  /* the two outcomes — the only saturated colour in the system */
+  /* the two outcomes - the only saturated colour in the system */
   --settled: #1a9c53; --settled-bg: #e9f7ef; --settled-line: #c2e9d3;
   --delinquent: #e0352b; --delinquent-bg: #fdecea; --delinquent-line: #f6cfca;
   /* in-flight states */
@@ -98,6 +98,14 @@ nav .brand {
   display: flex; align-items: center; gap: 0.5rem;
 }
 nav .brand:hover { color: var(--ink); }
+.brand-mark {
+  width: 1.18rem;
+  height: 1.18rem;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask: url("/plime-mark.svg") center / contain no-repeat;
+  mask: url("/plime-mark.svg") center / contain no-repeat;
+}
 nav a {
   color: var(--dim); font-size: 0.92rem; font-weight: 500;
   padding: 0.42rem 0.72rem; border-radius: 9px; letter-spacing: -0.01em;
@@ -145,7 +153,7 @@ nav.over .nav-toggle { color: #fff; }
 
 main { max-width: 940px; margin: 0 auto; padding: clamp(1.4rem, 4vw, 2.6rem) clamp(1rem, 4vw, 2rem) 5rem; }
 
-/* floating notices — sit below the nav, never in the page flow */
+/* floating notices - sit below the nav, never in the page flow */
 .toasts {
   position: fixed; top: calc(var(--nav-h) + 10px); left: 50%; transform: translateX(-50%);
   z-index: 50; width: max-content; max-width: 92vw; display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -346,7 +354,7 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
 /* ── landing page ───────────────────────────────────────────────────────── */
 .home { --gap: clamp(3rem, 8vw, 5.5rem); }
 
-/* scroll reveal — fade + blur-in + rise */
+/* scroll reveal - fade + blur-in + rise */
 .reveal {
   opacity: 0; transform: translateY(34px); filter: blur(8px);
   transition: opacity 0.8s ease, transform 0.95s cubic-bezier(0.2, 0.6, 0.2, 1), filter 0.8s ease;
@@ -515,7 +523,7 @@ hr { border: none; border-top: 1px solid var(--line); margin: 1.3rem 0; }
   nav .brand { margin-right: auto; }
   .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
   .chip, .spacer { display: none; }
-  /* classic side drawer — slides in from the right edge */
+  /* classic side drawer - slides in from the right edge */
   .nav-links {
     position: fixed; top: 0; right: 0; height: 100dvh; width: min(78vw, 300px);
     display: flex; flex-direction: column; align-items: stretch; gap: 4px; z-index: 30;

@@ -2,13 +2,13 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
- * Landing page — says what Plime is before dropping anyone into the app.
+ * Landing page - says what Plime is before dropping anyone into the app.
  * Hero → the core insight (proof of absence) → the two outcomes at equal
  * weight → how it works → the confidential score → CTA.
  */
 export default function Home() {
   // React can drop the `muted` attribute, which makes the browser block
-  // muted-autoplay and show a play button — force muted + play() via the ref.
+  // muted-autoplay and show a play button - force muted + play() via the ref.
   const videoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = videoRef.current;
@@ -16,7 +16,7 @@ export default function Home() {
     v.muted = true;
     // Low Power Mode / blocked autoplay: start on the first user gesture. On
     // desktop only a real activation gesture (click/keypress) is allowed to
-    // start playback — scroll and mousemove don't count — so listen for both
+    // start playback - scroll and mousemove don't count - so listen for both
     // those and the mobile-friendly touch/scroll ones. Detach once it plays.
     const events = ["pointerdown", "mousedown", "click", "keydown", "touchstart", "scroll", "wheel"] as const;
     const detach = () => events.forEach((e) => window.removeEventListener(e, onInteract));
@@ -114,7 +114,7 @@ export default function Home() {
         <span className="scroll-cue">Scroll ↓</span>
       </header>
 
-      {/* the core insight — image left, text right */}
+      {/* the core insight - image left, text right */}
       <div className="home-block split">
         <div className="split-media reveal">
           <img className="parallax" src="/insight.jpg" alt="" loading="lazy" />
@@ -178,7 +178,7 @@ export default function Home() {
         </ol>
       </div>
 
-      {/* confidential score — image left, text right */}
+      {/* confidential score - image left, text right */}
       <div className="home-block split media-left">
         <div className="split-media reveal">
           <img className="parallax" src="/confidential.jpg" alt="" loading="lazy" />

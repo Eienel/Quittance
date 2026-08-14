@@ -4,7 +4,7 @@ import type { ObligationKind } from "./types";
  * The same three contract calls, wearing the clothes each user recognizes.
  *
  * Every field below is presentation. The registry does not know a coupon from an
- * invoice — `createInvoice` issues the obligation, `settle` proves it was met,
+ * invoice - `createInvoice` issues the obligation, `settle` proves it was met,
  * `markDelinquent` proves it was missed, and an optional bond makes the outcome
  * move money. What changes between kinds is only *who* the two parties are and
  * *what* the deadline means. That invariance is the point: one primitive, many

@@ -25,7 +25,7 @@ export function useNow(intervalMs = 1000): number {
  *   awaiting_payment → deadline_passed → proving → delinquent
  *
  * `payeeAddress` is needed to query the XRPL and is not recoverable from the
- * invoice (which stores only a hash) — pass it from the address book or from
+ * invoice (which stores only a hash) - pass it from the address book or from
  * whatever the user typed. Without it we still report the on-chain stages.
  */
 export function usePipeline(inv: Invoice | null, payeeAddress: string | null): Pipeline {
@@ -66,7 +66,7 @@ export function usePipeline(inv: Invoice | null, payeeAddress: string | null): P
   if (status === "delinquent") {
     return { stage: "delinquent", secondsToDeadline: remaining };
   }
-  // Open on-chain, but we already know how it ends — the proof is just in flight.
+  // Open on-chain, but we already know how it ends - the proof is just in flight.
   if (seen) {
     return { stage: "proving", xrplTxHash: seen.hash, secondsToDeadline: remaining };
   }

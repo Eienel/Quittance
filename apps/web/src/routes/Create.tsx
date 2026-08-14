@@ -34,7 +34,7 @@ export default function Create() {
     setBusy(true);
     setError(null);
     try {
-      // Both a ledger index and a timestamp — the FDC window is bounded by each.
+      // Both a ledger index and a timestamp - the FDC window is bounded by each.
       const deadline = await deadlineFromMinutes(Number(minutes));
       const { invoiceId } = await createInvoice(wallet.signer, {
         payeeAddressHash: remember(payee),

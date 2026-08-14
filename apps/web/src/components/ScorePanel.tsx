@@ -1,16 +1,16 @@
 import type { Score } from "@/lib/types";
 
 /**
- * The confidential score — the part that most needs the UI to tell a story.
+ * The confidential score - the part that most needs the UI to tell a story.
  *
  * What must land visually: the enclave reads the account's ENTIRE payment
- * history — every invoice, amount and date — and only this number comes out.
+ * history - every invoice, amount and date - and only this number comes out.
  * Consider showing the boundary literally: raw history on one side marked
  * "never exposed", the score crossing over.
  *
  * `basis` must always be visible. A 700 backed by two invoices is a different
  * claim from a 700 backed by forty, and hiding that would be the dishonest
- * version of this screen — a judge will poke at exactly this.
+ * version of this screen - a judge will poke at exactly this.
  */
 export default function ScorePanel({ score }: { score: Score }) {
   if (score.score === 0) {

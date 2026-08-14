@@ -4,8 +4,8 @@
  *
  * Every attestation this script obtains is confirmed by the Flare Data Connector. None
  * of them is forged, malformed, or replayed. Each one nonetheless asserts something that
- * would be false about the invoice it is aimed at, and a naive integration — verify the
- * Merkle proof, then act — would accept all of them.
+ * would be false about the invoice it is aimed at, and a naive integration - verify the
+ * Merkle proof, then act - would accept all of them.
  *
  * That is the point worth demonstrating: on Flare the hard part is not getting a proof,
  * it is establishing that the proof you got is about the obligation in front of you.
@@ -44,7 +44,7 @@ function errorName(err) {
 }
 
 /**
- * Attack 1 — the cherry-picked window.
+ * Attack 1 - the cherry-picked window.
  *
  * Take an invoice that was genuinely paid, and ask the FDC to prove that no payment
  * matching its terms exists inside a *narrow slice* of its ledger range, chosen to sit
@@ -60,7 +60,7 @@ async function cherryPickedWindow(invoiceId) {
   log(`invoice ${invoiceId} is ${["None", "Open", "Settled", "Delinquent"][Number(inv.status)]}`);
 
   // A five-ledger slice at the very end of the invoice's range. The payment settled this
-  // invoice early — as real payments to a known deadline usually do — so a window pressed
+  // invoice early - as real payments to a known deadline usually do - so a window pressed
   // up against the deadline genuinely contains no matching payment, and the FDC will
   // confirm its absence there. The slice is still *inside* the invoice's declared range,
   // which is exactly what the registry refuses to accept as a proof about the whole range.
@@ -83,7 +83,7 @@ async function cherryPickedWindow(invoiceId) {
   });
 
   const proof = await fdc.obtainProof(encoded, fdc.XRP_NONEXISTENCE_RESPONSE, log);
-  log("the FDC confirmed it — the attestation is genuine and its statement is true");
+  log("the FDC confirmed it - the attestation is genuine and its statement is true");
 
   try {
     await (await reg.registry().markDelinquent(invoiceId, proof)).wait();
@@ -112,7 +112,7 @@ async function cherryPickedWindow(invoiceId) {
 }
 
 /**
- * Attack 2 — the fabricated debt.
+ * Attack 2 - the fabricated debt.
  *
  * Anyone may write an invoice naming anyone as the payer. Let one lapse and the
  * nonexistence proof is entirely truthful: nobody paid. But nobody agreed to owe
@@ -144,14 +144,14 @@ async function fabricatedDebt(invoiceId) {
 }
 
 /**
- * Attack 3 — cross-chain substitution.
+ * Attack 3 - cross-chain substitution.
  *
  * The same request aimed at a different XRPL network. On mainnet the payee address and
  * destination tag are meaningless, so "no such payment" is trivially true there.
  *
  * NOT executable on Coston2: its FDC attests exactly one pair, (XRPPaymentNonexistence,
  * testXRP), and the verifier refuses the request before the FDC sees it. The registry
- * checks the origin anyway — a security property that rests on an upstream service's
+ * checks the origin anyway - a security property that rests on an upstream service's
  * current configuration is a property you will lose the moment that configuration
  * changes, and Flare is actively adding sources.
  */

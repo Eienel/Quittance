@@ -1,7 +1,7 @@
 /**
  * Every address and endpoint the app talks to.
  *
- * All of this is public testnet infrastructure — nothing here is a secret, and
+ * All of this is public testnet infrastructure - nothing here is a secret, and
  * the app never handles a private key. Users sign with their own wallet.
  */
 
@@ -37,7 +37,7 @@ export const XRPL = {
   explorer: "https://testnet.xrpl.org",
   /** XRPL close times count from 2000-01-01; add this to get Unix seconds. */
   epochOffset: 946_684_800,
-  /** Ledgers close roughly this often — used to turn a deadline in minutes into a ledger index. */
+  /** Ledgers close roughly this often - used to turn a deadline in minutes into a ledger index. */
   secondsPerLedger: 4,
 } as const;
 

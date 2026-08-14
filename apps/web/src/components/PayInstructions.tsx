@@ -12,7 +12,7 @@ import Countdown from "./Countdown";
  * with no record of what it settled. That is the single most likely way a live
  * demo fails.
  *
- * TODO(design): QR code from `uri` below. Any QR library works — it encodes the
+ * TODO(design): QR code from `uri` below. Any QR library works - it encodes the
  * standard XRPL payment URI, which most wallets parse into a prefilled send.
  */
 export default function PayInstructions({
@@ -20,7 +20,7 @@ export default function PayInstructions({
   payeeAddress,
 }: {
   invoice: Invoice;
-  /** Not derivable from the invoice — it stores only a hash. */
+  /** Not derivable from the invoice - it stores only a hash. */
   payeeAddress: string;
 }) {
   const uri = xrplPaymentUri(payeeAddress, invoice.amountDrops, invoice.destinationTag);
@@ -34,7 +34,7 @@ export default function PayInstructions({
         Payable from any XRPL wallet or exchange. Nothing to install.
       </p>
 
-      {/* 1 — amount */}
+      {/* 1 - amount */}
       <label>Send exactly</label>
       <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
         <span style={{ font: "700 1.6rem/1 var(--sans)", color: "var(--ink)" }}>
@@ -43,14 +43,14 @@ export default function PayInstructions({
         <span className="dim">XRP</span>
       </div>
 
-      {/* 2 — destination address */}
+      {/* 2 - destination address */}
       <label>To address</label>
       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
         <span className="mono" style={{ wordBreak: "break-all" }}>{payeeAddress}</span>
         <button className="copy" onClick={() => copy(payeeAddress)}>Copy</button>
       </div>
 
-      {/* 3 — the destination tag: the hero, and the single most-missed field */}
+      {/* 3 - the destination tag: the hero, and the single most-missed field */}
       <div className="tag-hero">
         <div className="tag-label">Destination tag · required</div>
         <div className="tag-value">{invoice.destinationTag}</div>
@@ -68,7 +68,7 @@ export default function PayInstructions({
         </span>
       </div>
 
-      {/* 4 — countdown + wallet URI */}
+      {/* 4 - countdown + wallet URI */}
       <div className="payment-footer">
         <div>
           <p className="dim" style={{ marginTop: 0 }}>

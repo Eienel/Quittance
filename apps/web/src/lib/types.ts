@@ -1,7 +1,7 @@
 /**
  * The shapes the contracts return, as the UI sees them.
  *
- * `bigint` throughout for anything that is a uint on-chain — do not narrow to
+ * `bigint` throughout for anything that is a uint on-chain - do not narrow to
  * `number` in the data layer. Convert at the point of display, where you know
  * the unit.
  */
@@ -16,7 +16,7 @@ export enum InvoiceStatus {
 /**
  * The registry is generic: an obligation is a deadline, an amount, a debtor, a
  * creditor, and a proof either way. "Invoice" is just the first thing you point it
- * at. This label lives in metadata and is UI-only — the contract is identical for
+ * at. This label lives in metadata and is UI-only - the contract is identical for
  * every kind, which is the whole claim that this is a primitive rather than an app.
  */
 export type ObligationKind = "invoice" | "deposit" | "coupon" | "sla";
@@ -42,7 +42,7 @@ export interface Invoice {
   payerAddressHash: string;
   /**
    * Whether the named debtor has admitted this debt. Anyone may *name* a payer, so an
-   * unacknowledged invoice can still be marked delinquent — but the mark reaches no
+   * unacknowledged invoice can still be marked delinquent - but the mark reaches no
    * payment record. Surface this: an unacknowledged mark is a claim, not a judgement.
    */
   acknowledged: boolean;
@@ -53,7 +53,7 @@ export interface Invoice {
    * the registry.
    */
   bondAmount: bigint;
-  /** Who gets it back on settlement — not necessarily the payer; guarantors are allowed. */
+  /** Who gets it back on settlement - not necessarily the payer; guarantors are allowed. */
   bondPoster: string;
   settledByAddressHash: string;
   outcomeTimestamp: bigint;
@@ -76,7 +76,7 @@ export type ScoreBand = "none" | "poor" | "fair" | "good" | "excellent";
  * history behind it.
  */
 export interface Score {
-  /** 300–850, or 0 meaning "no attested history" — render that as "no record". */
+  /** 300–850, or 0 meaning "no attested history" - render that as "no record". */
   score: number;
   band: ScoreBand;
   /** How many attested outcomes back the score. Always show this. */

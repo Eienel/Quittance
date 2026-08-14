@@ -7,7 +7,7 @@ import { formatXrp, formatTimestamp, looksLikeXrplAddress } from "@/lib/format";
  * The lender's view: what a counterparty sees before extending credit.
  *
  * A delinquency here is permanent and network-attested. Nobody can retract it,
- * including the issuer — that permanence is the value proposition and the copy
+ * including the issuer - that permanence is the value proposition and the copy
  * should say so.
  */
 export default function Record() {

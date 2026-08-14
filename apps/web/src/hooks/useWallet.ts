@@ -19,7 +19,7 @@ export interface WalletState {
 /**
  * Wallet connection, with the Coston2 network add/switch dance.
  *
- * Reads never need this — the app talks to a public RPC directly. Only issuing
+ * Reads never need this - the app talks to a public RPC directly. Only issuing
  * an invoice or requesting a score requires a signer.
  */
 export function useWallet() {

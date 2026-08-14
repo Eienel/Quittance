@@ -29,7 +29,7 @@ export const ZERO_HASH = ethers.ZeroHash;
 
 export const isBearer = (inv: Invoice): boolean => inv.payerAddressHash === ZERO_HASH;
 
-/** Loose check — enough to catch typos before a transaction, not a full validation. */
+/** Loose check - enough to catch typos before a transaction, not a full validation. */
 export const looksLikeXrplAddress = (s: string): boolean =>
   /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(s.trim());
 
@@ -40,7 +40,7 @@ export const truncate = (s: string, lead = 6, tail = 4): string =>
  * Map on-chain status to what the UI should show.
  *
  * The interesting case is an Open invoice past its deadline: on-chain it is
- * still Open, but its outcome is already determined — the delinquency proof is
+ * still Open, but its outcome is already determined - the delinquency proof is
  * just being produced. Showing that as "open" makes a working system look stuck.
  */
 export function displayStatus(inv: Invoice, nowUnix = Math.floor(Date.now() / 1000)): DisplayStatus {
@@ -59,7 +59,7 @@ export function displayStatus(inv: Invoice, nowUnix = Math.floor(Date.now() / 10
 export const secondsToDeadline = (inv: Invoice, nowUnix = Math.floor(Date.now() / 1000)): number =>
   Number(inv.deadlineTimestamp) - nowUnix;
 
-/** "2h 14m", "4m 03s", "past" — for countdowns. */
+/** "2h 14m", "4m 03s", "past" - for countdowns. */
 export function formatCountdown(seconds: number): string {
   if (seconds <= 0) return "past";
   const h = Math.floor(seconds / 3600);
@@ -75,7 +75,7 @@ export const formatTimestamp = (unix: bigint | number): string =>
 
 /**
  * The XRPL payment URI most wallets understand. Amount is in XRP, `dt` is the
- * destination tag — the one field that must not be lost.
+ * destination tag - the one field that must not be lost.
  */
 export const xrplPaymentUri = (payeeAddress: string, drops: bigint, destinationTag: number): string =>
   `ripple:${payeeAddress}?amount=${dropsToXrp(drops)}&dt=${destinationTag}`;

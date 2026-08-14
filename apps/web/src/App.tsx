@@ -38,7 +38,10 @@ export default function App() {
   return (
     <>
       <nav className={`${over ? "over" : ""}${menuOpen ? " menu-open" : ""}`.trim()}>
-        <Link to="/" className="brand">Plime</Link>
+        <Link to="/" className="brand" aria-label="Plime home">
+          <span className="brand-mark" aria-hidden="true" />
+          <span>Plime</span>
+        </Link>
         <div className={`nav-links${menuOpen ? " open" : ""}`}>
           <button className="drawer-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
             <span className="xicon"><i /><i /></span>
@@ -72,7 +75,7 @@ export default function App() {
       </nav>
       {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)} />}
 
-      {/* Floating notices — kept out of the page flow so they never shift the hero. */}
+      {/* Floating notices - kept out of the page flow so they never shift the hero. */}
       <div className="toasts">
         {fixtures && (
           <p className="toast-note">

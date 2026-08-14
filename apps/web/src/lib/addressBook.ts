@@ -3,7 +3,7 @@
  *
  * The chain stores keccak256 of the address, never the address itself, so an
  * invoice fetched cold cannot be rendered with a friendly `r...` name. We
- * remember every address the user types and resolve what we can — and show a
+ * remember every address the user types and resolve what we can - and show a
  * truncated hash for the rest rather than pretending we know.
  */
 import { addressHash } from "./format";
@@ -24,7 +24,7 @@ function save(book: Book): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(book));
   } catch {
-    // Storage full or blocked — the app still works, names just won't persist.
+    // Storage full or blocked - the app still works, names just won't persist.
   }
 }
 

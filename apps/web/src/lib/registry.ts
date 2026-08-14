@@ -57,7 +57,7 @@ export async function getInvoiceByTag(tag: number): Promise<Invoice> {
  * Most recent invoices first.
  *
  * Invoice ids start at 1, and there is no "get all" call. For long lists prefer
- * `getInvoicesByEvents` — this per-id loop is one RPC round trip per invoice and
+ * `getInvoicesByEvents` - this per-id loop is one RPC round trip per invoice and
  * is only reasonable for a page's worth.
  */
 export async function listInvoices(limit = 25, fromId?: number): Promise<Invoice[]> {
@@ -90,7 +90,7 @@ export async function getRecord(payerAddressHash: string): Promise<PayerRecord> 
 
 export interface CreateInvoiceArgs {
   payeeAddressHash: string;
-  /** Zero hash for a bearer invoice — anyone may settle, and a lapse marks nobody. */
+  /** Zero hash for a bearer invoice - anyone may settle, and a lapse marks nobody. */
   payerAddressHash: string;
   amountDrops: bigint;
   minimalBlockNumber: number;
@@ -101,7 +101,7 @@ export interface CreateInvoiceArgs {
 
 /**
  * Issue an invoice. The assigned destination tag comes from the `InvoiceCreated`
- * event — a transaction's return value is not readable, only its logs.
+ * event - a transaction's return value is not readable, only its logs.
  */
 export async function createInvoice(
   signer: ethers.Signer,
@@ -174,7 +174,7 @@ export async function requestScore(signer: ethers.Signer, payerAddressHash: stri
  * Turn a revert into something worth showing a user.
  *
  * These are real custom errors from InvoiceRegistry, and the field name in
- * ProofMismatch is usually the diagnosis — `destinationTag` almost always means
+ * ProofMismatch is usually the diagnosis - `destinationTag` almost always means
  * the payer sent XRP without the tag.
  */
 export function decodeRegistryError(err: unknown): string | null {

@@ -1,8 +1,8 @@
 /**
  * Live checks for the browser-side FDC pipeline.
  *
- * Only the read-only halves are exercised here — preparing a request and
- * fetching a finalized proof — because the write half spends gas. Those two are
+ * Only the read-only halves are exercised here - preparing a request and
+ * fetching a finalized proof - because the write half spends gas. Those two are
  * where the browser port could realistically break: request encoding, and the DA
  * layer's header rules.
  *
@@ -69,7 +69,7 @@ describe.skipIf(!live)("FDC pipeline", () => {
 
   /**
    * The DA layer's CORS allowlist does not include x-api-key, so the browser must
-   * not send it. This asserts the keyless call works — if that ever changes, the
+   * not send it. This asserts the keyless call works - if that ever changes, the
    * browser pipeline breaks and this catches it.
    */
   it("fetches a finalized proof without an API key", async () => {

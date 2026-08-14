@@ -5,14 +5,14 @@ import ScorePanel from "@/components/ScorePanel";
 import type { Score as ScoreType } from "@/lib/types";
 
 /**
- * Plime Confidential — the differentiator.
+ * Plime Confidential - the differentiator.
  *
  * STATUS: the on-chain request path and extension 66014 are real, but no TEE
  * machine or result proxy is registered yet. Until that end-to-end path exists,
  * this screen only returns a clearly labelled fixture preview.
  *
  * When the machine is live, the result arrives asynchronously from the enclave,
- * so this needs the same pending treatment as the proof flows — the request
+ * so this needs the same pending treatment as the proof flows - the request
  * transaction confirming is not the score arriving.
  */
 export default function Score() {

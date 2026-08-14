@@ -77,7 +77,7 @@ async function protocolContract(name, abi, runner) {
  *
  * A freshly submitted XRPL transaction is not attestable yet: the verifier requires
  * finality (3 confirmations, ~12 s) and answers `TRANSACTION DOES NOT EXIST` until then.
- * That is a race, not a rejection, so it is worth waiting out — whereas a genuinely
+ * That is a race, not a rejection, so it is worth waiting out - whereas a genuinely
  * malformed request fails the same way every time and should surface immediately.
  */
 async function prepareRequest(attestationName, sourcePath, requestBody, log = () => {}) {
@@ -123,7 +123,7 @@ function prepareXrpPaymentRequest(transactionId, log) {
 }
 
 /**
- * The request body here must mirror the invoice terms exactly — the registry
+ * The request body here must mirror the invoice terms exactly - the registry
  * enforces that on-chain, so any drift just produces an unusable proof.
  */
 function prepareNonexistenceRequest(invoice) {

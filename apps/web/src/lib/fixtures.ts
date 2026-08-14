@@ -4,12 +4,12 @@
  * strong payment record would take a day of invoices to build).
  *
  * Build screens against these first. `?fixtures=1` in the URL switches the whole
- * app onto them — see `useFixtures()`.
+ * app onto them - see `useFixtures()`.
  */
 import { InvoiceStatus, type Invoice, type PayerRecord, type Score } from "./types";
 import { ZERO_HASH } from "./format";
 
-/** From the live end-to-end run on Coston2 — these are real values. */
+/** From the live end-to-end run on Coston2 - these are real values. */
 export const LIVE = {
   payeeAddress: "rLthLtDGxNQSTz3m2uYWmM891gpHqBe7fs",
   payeeHash: "0x49ed1d1fbbb168b407d0836c6b3f900bc2551f017ae28f183c6ae3c41ec56b29",
@@ -44,7 +44,7 @@ export const invoices = {
   /** Open, ten minutes left. */
   open: () => base(),
 
-  /** Open with seconds left — for testing countdown urgency states. */
+  /** Open with seconds left - for testing countdown urgency states. */
   expiringSoon: () => base({ id: 2n, destinationTag: 2, deadlineTimestamp: BigInt(now() + 25) }),
 
   /**
@@ -80,13 +80,13 @@ export const invoices = {
 
   /**
    * A debt the named payer never admitted. Anyone can write an invoice naming
-   * anyone, so this can still be marked — but it reaches no payment record, and
+   * anyone, so this can still be marked - but it reaches no payment record, and
    * the UI must say so rather than presenting it as a judgement.
    */
   unacknowledged: () =>
     base({ id: 8n, destinationTag: 8, acknowledged: false, amountDrops: 1_000_000_000n }),
 
-  /** Bonded and open — the payer has real money riding on the deadline. */
+  /** Bonded and open - the payer has real money riding on the deadline. */
   bonded: () =>
     base({
       id: 10n,
@@ -166,7 +166,7 @@ export const records: Record<string, PayerRecord> = {
 };
 
 export const scores: Record<string, Score> = {
-  /** score 0 means no history — render as "no record", not a zero score. */
+  /** score 0 means no history - render as "no record", not a zero score. */
   none: { score: 0, band: "none", basis: 0, version: "plime-score-1" },
   /** One outcome. The `basis` is what stops this reading as a real judgement. */
   thin: { score: 546, band: "poor", basis: 1, version: "plime-score-1" },

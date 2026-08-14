@@ -30,7 +30,7 @@ async function fundNewAccount() {
  * Runs `fn` against the first XRPL endpoint that both connects and is in sync.
  *
  * A node that is up but still catching up answers `notSynced`, which is a
- * failure for our purposes — fail over rather than surfacing it as a dead end.
+ * failure for our purposes - fail over rather than surfacing it as a dead end.
  */
 async function withClient(fn) {
   const failures = [];
@@ -47,7 +47,7 @@ async function withClient(fn) {
     }
   }
 
-  throw new Error(`no usable XRPL endpoint — ${failures.join("; ")}`);
+  throw new Error(`no usable XRPL endpoint - ${failures.join("; ")}`);
 }
 
 /**
